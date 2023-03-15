@@ -11,7 +11,7 @@ class Variables:
     k_means = []
     number_of_features = 0
 
-    prev_centroids = None
+    prev_k_means = []
 
 
 class DefaultVariables:
@@ -57,7 +57,7 @@ def get_min() -> list:
 def pick_random_points():
     print("----")
     print("picking random starting points")
-    rand_poitns :list = []
+    rand_points :list = []
     # tmp_rand_points :list = []
 
     max_list = get_max()
@@ -70,10 +70,10 @@ def pick_random_points():
             # tmp_rand_points.append(random.random(min_list[i], max_list[i]))
             tmp_rand_points.append(round(random.uniform(min_list[i], max_list[i]), 2))
 
-        rand_poitns.append(tmp_rand_points)
+        rand_points.append(tmp_rand_points)
     
-    print(rand_poitns)
-    Variables.k_means = rand_poitns
+    print(rand_points)
+    Variables.k_means = rand_points
     print("----")
 
 
@@ -97,8 +97,26 @@ def iterations():
 
     print(points_sorted)
 
+
+    Variables.prev_k_means = Variables.k_means
+
+    new_k_means :list[float] = [0 for _ in range(Variables.k)]
+
+    for i in range(Variables.k):
+        new_k_means[i] = calc_mean(points_sorted[i])
+
+
+    # update_mean()
+
         # print(f"1.5 {tmp_dist}")
         # tmp_dist.sort()
+
+def calc_mean(points :list) -> float:
+    for i in range(Variables.k):
+        for p in points:
+            pass
+
+    return 0.0
 
 
 def ask_for_k_value():
