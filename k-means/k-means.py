@@ -7,9 +7,11 @@ import random
 
 class Variables:
     k = 0
-    k_points = []
-    k_medians = []
+    points = []
+    k_means = []
     number_of_features = 0
+
+    prev_centroids = None
 
 
 class DefaultVariables:
@@ -23,11 +25,11 @@ def get_max() -> list:
     print(f"print listy init {max}")
 
     for j in range(0,  Variables.number_of_features):
-        max.append(Variables.k_points[0][j])
+        max.append(Variables.points[0][j])
         print(f"print listy: {max}")
-        for i in range(1 , len(Variables.k_points)): #is inclusinve?
-            if max[j] < Variables.k_points[i][j]:
-                max[j] = Variables.k_points[i][j]
+        for i in range(1 , len(Variables.points)): #is inclusinve?
+            if max[j] < Variables.points[i][j]:
+                max[j] = Variables.points[i][j]
     
     print(f"print listy final {max}")
     print("-----")
@@ -41,11 +43,11 @@ def get_min() -> list:
     print(f"print listy init {min}")
 
     for j in range(0,  Variables.number_of_features):
-        min.append(Variables.k_points[0][j])
+        min.append(Variables.points[0][j])
         print(f"print listy: {min}")
-        for i in range(1 , len(Variables.k_points)): #is inclusinve?
-            if min[j] > Variables.k_points[i][j]:
-                min[j] = Variables.k_points[i][j]
+        for i in range(1 , len(Variables.points)): #is inclusinve?
+            if min[j] > Variables.points[i][j]:
+                min[j] = Variables.points[i][j]
     
     print(f"print listy final {min}")
     print("-----")
@@ -71,12 +73,32 @@ def pick_random_points():
         rand_poitns.append(tmp_rand_points)
     
     print(rand_poitns)
-    Variables.k_medians = rand_poitns
+    Variables.k_means = rand_poitns
     print("----")
 
 
 def iterations():
-    pass
+    points_sorted = [[] for _ in range(Variables.k)]
+    # tmp_dist :list[float] = [0 for _ in range(Variables.k)]
+    # print(tmp_dist)
+
+    for point in Variables.points:
+        tmp_dist :list[float] = [0 for _ in range(Variables.k)]
+        print(f"first {tmp_dist}")
+
+        for i in range(Variables.k):
+            tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
+
+        print(f"second {tmp_dist}")
+        which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
+        print(which_mean_closest)
+
+        points_sorted[which_mean_closest].append(point)
+
+    print(points_sorted)
+
+        # print(f"1.5 {tmp_dist}")
+        # tmp_dist.sort()
 
 
 def ask_for_k_value():
@@ -84,16 +106,17 @@ def ask_for_k_value():
 
 
 def calc_euclidean_distance(a: tuple, b: tuple) -> float:
+    print("eucal")
     # print(a)
     # print(len(a))
 
 
-    if len(a) != len(b):
-        print("tuples are of different size")
+    if len(a) -1 != len(b):
+        print("tuples are of wrong size. 'a'(first param) should be longer by 1 (last arg is the answer) ")
         return -1
     dist = 0
 
-    for i in range(0, len(a)):
+    for i in range(0, len(b)):
         dist += (a[i] - b[i]) ** 2
 
     print(f"c_e_d: {dist ** (1 / 2)}")
@@ -116,8 +139,8 @@ def dowload_data_set():
 
         # while f
         #   str = f.readline()
-    Variables.number_of_features = len(Variables.k_points[0]) - 1
-    print(f"asdf {len(Variables.k_points[0]) - 1}")
+    Variables.number_of_features = len(Variables.points[0]) - 1
+    print(f"asdf {len(Variables.points[0]) - 1}")
 
 def train():
     dowload_data_set()
@@ -130,7 +153,7 @@ def train():
 def get_data(line: str):
     print("----")
     print("getting data")
-    tmp_list: tuple = line.split()  # still a list
+    tmp_list: list = line.split()  # still a list
     print(tmp_list)
     print(type(tmp_list))
     print(len(tmp_list))
@@ -139,7 +162,7 @@ def get_data(line: str):
     int_tmp_list = [eval(i) for i in tmp_list]
     print("Modified list is: ", int_tmp_list)
 
-    Variables.k_points.append(int_tmp_list)
+    Variables.points.append(int_tmp_list)
     print("----")
     
 
@@ -155,3 +178,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    iterations()
