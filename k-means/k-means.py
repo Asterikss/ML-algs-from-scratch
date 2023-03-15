@@ -77,7 +77,8 @@ def pick_random_points():
     print("----")
 
 
-def iterations():
+def one_full_iter():
+    print("full one----@@@@@@@@@@@@")
     points_sorted = [[] for _ in range(Variables.k)]
     # tmp_dist :list[float] = [0 for _ in range(Variables.k)]
     # print(tmp_dist)
@@ -93,30 +94,59 @@ def iterations():
         which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
         print(which_mean_closest)
 
+        # with few data points there can be a situation where one list is empty.
+        # I devide by len of them later. Probably fix it there. Marked as @!@1
+        # or here just go through all lists and add a dumy point
         points_sorted[which_mean_closest].append(point)
 
     print(points_sorted)
 
 
+
     Variables.prev_k_means = Variables.k_means
 
+    new_k_means :list[float] = [0.0 for _ in range(Variables.k)]
+    # new_k_means = [0.0 for _ in range(Variables.k)]
+    # new_k_means :list[float] = []
+    # new_k_means :list[float] = [0 for _ in range(Variables.k)]
+
+    for i in range(Variables.k):
+        new_k_means[i] = calc_means(points_sorted[i])
+        # new_k_means.append(calc_means(points_sorted[i]))
+        # new_k_means[i] = 3.0
+
+    print(new_k_means)
+    
+    Variables.k_means = new_k_means
+
+    # print(calc_means([[1,4,5,6], [1,4,6,6], [2, 4, 6, 1]]))
+    print("full end----$$$$$$$$$$$$$$$")
+
+
+def interation_loop():
+    i = 0
+    #while i < DefaultVariables.max_iterations and Variables.k_means != Variables.prev_k_means:
+    while i < 4 and Variables.k_means != Variables.prev_k_means:
+        one_full_iter()
+
+    print(Variables.k_means)
+
+
+def calc_means(points :list) -> list[float]:
+    print("calc means")
     new_k_means :list[float] = [0 for _ in range(Variables.k)]
 
     for i in range(Variables.k):
-        new_k_means[i] = calc_mean(points_sorted[i])
+        sum = 0.0
+        mean = 0.0
+        for j in range(len(points)):
+            sum += points[j][i]
 
+        # @!@1
+        mean = sum/len(points)
+        new_k_means[i] = mean
 
-    # update_mean()
-
-        # print(f"1.5 {tmp_dist}")
-        # tmp_dist.sort()
-
-def calc_mean(points :list) -> float:
-    for i in range(Variables.k):
-        for p in points:
-            pass
-
-    return 0.0
+    return new_k_means
 
 
 def ask_for_k_value():
@@ -155,6 +185,11 @@ def dowload_data_set():
     get_data("2 2   6   2")
     get_data("2 2   6   2")
 
+    # get_data("3 4   2   0")
+    # get_data("4 3   4   1")
+    # get_data("3 2   5   1")
+
+
         # while f
         #   str = f.readline()
     Variables.number_of_features = len(Variables.points[0]) - 1
@@ -165,7 +200,8 @@ def train():
     # get_max()
     # get_min()
     pick_random_points()
-    
+
+    interation_loop()
 
 
 def get_data(line: str):
@@ -196,4 +232,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    iterations()
