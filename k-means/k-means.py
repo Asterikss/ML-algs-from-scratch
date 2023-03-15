@@ -195,13 +195,6 @@ def dowload_data_set():
     Variables.number_of_features = len(Variables.points[0]) - 1
     print(f"asdf {len(Variables.points[0]) - 1}")
 
-def train():
-    dowload_data_set()
-    # get_max()
-    # get_min()
-    pick_random_points()
-
-    interation_loop()
 
 
 def get_data(line: str):
@@ -220,14 +213,15 @@ def get_data(line: str):
     print("----")
     
 
+def train():
+    dowload_data_set()
+    pick_random_points()
+    interation_loop()
+
 
 def main():
-    # a = (1, 3, 5)
-    # b = (3, 1, 4)
-    # calc_euclidean_distance(a, b)
     ask_for_k_value()
     train()
-    
 
 
 if __name__ == "__main__":
