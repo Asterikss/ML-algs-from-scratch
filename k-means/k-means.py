@@ -251,8 +251,17 @@ def dowload_data_set(path: str, read_type: TypeOfRead):
     print(f"asdf {len(Variables.points[0]) - 1}")
 
 
-def predict_label(point :list):
-    pass
+def predict_label(point :tuple) -> int:
+    tmp_dist :list[float] = [0 for _ in range(Variables.k)]
+    print(f"first_in_label {tmp_dist}")
+
+    for i in range(Variables.k):
+        tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
+
+    print(f"second_in_label {tmp_dist}")
+    which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
+    print(which_mean_closest)
+    return which_mean_closest
 
 
 def predict():
@@ -272,6 +281,8 @@ def predict():
                 get_data(line, TypeOfRead.PREDICTING)
 
         print(Variables.predict_data)
+
+        predict_label(Variables.predict_data[0])
         
     
     print(f"End predict")
