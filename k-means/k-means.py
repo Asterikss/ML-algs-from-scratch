@@ -251,6 +251,10 @@ def dowload_data_set(path: str, read_type: TypeOfRead):
     print(f"asdf {len(Variables.points[0]) - 1}")
 
 
+def predict_label(point :list):
+    pass
+
+
 def predict():
     print(f"Begin predict")
 
@@ -268,6 +272,7 @@ def predict():
                 get_data(line, TypeOfRead.PREDICTING)
 
         print(Variables.predict_data)
+        
     
     print(f"End predict")
 
