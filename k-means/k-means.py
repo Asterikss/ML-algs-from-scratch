@@ -3,19 +3,27 @@
 # pyright: ignore [reportUnusedVariable=] - single line
 # https://towardsdatascience.com/create-your-own-k-means-clustering-algorithm-in-python-d7d4c9077670
 import random
+from enum import Enum
 
 
 class Variables:
     k = 0
+    data_loc = ""
     points = []
     k_means = []
     number_of_features = 0
-
     prev_k_means = []
+
+    predict_data = []
 
 
 class DefaultVariables:
     max_iterations = 300
+
+
+class TypeOfRead(Enum):
+    TRAINING = 0
+    PREDICTING = 1
 
 
 def get_max() -> list:
@@ -77,6 +85,47 @@ def pick_random_points():
     print("----")
 
 
+def calc_means(points :list) -> list[float]:
+    print("calc means")
+    new_k_means :list[float] = [0 for _ in range(Variables.k)]
+
+    for i in range(Variables.k):
+        sum = 0.0
+        mean = 0.0
+        for j in range(len(points)):
+            sum += points[j][i]
+
+        # @!@1
+        mean = sum/len(points)
+        new_k_means[i] = mean
+
+    return new_k_means
+
+
+def ask_for_k_value_and_data_loc():
+    Variables.k = int(input("Enter k value: "))
+    # TODO
+    Variables.data_loc = "iris_training.txt"
+
+
+def calc_euclidean_distance(a: tuple, b: tuple) -> float:
+    print("eucal")
+    # print(a)
+    # print(len(a))
+
+
+    if len(a) -1 != len(b):
+        print("tuples are of wrong size. 'a'(first param) should be longer by 1 (last arg is the answer) ")
+        return -1
+    dist = 0
+
+    for i in range(0, len(b)):
+        dist += (a[i] - b[i]) ** 2
+
+    print(f"c_e_d: {dist ** (1 / 2)}")
+    return dist ** (1 / 2)
+
+
 def one_full_iter():
     print("full one----@@@@@@@@@@@@")
     points_sorted = [[] for _ in range(Variables.k)]
@@ -94,12 +143,26 @@ def one_full_iter():
         which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
         print(which_mean_closest)
 
-        # with few data points there can be a situation where one list is empty.
-        # I devide by len of them later. Probably fix it there. Marked as @!@1
-        # or here just go through all lists and add a dumy point
         points_sorted[which_mean_closest].append(point)
 
     print(points_sorted)
+
+    # Sometimes, with few data points, there can be a situation where none
+    # of the points are closest to a particualr starting mean. Therefore
+    # an empty list is created. I'm populating it here with big numbers
+    # so none of the future points will be closest to that mean(point).
+    # Algorithm, by doing that, will suggest that their are less groups
+    # than entered by a user. Puting big numbers there is unnecesarry. 
+    # List can't be empty though, because I'm deviding by it's len later
+    for i in range(len(points_sorted)):
+        if len(points_sorted[i]) == 0:
+            points_sorted[i].append([1248 for _ in range(Variables.k)])
+            points_sorted[i][0].append(-1)
+            print("One of the lists created as an empty list.")
+            print("Now populated artificially.")
+            
+    print(points_sorted)
+
 
 
 
@@ -126,81 +189,17 @@ def one_full_iter():
 def interation_loop():
     i = 0
     #while i < DefaultVariables.max_iterations and Variables.k_means != Variables.prev_k_means:
-    while i < 4 and Variables.k_means != Variables.prev_k_means:
+    while i < 1 and Variables.k_means != Variables.prev_k_means:
         one_full_iter()
 
     print(Variables.k_means)
 
 
-def calc_means(points :list) -> list[float]:
-    print("calc means")
-    new_k_means :list[float] = [0 for _ in range(Variables.k)]
-
-    for i in range(Variables.k):
-        sum = 0.0
-        mean = 0.0
-        for j in range(len(points)):
-            sum += points[j][i]
-
-        # @!@1
-        mean = sum/len(points)
-        new_k_means[i] = mean
-
-    return new_k_means
-
-
-def ask_for_k_value():
-    Variables.k = int(input("Enter k value: "))
-
-
-def calc_euclidean_distance(a: tuple, b: tuple) -> float:
-    print("eucal")
-    # print(a)
-    # print(len(a))
-
-
-    if len(a) -1 != len(b):
-        print("tuples are of wrong size. 'a'(first param) should be longer by 1 (last arg is the answer) ")
-        return -1
-    dist = 0
-
-    for i in range(0, len(b)):
-        dist += (a[i] - b[i]) ** 2
-
-    print(f"c_e_d: {dist ** (1 / 2)}")
-    return dist ** (1 / 2)
-
-def dowload_data_set():
-    # f0 = open("data.txt", "r")
-
-    # with open("venv/data.txt", "r") as f:
-    #     for line in f:
-    #         print("a")
-    #         print(line)
-    #         get_data(line)
-
-    get_data("5 2   3   1")
-    get_data("2 5   1   0")
-    get_data("3 2   4   1")
-    get_data("2 2   6   2")
-    get_data("2 2   6   2")
-
-    # get_data("3 4   2   0")
-    # get_data("4 3   4   1")
-    # get_data("3 2   5   1")
-
-
-        # while f
-        #   str = f.readline()
-    Variables.number_of_features = len(Variables.points[0]) - 1
-    print(f"asdf {len(Variables.points[0]) - 1}")
-
-
-
-def get_data(line: str):
+#enum would be better
+def get_data(line: str, read_type: TypeOfRead):
     print("----")
     print("getting data")
-    tmp_list: list = line.split()  # still a list
+    tmp_list: list = line.split()
     print(tmp_list)
     print(type(tmp_list))
     print(len(tmp_list))
@@ -209,19 +208,69 @@ def get_data(line: str):
     int_tmp_list = [eval(i) for i in tmp_list]
     print("Modified list is: ", int_tmp_list)
 
-    Variables.points.append(int_tmp_list)
+    if read_type == TypeOfRead.TRAINING:
+        Variables.points.append(int_tmp_list)
+    else:
+        Variables.predict_data.append(int_tmp_list)
+
     print("----")
+ 
+
+def dowload_data_set(path: str, read_type: TypeOfRead):
+    # f0 = open("data.txt", "r")
+
+    # with open("venv/data.txt", "r") as f:
+    #     for line in f:
+    #         print("a")
+    #         print(line)
+    #         get_data(line)
+
+    get_data("5 2   3   1", read_type)
+    get_data("2 5   1   0", read_type)
+    get_data("3 2   4   1", read_type)
+    get_data("2 2   6   2", read_type)
+    get_data("2 2   6   2", read_type)
+
+    get_data("3 4   2   0", read_type)
+    get_data("4 3   4   1", read_type)
+    get_data("3 2   5   1", read_type)
+
+
+        # while f
+        #   str = f.readline()
+    Variables.number_of_features = len(Variables.points[0]) - 1
+    print(f"asdf {len(Variables.points[0]) - 1}")
+
+
+def predict():
+    choice = -1
+    while choice != 0 and choice != 1 and choice != 2:
+        print("For predicting data from the default file (iris_test.txt) type 0")
+        print("For custom guess (providing vector) type 1 ")
+        print("For predicting data from custom file type 2")
+        choice = int(input(": "))
+
+    if choice == 0:
+        with open("iris_test.txt", "r") as f:
+            for line in f:
+                print("a")
+                print(line)
+                get_data(line, TypeOfRead.PREDICTING)
+
+        print(Variables.predict_data)
     
 
 def train():
-    dowload_data_set()
+    dowload_data_set(Variables.data_loc, TypeOfRead.TRAINING)
     pick_random_points()
     interation_loop()
 
 
 def main():
-    ask_for_k_value()
+    ask_for_k_value_and_data_loc()
     train()
+    predict()
+
 
 
 if __name__ == "__main__":
