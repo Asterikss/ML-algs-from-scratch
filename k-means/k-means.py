@@ -111,7 +111,7 @@ def calc_means(points :list) -> list[float]:
 def ask_for_k_value_and_data_loc():
     Variables.k = int(input("Enter k value: "))
     # TODO
-    Variables.data_loc = "iris_training.txt"
+    Variables.data_loc = "data/iris_training.txt"
 
 
 def calc_euclidean_distance(a: tuple, b: tuple) -> float:
@@ -248,8 +248,9 @@ def dowload_data_set(data_loc :str, read_type: TypeOfRead):
 
         # while f
         #   str = f.readline()
-    Variables.number_of_features = len(Variables.points[0]) - 1
-    print(f"asdf {len(Variables.points[0]) - 1}")
+    if Variables.number_of_features == 0:
+        Variables.number_of_features = len(Variables.points[0]) - 1
+        print(f"asdf {len(Variables.points[0]) - 1}")
 
 
 def predict_label(point :tuple) -> int:
@@ -270,20 +271,27 @@ def predict():
 
     choice = -1
     while choice != 0 and choice != 1 and choice != 2:
-        print("For predicting data from the default file (iris_test.txt) type 0")
+        print("For predicting data from the default file (data/iris_test.txt) type 0")
         print("For custom guess (providing vector) type 1 ")
         print("For predicting data from custom file type 2")
         choice = int(input(": "))
 
     if choice == 0:
-        with open("iris_test.txt", "r") as f:
-            for line in f:
-                print(line)
-                get_data(line, TypeOfRead.PREDICTING)
+        dowload_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
+        # with open("data/iris_test.txt", "r") as f:
+        #     for line in f:
+        #         print(line)
+        #         get_data(line, TypeOfRead.PREDICTING)
 
         print(Variables.predict_data)
 
-        predict_label(Variables.predict_data[0])
+        label = predict_label(Variables.predict_data[0])
+        label_table = [0 for _ in range(Variables.k)] 
+
+        label_table[label] += 1
+
+        print("lable_table:")
+        print(label_table)
         
     
     print(f"End predict")
