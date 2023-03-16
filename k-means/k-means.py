@@ -305,7 +305,7 @@ def train():
 def main():
     ask_for_k_value_and_data_loc()
     train()
-    predict()
+    # predict()
 
 
 
