@@ -29,6 +29,9 @@ class TypeOfRead(Enum):
     TRAINING = 0
     PREDICTING = 1
 
+class DataLoc(Enum):
+    DEFAULT = 0
+    CUSTOM = 1
 
 def get_max() -> list:
     print("-----")
@@ -224,25 +227,23 @@ def get_data(line: str, read_type: TypeOfRead):
     print("----")
  
 
-def dowload_data_set(path: str, read_type: TypeOfRead):
+def dowload_data_set(data_loc :str, read_type: TypeOfRead):
     # f0 = open("data.txt", "r")
 
-    # with open("venv/data.txt", "r") as f:
-    #     for line in f:
-    #         print("a")
-    #         print(line)
-    #         get_data(line)
+    with open(data_loc, "r") as f:
+        for line in f:
+            get_data(line, read_type)
 
-    get_data("5.2   2.1   1.5   3   1", read_type)
-    get_data("5 2   3       3   1", read_type)
-    get_data("2 5   1   3   0", read_type)
-    get_data("3 2   4   3   1", read_type)
-    get_data("2 2   6   3   2", read_type)
-    get_data("2 2   6   3   2", read_type)
-
-    get_data("3 4   2   3   0", read_type)
-    get_data("4 3   4   3   1", read_type)
-    get_data("3 2   5   3   1", read_type)
+    # get_data("5.2   2.1   1.5   3   1", read_type)
+    # get_data("5 2   3       3   1", read_type)
+    # get_data("2 5   1   3   0", read_type)
+    # get_data("3 2   4   3   1", read_type)
+    # get_data("2 2   6   3   2", read_type)
+    # get_data("2 2   6   3   2", read_type)
+    #
+    # get_data("3 4   2   3   0", read_type)
+    # get_data("4 3   4   3   1", read_type)
+    # get_data("3 2   5   3   1", read_type)
 
 
         # while f
