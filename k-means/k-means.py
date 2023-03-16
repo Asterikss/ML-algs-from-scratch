@@ -2,6 +2,10 @@
 # pyright: ignore - single line (# type: ignore)
 # pyright: ignore [reportUnusedVariable=] - single line
 # https://towardsdatascience.com/create-your-own-k-means-clustering-algorithm-in-python-d7d4c9077670
+
+# Iris-setosa = 0
+# Iris-versicolor = 1
+# Iris-virginica = 2
 import random
 from enum import Enum
 
@@ -87,19 +91,18 @@ def pick_random_points():
 
 def calc_means(points :list) -> list[float]:
     print("calc means")
-    new_k_means :list[float] = [0 for _ in range(Variables.k)]
+    new_single_k_mean :list[float] = [0 for _ in range(Variables.number_of_features)]
 
-    for i in range(Variables.k):
+    for i in range(Variables.number_of_features):
         sum = 0.0
         mean = 0.0
         for j in range(len(points)):
             sum += points[j][i]
 
-        # @!@1
         mean = sum/len(points)
-        new_k_means[i] = mean
+        new_single_k_mean[i] = mean
 
-    return new_k_means
+    return new_single_k_mean
 
 
 def ask_for_k_value_and_data_loc():
@@ -168,7 +171,9 @@ def one_full_iter():
 
     Variables.prev_k_means = Variables.k_means
 
-    new_k_means :list[float] = [0.0 for _ in range(Variables.k)]
+    print(f"!!k_means: {Variables.prev_k_means}")
+
+    new_k_means :list[list[float]] = [[] for _ in range(Variables.k)]
     # new_k_means = [0.0 for _ in range(Variables.k)]
     # new_k_means :list[float] = []
     # new_k_means :list[float] = [0 for _ in range(Variables.k)]
@@ -191,8 +196,10 @@ def interation_loop():
     #while i < DefaultVariables.max_iterations and Variables.k_means != Variables.prev_k_means:
     while i < 1 and Variables.k_means != Variables.prev_k_means:
         one_full_iter()
+        i += 1
 
     print(Variables.k_means)
+    print("--End of interation loop--")
 
 
 #enum would be better
@@ -200,6 +207,7 @@ def get_data(line: str, read_type: TypeOfRead):
     print("----")
     print("getting data")
     tmp_list: list = line.split()
+    # tmp_list: list = line.split("   " || " ")
     print(tmp_list)
     print(type(tmp_list))
     print(len(tmp_list))
@@ -225,15 +233,16 @@ def dowload_data_set(path: str, read_type: TypeOfRead):
     #         print(line)
     #         get_data(line)
 
-    get_data("5 2   3   1", read_type)
-    get_data("2 5   1   0", read_type)
-    get_data("3 2   4   1", read_type)
-    get_data("2 2   6   2", read_type)
-    get_data("2 2   6   2", read_type)
+    get_data("5.2   2.1   1.5   3   1", read_type)
+    get_data("5 2   3       3   1", read_type)
+    get_data("2 5   1   3   0", read_type)
+    get_data("3 2   4   3   1", read_type)
+    get_data("2 2   6   3   2", read_type)
+    get_data("2 2   6   3   2", read_type)
 
-    get_data("3 4   2   0", read_type)
-    get_data("4 3   4   1", read_type)
-    get_data("3 2   5   1", read_type)
+    get_data("3 4   2   3   0", read_type)
+    get_data("4 3   4   3   1", read_type)
+    get_data("3 2   5   3   1", read_type)
 
 
         # while f
@@ -243,6 +252,8 @@ def dowload_data_set(path: str, read_type: TypeOfRead):
 
 
 def predict():
+    print(f"Begin predict")
+
     choice = -1
     while choice != 0 and choice != 1 and choice != 2:
         print("For predicting data from the default file (iris_test.txt) type 0")
@@ -253,12 +264,12 @@ def predict():
     if choice == 0:
         with open("iris_test.txt", "r") as f:
             for line in f:
-                print("a")
                 print(line)
                 get_data(line, TypeOfRead.PREDICTING)
 
         print(Variables.predict_data)
     
+    print(f"End predict")
 
 def train():
     dowload_data_set(Variables.data_loc, TypeOfRead.TRAINING)
