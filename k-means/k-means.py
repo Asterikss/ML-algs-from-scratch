@@ -9,6 +9,8 @@
 import random
 from enum import Enum
 
+# import logging
+# logging.basicConfig(filename='log_k-means.log', level=logging.DEBUG)
 
 class Variables:
     k = 0
@@ -70,6 +72,15 @@ def get_min() -> list:
 
 
 def pick_random_points():
+    '''
+    Calc min and max for each feature. Calc the interval beetween min and max for each of them.
+    Devide it by the number of means. Calc single feature in single mean by picking random value
+    beetween min and min + devided interval. Calc the same feature, but for the next mean pick
+    a value beetween min + devided interval and min + devided interval * 2. And so on.
+    It makes in unlikely that there will be no points assigned to a given mean. Therefore no
+    need to populate in artificially or trying to drop it alltogether. Plus they are more
+    evenly distribuated which given reasonable data and k-value will improve results
+    '''
     print("----")
     print("picking random starting points")
     rand_points :list = []
@@ -77,13 +88,27 @@ def pick_random_points():
 
     max_list = get_max()
     min_list = get_min()
+    #interval :list = max_list - min_list
+    #intervals :list = [max_list[i] - min_list[i] for i in range(Variables.number_of_features)]
+    intervals :list = [round(max_list[i] - min_list[i], 2) for i in range(Variables.number_of_features)]
 
-    for i in range(Variables.k):
+    print("----!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print(max_list)
+    print(min_list)
+    print(intervals)
+
+    for i in range(Variables.number_of_features):
+        #intervals[i] = (intervals[i] / Variables.k)
+        intervals[i] = round((intervals[i] / Variables.k), 1)
+
+    print(intervals)
+    print("----!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+    for i in range(1, Variables.k + 1):
         tmp_rand_points :list = []
 
-        for i in range(Variables.number_of_features):
-            # tmp_rand_points.append(random.random(min_list[i], max_list[i]))
-            tmp_rand_points.append(round(random.uniform(min_list[i], max_list[i]), 2))
+        for j in range(Variables.number_of_features):
+            tmp_rand_points.append(round(random.uniform(min_list[j] + (intervals[j] * (i - 1)), min_list[j] + (intervals[j] * i)), 2))
 
         rand_points.append(tmp_rand_points)
     
@@ -299,7 +324,7 @@ def predict():
 def train():
     dowload_data_set(Variables.data_loc, TypeOfRead.TRAINING)
     pick_random_points()
-    interation_loop()
+    # interation_loop()
 
 
 def main():
