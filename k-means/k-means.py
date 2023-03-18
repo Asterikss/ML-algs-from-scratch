@@ -31,47 +31,45 @@ class TypeOfRead(Enum):
     TRAINING = 0
     PREDICTING = 1
 
-class DataLoc(Enum):
-    DEFAULT = 0
-    CUSTOM = 1
+# class DataLoc(Enum):
+#     DEFAULT = 0
+#     CUSTOM = 1
 
 def get_max() -> list:
-    print("-----")
+    print("v")
     print(f"calculating max for {Variables.number_of_features} features")
     max: list = []
-    print(f"print listy init {max}")
 
     for j in range(0,  Variables.number_of_features):
         max.append(Variables.points[0][j])
-        print(f"print listy: {max}")
         for i in range(1 , len(Variables.points)): #is inclusinve?
             if max[j] < Variables.points[i][j]:
                 max[j] = Variables.points[i][j]
     
-    print(f"print listy final {max}")
-    print("-----")
+    print(f"max list: {max}")
+    print("^")
     return max
 
 
 def get_min() -> list:
-    print("-----")
+    print("v")
     print(f"calculating min for {Variables.number_of_features} features")
     min: list = []
-    print(f"print listy init {min}")
 
     for j in range(0,  Variables.number_of_features):
         min.append(Variables.points[0][j])
-        print(f"print listy: {min}")
         for i in range(1 , len(Variables.points)): #is inclusinve?
             if min[j] > Variables.points[i][j]:
                 min[j] = Variables.points[i][j]
     
-    print(f"print listy final {min}")
-    print("-----")
+    print(f"min list: {min}")
+    print("^")
     return min
 
 
 def pick_random_points():
+    print("v")
+    print("picking random points")
     '''
     Calc min and max for each feature. Calc the interval beetween min and max for each of them.
     Devide it by the number of means. Calc single feature in single mean by picking random value
@@ -92,9 +90,8 @@ def pick_random_points():
     #intervals :list = [max_list[i] - min_list[i] for i in range(Variables.number_of_features)]
     intervals :list = [round(max_list[i] - min_list[i], 2) for i in range(Variables.number_of_features)]
 
-    print("----!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    print(max_list)
-    print(min_list)
+    # print(max_list)
+    # print(min_list)
     print(intervals)
 
     for i in range(Variables.number_of_features):
@@ -102,7 +99,6 @@ def pick_random_points():
         intervals[i] = round((intervals[i] / Variables.k), 1)
 
     print(intervals)
-    print("----!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
     for i in range(1, Variables.k + 1):
         tmp_rand_points :list = []
@@ -112,13 +108,14 @@ def pick_random_points():
 
         rand_points.append(tmp_rand_points)
     
-    print(rand_points)
+    print(f"means: {rand_points}")
     Variables.k_means = rand_points
-    print("----")
+    print("^")
 
 
 def calc_means(points :list) -> list[float]:
-    print("calc means")
+    print("v")
+    print("calculating means")
     new_single_k_mean :list[float] = [0 for _ in range(Variables.number_of_features)]
 
     for i in range(Variables.number_of_features):
@@ -130,6 +127,7 @@ def calc_means(points :list) -> list[float]:
         mean = sum/len(points)
         new_single_k_mean[i] = mean
 
+    print("^")
     return new_single_k_mean
 
 
@@ -230,10 +228,8 @@ def interation_loop():
     print("--End of interation loop--")
 
 
-#enum would be better
 def get_data(line: str, read_type: TypeOfRead):
-    print("----")
-    print("getting data")
+    # print("getting data")
     tmp_list: list = line.split()
     # tmp_list: list = line.split("   " || " ")
     print(tmp_list)
@@ -242,17 +238,17 @@ def get_data(line: str, read_type: TypeOfRead):
 
     # lis = ['1', '-4', '3', '-6', '7']
     int_tmp_list = [eval(i) for i in tmp_list]
-    print("Modified list is: ", int_tmp_list)
+    # print("Modified list is: ", int_tmp_list)
 
     if read_type == TypeOfRead.TRAINING:
         Variables.points.append(int_tmp_list)
     else:
         Variables.predict_data.append(int_tmp_list)
-
-    print("----")
  
 
-def dowload_data_set(data_loc :str, read_type: TypeOfRead):
+def download_data_set(data_loc :str, read_type: TypeOfRead):
+    print("v")
+    print("downloading data det")
     # f0 = open("data.txt", "r")
 
     with open(data_loc, "r") as f:
@@ -302,7 +298,7 @@ def predict():
         choice = int(input(": "))
 
     if choice == 0:
-        dowload_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
+        download_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
         # with open("data/iris_test.txt", "r") as f:
         #     for line in f:
         #         print(line)
@@ -322,9 +318,9 @@ def predict():
     print(f"End predict")
 
 def train():
-    dowload_data_set(Variables.data_loc, TypeOfRead.TRAINING)
+    download_data_set(Variables.data_loc, TypeOfRead.TRAINING)
     pick_random_points()
-    # interation_loop()
+    interation_loop()
 
 
 def main():
