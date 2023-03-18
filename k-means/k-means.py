@@ -122,7 +122,7 @@ def calc_means(points :list) -> list[float]:
         for j in range(len(points)):
             sum += points[j][i]
 
-        mean = sum/len(points)
+        mean = round(sum/len(points), 2)
         new_single_k_mean[i] = mean
 
     print("^")
@@ -130,9 +130,30 @@ def calc_means(points :list) -> list[float]:
 
 
 def ask_for_k_value_and_data_loc():
-    Variables.k = int(input("Enter k value: "))
-    # TODO
-    Variables.data_loc = "data/iris_training.txt"
+    missing_input = True
+
+    while missing_input:
+        k = int(input("Enter k value: "))
+        if 0 < k < 7:
+            Variables.k = k
+            missing_input = False
+        else:
+            print("K beetween 1 and 6")
+
+    missing_input = True
+    while missing_input:
+        data_loc = int(input("For default data location type 1. Otherwise type 0: "))
+        if data_loc == 1:
+            Variables.data_loc = "data/iris_training.txt"
+            missing_input = False
+        elif data_loc == 0:
+            data_loc = str(input("Enter custom data location: "))
+            Variables.data_loc = data_loc
+            missing_input = False
+        else:
+            print("Enter valid input")
+
+    # Variables.data_loc = "data/iris_training.txt"
 
 
 def calc_euclidean_distance(a: tuple, b: tuple) -> float:
@@ -155,8 +176,8 @@ def calc_euclidean_distance(a: tuple, b: tuple) -> float:
 
 
 def one_full_iter():
-    print("v")
-    print("full one----@@@@@@@@@@@@")
+    # print("v")
+    # print("full one----@@@@@@@@@@@@")
     points_sorted = [[] for _ in range(Variables.k)]
     # tmp_dist :list[float] = [0 for _ in range(Variables.k)]
     # print(tmp_dist)
@@ -174,7 +195,7 @@ def one_full_iter():
 
         points_sorted[which_mean_closest].append(point)
 
-    print(points_sorted)
+    # print(points_sorted)
 
     # Sometimes, with few data points, there can be a situation where none
     # of the points are closest to a particualr starting mean. Therefore
@@ -214,8 +235,8 @@ def one_full_iter():
     Variables.k_means = new_k_means
 
     # print(calc_means([[1,4,5,6], [1,4,6,6], [2, 4, 6, 1]]))
-    print("full end----$$$$$$$$$$$$$$$")
-    print("^")
+    # print("full end----$$$$$$$$$$$$$$$")
+    # print("^")
 
 
 def interation_loop():
@@ -226,6 +247,7 @@ def interation_loop():
     while i < 1 and Variables.k_means != Variables.prev_k_means:
         one_full_iter()
         i += 1
+        print(f"inter {i}")
 
     # print(Variables.k_means)
     print("--End of interation loop--")
@@ -289,21 +311,23 @@ def predict_label(point :tuple) -> int:
 
     print(f"second_in_label {tmp_dist}")
     which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
-    print(which_mean_closest)
+    #print(f"Prediction: predicted to be associated with label {which_mean_closest}")
+    #print(f"Prediction: To be associated with label {which_mean_closest}")
+    print(f"Prediction: Label {which_mean_closest}")
     return which_mean_closest
 
 
 def predict():
-    print(f"Begin predict")
+    print(f"Begin prediction")
 
     choice = -1
     while choice != 0 and choice != 1 and choice != 2:
-        print("For predicting data from the default file (data/iris_test.txt) type 0")
-        print("For custom guess (providing vector) type 1 ")
-        print("For predicting data from custom file type 2")
+        print("For predicting data from the default file (data/iris_test.txt) type 1")
+        print("For custom guess (providing a vector) type 2 ")
+        print("For predicting data from custom file type 3")
         choice = int(input(": "))
 
-    if choice == 0:
+    if choice == 1:
         download_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
         # with open("data/iris_test.txt", "r") as f:
         #     for line in f:
@@ -321,7 +345,7 @@ def predict():
         print(label_table)
         
     
-    print(f"End predict")
+    print(f"End prediction")
 
 def train():
     download_data_set(Variables.data_loc, TypeOfRead.TRAINING)
@@ -332,7 +356,7 @@ def train():
 def main():
     ask_for_k_value_and_data_loc()
     train()
-    # predict()
+    predict()
 
 
 
