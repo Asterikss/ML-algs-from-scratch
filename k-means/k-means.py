@@ -69,7 +69,7 @@ def get_min() -> list:
 
 def pick_random_points():
     print("v")
-    print("picking random points")
+    print("picking centroids")
     '''
     Calc min and max for each feature. Calc the interval beetween min and max for each of them.
     Devide it by the number of means. Calc single feature in single mean by picking random value
@@ -79,8 +79,6 @@ def pick_random_points():
     need to populate in artificially or trying to drop it alltogether. Plus they are more
     evenly distribuated which given reasonable data and k-value will improve results
     '''
-    print("----")
-    print("picking random starting points")
     rand_points :list = []
     # tmp_rand_points :list = []
 
@@ -138,7 +136,7 @@ def ask_for_k_value_and_data_loc():
 
 
 def calc_euclidean_distance(a: tuple, b: tuple) -> float:
-    print("eucal")
+    # print("eucal")
     # print(a)
     # print(len(a))
 
@@ -151,11 +149,13 @@ def calc_euclidean_distance(a: tuple, b: tuple) -> float:
     for i in range(0, len(b)):
         dist += (a[i] - b[i]) ** 2
 
-    print(f"c_e_d: {dist ** (1 / 2)}")
+    # print(f"c_e_d: {dist ** (1 / 2)}")
+    #TODO można chyba nie pierwiastkować
     return dist ** (1 / 2)
 
 
 def one_full_iter():
+    print("v")
     print("full one----@@@@@@@@@@@@")
     points_sorted = [[] for _ in range(Variables.k)]
     # tmp_dist :list[float] = [0 for _ in range(Variables.k)]
@@ -163,14 +163,14 @@ def one_full_iter():
 
     for point in Variables.points:
         tmp_dist :list[float] = [0 for _ in range(Variables.k)]
-        print(f"first {tmp_dist}")
+        # print(f"first {tmp_dist}")
 
         for i in range(Variables.k):
             tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
 
-        print(f"second {tmp_dist}")
+        # print(f"second {tmp_dist}")
         which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
-        print(which_mean_closest)
+        # print(which_mean_closest)
 
         points_sorted[which_mean_closest].append(point)
 
@@ -190,14 +190,14 @@ def one_full_iter():
             print("One of the lists created as an empty list.")
             print("Now populated artificially.")
             
-    print(points_sorted)
+    # print(points_sorted)
 
 
 
 
     Variables.prev_k_means = Variables.k_means
 
-    print(f"!!k_means: {Variables.prev_k_means}")
+    print(f"prev k_means: {Variables.prev_k_means}")
 
     new_k_means :list[list[float]] = [[] for _ in range(Variables.k)]
     # new_k_means = [0.0 for _ in range(Variables.k)]
@@ -209,32 +209,36 @@ def one_full_iter():
         # new_k_means.append(calc_means(points_sorted[i]))
         # new_k_means[i] = 3.0
 
-    print(new_k_means)
+    print(f"new k_means {new_k_means}")
     
     Variables.k_means = new_k_means
 
     # print(calc_means([[1,4,5,6], [1,4,6,6], [2, 4, 6, 1]]))
     print("full end----$$$$$$$$$$$$$$$")
+    print("^")
 
 
 def interation_loop():
+    print("v")
+    print("--Start of interation loop--")
     i = 0
     #while i < DefaultVariables.max_iterations and Variables.k_means != Variables.prev_k_means:
     while i < 1 and Variables.k_means != Variables.prev_k_means:
         one_full_iter()
         i += 1
 
-    print(Variables.k_means)
+    # print(Variables.k_means)
     print("--End of interation loop--")
+    print("^")
 
 
 def get_data(line: str, read_type: TypeOfRead):
     # print("getting data")
     tmp_list: list = line.split()
     # tmp_list: list = line.split("   " || " ")
-    print(tmp_list)
-    print(type(tmp_list))
-    print(len(tmp_list))
+    # print(tmp_list)
+    # print(type(tmp_list))
+    # print(len(tmp_list))
 
     # lis = ['1', '-4', '3', '-6', '7']
     int_tmp_list = [eval(i) for i in tmp_list]
@@ -269,9 +273,11 @@ def download_data_set(data_loc :str, read_type: TypeOfRead):
 
         # while f
         #   str = f.readline()
-    if Variables.number_of_features == 0:
+    #if Variables.number_of_features == 0:
+    if read_type == TypeOfRead.TRAINING:
         Variables.number_of_features = len(Variables.points[0]) - 1
-        print(f"asdf {len(Variables.points[0]) - 1}")
+        print(f"number of features {len(Variables.points[0]) - 1}")
+    print("^")
 
 
 def predict_label(point :tuple) -> int:
