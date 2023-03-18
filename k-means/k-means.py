@@ -171,8 +171,9 @@ def calc_euclidean_distance(a: tuple, b: tuple) -> float:
         dist += (a[i] - b[i]) ** 2
 
     # print(f"c_e_d: {dist ** (1 / 2)}")
-    #TODO można chyba nie pierwiastkować
-    return dist ** (1 / 2)
+
+    #return dist ** (1 / 2)
+    return round(dist, 3)
 
 
 def one_full_iter():
@@ -304,12 +305,12 @@ def download_data_set(data_loc :str, read_type: TypeOfRead):
 
 def predict_label(point :tuple) -> int:
     tmp_dist :list[float] = [0 for _ in range(Variables.k)]
-    print(f"first_in_label {tmp_dist}")
+    # print(f"first_in_label {tmp_dist}")
 
     for i in range(Variables.k):
         tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
 
-    print(f"second_in_label {tmp_dist}")
+    # print(f"second_in_label {tmp_dist}")
     which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
     #print(f"Prediction: predicted to be associated with label {which_mean_closest}")
     #print(f"Prediction: To be associated with label {which_mean_closest}")
@@ -336,10 +337,16 @@ def predict():
 
         print(Variables.predict_data)
 
-        label = predict_label(Variables.predict_data[0])
         label_table = [0 for _ in range(Variables.k)] 
 
-        label_table[label] += 1
+        for observation in Variables.predict_data:
+            label = predict_label(observation)
+            label_table[label] += 1
+
+        # label = predict_label(Variables.predict_data[0])
+        # label_table = [0 for _ in range(Variables.k)] 
+
+        # label_table[label] += 1
 
         print("lable_table:")
         print(label_table)
