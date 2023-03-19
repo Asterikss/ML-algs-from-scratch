@@ -6,7 +6,6 @@
 # Iris-setosa = 0
 # Iris-versicolor = 1
 # Iris-virginica = 2
-from os import dup
 import random
 from enum import Enum
 
@@ -25,30 +24,23 @@ class Variables:
 
 
 class DefaultVariables:
-    #max_iterations = 10
     max_iterations = 10
-    threshold = 0.0009
+    threshold = 0.000001
 
 
 class TypeOfRead(Enum):
     TRAINING = 0
     PREDICTING = 1
 
-# class DataLoc(Enum):
-#     DEFAULT = 0
-#     CUSTOM = 1
 
 def is_done_iterating() -> bool:
-    # k_long_list = [0 for _ in range(Variables.k)]
-
-    # for i in range(0, len(Variables.number_of_features)):
     for i in range(Variables.k):
         dist = 0
         for j in range(Variables.number_of_features):
             dist += (Variables.prev_k_means[i][j] - Variables.k_means[i][j]) ** 2
 
-        print("ASDASD")
-        print(dist)
+        # print("ASDASD")
+        # print(dist)
         if dist < DefaultVariables.threshold:
             print("Reached threshold")
             return True
