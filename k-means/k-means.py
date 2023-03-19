@@ -1,23 +1,14 @@
-# pyright: reportUnusedVariable=false
-# pyright: ignore - single line (# type: ignore)
-# pyright: ignore [reportUnusedVariable=] - single line
-# https://towardsdatascience.com/create-your-own-k-means-clustering-algorithm-in-python-d7d4c9077670
 # use pathlib later
-# use parsing library. json, pydantic
-
 # @dataclass
-## class classname(object):
-# class classname(order = True, frozen = True):
-#   pass
+# class classname(frozen = True):
 
-# Iris-setosa = 0
-# Iris-versicolor = 1
-# Iris-virginica = 2
+# originally in default files
+# 0 = Iris-setosa
+# 1 = Iris-versicolor
+# 2 = Iris-virginica
 import random
 from enum import Enum
 import logging
-# from dataclasses import dataclass
-# from collections import Counter
 
 class Variables:
     k = 0
@@ -26,7 +17,6 @@ class Variables:
     k_means = []
     number_of_features = 0
     prev_k_means = []
-
     predict_data = []
 
 
@@ -39,7 +29,7 @@ class DefaultVariables:
     # filename = 'log_k-means.log', filemode = "w"
 
 class TypeOfRead(Enum):
-    # this shows an error for some reason TRAINING, PREDICTING = range(2)
+    # TRAINING, PREDICTING = range(2) - this shows an error for some reason
     TRAINING = 0
     PREDICTING = 1
 
@@ -50,13 +40,12 @@ def is_done_iterating() -> bool:
         for j in range(Variables.number_of_features):
             dist += (Variables.prev_k_means[i][j] - Variables.k_means[i][j]) ** 2
 
-        # print("ASDASD")
-        # print(dist)
         if dist < DefaultVariables.threshold:
             print("~Threshold reached~")
             return True
 
     return False
+
 
 def get_max() -> list:
     print("v")
@@ -96,7 +85,7 @@ def pick_random_points():
     '''
     Calc min and max for each feature. Calc the interval beetween min and max for each of them.
     Devide it by the number of means. Calc single feature in single mean by picking random value
-    beetween min and min + devided interval. Calc the same feature, but for the next mean pick
+    beetween min and min + devided interval. Calc the same feature, but for the next mean - pick
     a value beetween min + devided interval and min + devided interval * 2. And so on.
     It makes in unlikely that there will be no points assigned to a given mean. Therefore no
     need to populate in artificially or trying to drop it alltogether. Plus they are more
@@ -253,6 +242,7 @@ def get_data(line: str, read_type: TypeOfRead):
 
     parsed_tmp_list = [eval(i) for i in tmp_list]
 
+    # code for dealing with clusters described using a string
     # parsed_tmp_list2 = []
     # for i in range(len(tmp_list) - 1):
     #     parsed_tmp_list2.append(eval(tmp_list[i]))
@@ -364,7 +354,6 @@ def train():
 
 
 def main():
-    logging.error("eeaea")
     ask_for_k_value_and_data_loc()
     train()
     predict()
