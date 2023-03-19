@@ -35,20 +35,13 @@ class DefaultVariables:
     level = logging.INFO
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
     logging.basicConfig(level = level, format = fmt)
-    # Debug, Info, Warning, Error, Critical
-    # filename = 'log_k-means.log'
-    # filemode = "w"
-    # format = "%(name)s:%(funcName)s:%(asctime)s"
-
+    # filename = 'log_k-means.log', filemode = "w"
 
 class TypeOfRead(Enum):
-    TRAINING = 0
-    PREDICTING = 1
-    # TRAINING, PREDICTING = range(2)
+    TRAINING, PREDICTING = range(2)
 
 
 def is_done_iterating() -> bool:
-    logging.error("eeaea")
     for i in range(Variables.k):
         dist = 0
         for j in range(Variables.number_of_features):
@@ -73,7 +66,7 @@ def get_max() -> list:
             if max[j] < Variables.points[i][j]:
                 max[j] = Variables.points[i][j]
     
-    print(f"max list: {max}")
+    logging.debug(f"max list: {max}")
     print("^")
     return max
 
@@ -115,12 +108,11 @@ def pick_random_points():
     #intervals :list = [max_list[i] - min_list[i] for i in range(Variables.number_of_features)]
     intervals :list = [round(max_list[i] - min_list[i], 2) for i in range(Variables.number_of_features)]
 
-    # print(max_list)
-    # print(min_list)
+    logging.debug(max_list)
+    logging.debug(min_list)
     print(intervals)
 
     for i in range(Variables.number_of_features):
-        #intervals[i] = (intervals[i] / Variables.k)
         intervals[i] = round((intervals[i] / Variables.k), 1)
 
     print(intervals)
@@ -374,10 +366,21 @@ def predict():
             predictions[label[0]] += 1
             actual_labels[label[1]] += 1
 
+        accuracy_table = [1 - round((abs(predictions[i] - actual_labels[i])/actual_labels[i]), 3) for i in range(Variables.k)] 
+        total_acc = 0
+
+        for e in accuracy_table:
+            total_acc += e
+        total_acc /= Variables.k
+
         print("predictions:")
         print(predictions)
         print("acutal labels:")
         print(actual_labels)
+        print("accuracy_table: ")
+        print(accuracy_table)
+        print("Total accuracy: ")
+        print(total_acc)
     
     print("^")
 
