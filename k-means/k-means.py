@@ -5,7 +5,6 @@
 # use pathlib later
 # use parsing library. json, pydantic
 
-# from dataclasses import dataclass
 # @dataclass
 ## class classname(object):
 # class classname(order = True, frozen = True):
@@ -17,7 +16,8 @@
 import random
 from enum import Enum
 import logging
-from collections import Counter
+# from dataclasses import dataclass
+# from collections import Counter
 
 class Variables:
     k = 0
@@ -53,7 +53,7 @@ def is_done_iterating() -> bool:
         # print("ASDASD")
         # print(dist)
         if dist < DefaultVariables.threshold:
-            print("Reached threshold")
+            print("~Threshold reached~")
             return True
 
     return False
@@ -85,7 +85,7 @@ def get_min() -> list:
             if min[j] > Variables.points[i][j]:
                 min[j] = Variables.points[i][j]
     
-    print(f"min list: {min}")
+    logging.debug(f"min list: {min}")
     print("^")
     return min
 
@@ -103,22 +103,18 @@ def pick_random_points():
     evenly distribuated which given reasonable data and k-value will improve results
     '''
     rand_points :list = []
-    # tmp_rand_points :list = []
 
     max_list = get_max()
     min_list = get_min()
-    #interval :list = max_list - min_list
-    #intervals :list = [max_list[i] - min_list[i] for i in range(Variables.number_of_features)]
+
     intervals :list = [round(max_list[i] - min_list[i], 2) for i in range(Variables.number_of_features)]
 
-    logging.debug(max_list)
-    logging.debug(min_list)
-    print(intervals)
+    logging.debug(f"intervals: {intervals}")
 
     for i in range(Variables.number_of_features):
         intervals[i] = round((intervals[i] / Variables.k), 1)
 
-    print(intervals)
+    logging.debug(f"intervals2: {intervals}")
 
     for i in range(1, Variables.k + 1):
         tmp_rand_points :list = []
@@ -175,50 +171,40 @@ def ask_for_k_value_and_data_loc():
         else:
             print("Enter valid input")
 
-    # Variables.data_loc = "data/iris_training.txt"
-
 
 def calc_euclidean_distance(a: tuple, b: tuple) -> float:
     if len(a) -1 != len(b):
-        print("tuples are of wrong size. 'a'(first param) should be longer by 1 (last arg is the answer) ")
+        print("tuples (points) are of wrong size")
+        print("'a'(first param) should be longer by 1 (last arg is the actual cluster) ")
         return -1
-    dist = 0
 
+    dist = 0
     for i in range(0, len(b)):
         dist += (a[i] - b[i]) ** 2
 
-    # print(f"c_e_d: {dist ** (1 / 2)}")
-
-    #return dist ** (1 / 2)
+    # return dist ** (1 / 2)
     return round(dist, 3)
 
 
 def one_full_iter():
-    # print("v")
-    # print("full one----@@@@@@@@@@@@")
     points_sorted = [[] for _ in range(Variables.k)]
-    # tmp_dist :list[float] = [0 for _ in range(Variables.k)]
-    # print(tmp_dist)
 
     for point in Variables.points:
         tmp_dist :list[float] = [0 for _ in range(Variables.k)]
-        # print(f"first {tmp_dist}")
 
         for i in range(Variables.k):
             tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
 
-        # print(f"second {tmp_dist}")
+        logging.debug(tmp_dist)
         which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
-        # print(which_mean_closest)
+        logging.debug(which_mean_closest)
 
         points_sorted[which_mean_closest].append(point)
-
-    # print(points_sorted)
 
     # Sometimes, with few data points, there can be a situation where none
     # of the points are closest to a particualr starting mean. Therefore
     # an empty list is created. I'm populating it here with big numbers
-    # so none of the future points will be closest to that mean(point).
+    # so none of the future points will be closest to that mean.
     # Algorithm, by doing that, will suggest that their are less groups
     # than entered by a user. Puting big numbers there is unnecesarry. 
     # List can't be empty though, because I'm deviding by it's len later
@@ -229,32 +215,19 @@ def one_full_iter():
             print("One of the lists created as an empty list.")
             print("Now populated artificially.")
             
-    # print(points_sorted)
-
-
-
+    logging.debug(points_sorted)
 
     Variables.prev_k_means = Variables.k_means
 
-    print(f"prev k_means: {Variables.prev_k_means}")
-
     new_k_means :list[list[float]] = [[] for _ in range(Variables.k)]
-    # new_k_means = [0.0 for _ in range(Variables.k)]
-    # new_k_means :list[float] = []
-    # new_k_means :list[float] = [0 for _ in range(Variables.k)]
 
     for i in range(Variables.k):
         new_k_means[i] = calc_means(points_sorted[i])
-        # new_k_means.append(calc_means(points_sorted[i]))
-        # new_k_means[i] = 3.0
 
-    print(f"new k_means {new_k_means}")
+    print(f"Prev k_means: {Variables.prev_k_means}")
+    print(f"New k_means {new_k_means}")
     
     Variables.k_means = new_k_means
-
-    # print(calc_means([[1,4,5,6], [1,4,6,6], [2, 4, 6, 1]]))
-    # print("full end----$$$$$$$$$$$$$$$")
-    # print("^")
 
 
 def interation_loop():
@@ -262,72 +235,45 @@ def interation_loop():
     print("--Start of interation loop--")
     i = 1
 
-    #while i < DefaultVariables.max_iterations and Variables.k_means != Variables.prev_k_means:
-    #while i < 4 and Variables.k_means != Variables.prev_k_means:
-
-    #So the is_done_iterating() does not crash (no prev_k_means)
+    # So the is_done_iterating() does not crash (no prev_k_means)
+    print(f"-inter {i}-")
     one_full_iter()
-    print(f"inter {i}")
     while i < DefaultVariables.max_iterations and not is_done_iterating():
-        one_full_iter()
         i += 1
-        print(f"inter {i}")
+        print(f"-inter {i}-")
+        one_full_iter()
 
-    # print(Variables.k_means)
     print("--End of interation loop--")
     print("^")
 
 
 def get_data(line: str, read_type: TypeOfRead):
-    # print("getting data")
     tmp_list: list = line.split()
-    # tmp_list: list = line.split("   " || " ")
-    # print(tmp_list)
-    # print(type(tmp_list))
-    # print(len(tmp_list))
+    logging.debug(tmp_list)
 
-    # lis = ['1', '-4', '3', '-6', '7']
-    int_tmp_list = [eval(i) for i in tmp_list]
+    parsed_tmp_list = [eval(i) for i in tmp_list]
+
     # parsed_tmp_list2 = []
-    #
     # for i in range(len(tmp_list) - 1):
     #     parsed_tmp_list2.append(eval(tmp_list[i]))
     # parsed_tmp_list2.append(tmp_list[-1])
         
-    # print("Modified list is: ", int_tmp_list)
-
     if read_type == TypeOfRead.TRAINING:
-        Variables.points.append(int_tmp_list)
+        Variables.points.append(parsed_tmp_list)
         # Variables.points.append(parsed_tmp_list2)
     else:
-        Variables.predict_data.append(int_tmp_list)
+        Variables.predict_data.append(parsed_tmp_list)
         # Variables.predict_data.append(parsed_tmp_list2)
  
 
 def download_data_set(data_loc :str, read_type: TypeOfRead):
     print("v")
-    print("downloading data det")
-    # f0 = open("data.txt", "r")
+    print("downloading data set")
 
     with open(data_loc, "r") as f:
         for line in f:
             get_data(line, read_type)
 
-    # get_data("5.2   2.1   1.5   3   1", read_type)
-    # get_data("5 2   3       3   1", read_type)
-    # get_data("2 5   1   3   0", read_type)
-    # get_data("3 2   4   3   1", read_type)
-    # get_data("2 2   6   3   2", read_type)
-    # get_data("2 2   6   3   2", read_type)
-    #
-    # get_data("3 4   2   3   0", read_type)
-    # get_data("4 3   4   3   1", read_type)
-    # get_data("3 2   5   3   1", read_type)
-
-
-        # while f
-        #   str = f.readline()
-    #if Variables.number_of_features == 0:
     if read_type == TypeOfRead.TRAINING:
         Variables.number_of_features = len(Variables.points[0]) - 1
         print(f"number of features {len(Variables.points[0]) - 1}")
@@ -355,17 +301,18 @@ def predict():
     print("v")
 
     choice = -1
-    #fix proper loop later
-    while choice != 0 and choice != 1 and choice != 2:
-        print("For predicting the cluster from the default file (data/iris_test.txt) type 1")
-        print("For custom guess (providing a vector) type 2 ")
-        print("For predicting the cluster from custom file type 3")
-        choice = int(input(": "))
+    print("For predicting the cluster from the default file (data/iris_test.txt) type 1")
+    print("For custom guess (providing a vector) type 2 ")
+    print("For predicting the cluster from custom file type 3")
+    #That's a terrible way probably
+    while choice != "0" and choice != "1" and choice != "2":
+        choice = input(": ")
 
-    if choice == 1 or choice == 3:
-        if choice == 1:
+    if choice == "1" or choice == "3":
+
+        if choice == "1":
             download_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
-        if choice == 3:
+        if choice == "3":
             path = str(input("Provide path: "))
             download_data_set(path, TypeOfRead.PREDICTING)
 
@@ -373,19 +320,12 @@ def predict():
 
         predictions = [0 for _ in range(Variables.k)] 
         actual_clusters = [0 for _ in range(Variables.k)] 
-        counter = Counter()
 
         for observation in Variables.predict_data:
             cluster_tuple :tuple = predict_cluster(observation)
             logging.debug(cluster_tuple)
             predictions[cluster_tuple[0]] += 1
             actual_clusters[cluster_tuple[1]] += 1
-            counter[cluster_tuple[1]] += 1
-
-        # logging.error("here")
-        # print(counter)
-        # print(counter.get("abc"))
-        # print(counter.most_common())
 
         accuracy_table = [1 - round((abs(predictions[i] - actual_clusters[i])/actual_clusters[i]), 3) for i in range(Variables.k)] 
         total_acc = 0
@@ -403,12 +343,9 @@ def predict():
         print("Total accuracy:")
         print(total_acc)
 
-    if choice == 2:
+    if choice == "2":
         print(f"Enter a vector with {Variables.number_of_features} features plus it's actual cluster")
         print(f"If the cluster is unknown enter {Variables.k} (k) there")
-        #custom_vector: tuple[int] = (0 for _ in range(Variables.number_of_features + 1))
-        # custom_vector: tuple[int] = tuple((0 for _ in range(Variables.number_of_features + 1)))
-        #custom_vector: list[int] = (0 for _ in range(Variables.number_of_features + 1))
         custom_vector: list[int] = []
         for i in range(Variables.number_of_features):
             custom_vector.append((int(input(f"Input {i+1} feature: "))))
@@ -416,10 +353,9 @@ def predict():
 
         cluster_tuple :tuple = predict_cluster(tuple(custom_vector))
         logging.debug(cluster_tuple)
-
-
     
     print("^")
+
 
 def train():
     download_data_set(Variables.data_loc, TypeOfRead.TRAINING)
@@ -432,7 +368,6 @@ def main():
     ask_for_k_value_and_data_loc()
     train()
     predict()
-
 
 
 if __name__ == "__main__":
