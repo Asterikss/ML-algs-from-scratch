@@ -17,6 +17,7 @@
 import random
 from enum import Enum
 import logging
+from collections import Counter
 
 class Variables:
     k = 0
@@ -38,7 +39,9 @@ class DefaultVariables:
     # filename = 'log_k-means.log', filemode = "w"
 
 class TypeOfRead(Enum):
-    TRAINING, PREDICTING = range(2)
+    # this shows an error for some reason TRAINING, PREDICTING = range(2)
+    TRAINING = 0
+    PREDICTING = 1
 
 
 def is_done_iterating() -> bool:
@@ -176,11 +179,6 @@ def ask_for_k_value_and_data_loc():
 
 
 def calc_euclidean_distance(a: tuple, b: tuple) -> float:
-    # print("eucal")
-    # print(a)
-    # print(len(a))
-
-
     if len(a) -1 != len(b):
         print("tuples are of wrong size. 'a'(first param) should be longer by 1 (last arg is the answer) ")
         return -1
@@ -290,12 +288,20 @@ def get_data(line: str, read_type: TypeOfRead):
 
     # lis = ['1', '-4', '3', '-6', '7']
     int_tmp_list = [eval(i) for i in tmp_list]
+    # parsed_tmp_list2 = []
+    #
+    # for i in range(len(tmp_list) - 1):
+    #     parsed_tmp_list2.append(eval(tmp_list[i]))
+    # parsed_tmp_list2.append(tmp_list[-1])
+        
     # print("Modified list is: ", int_tmp_list)
 
     if read_type == TypeOfRead.TRAINING:
         Variables.points.append(int_tmp_list)
+        # Variables.points.append(parsed_tmp_list2)
     else:
         Variables.predict_data.append(int_tmp_list)
+        # Variables.predict_data.append(parsed_tmp_list2)
  
 
 def download_data_set(data_loc :str, read_type: TypeOfRead):
@@ -328,8 +334,7 @@ def download_data_set(data_loc :str, read_type: TypeOfRead):
     print("^")
 
 
-# Different way to return tuples maby
-def predict_label(point :tuple) -> tuple[int, int]:
+def predict_cluster(point :tuple) -> tuple[int, int]:
     tmp_dist :list[float] = [0 for _ in range(Variables.k)]
 
     for i in range(Variables.k):
@@ -338,7 +343,11 @@ def predict_label(point :tuple) -> tuple[int, int]:
     logging.debug(f"second_in_label {tmp_dist}")
     which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
 
-    print(f"Prediction: Label {which_mean_closest}. Actual label: {point[-1]}")
+    if point[-1] == Variables.k:
+        print(f"Prediction: Cluster {which_mean_closest}. Actual cluster: unknown")
+        return which_mean_closest, -1
+    
+    print(f"Prediction: Cluster {which_mean_closest}. Actual cluster: {point[-1]}")
     return which_mean_closest, point[-1]
 
 
@@ -348,25 +357,37 @@ def predict():
     choice = -1
     #fix proper loop later
     while choice != 0 and choice != 1 and choice != 2:
-        print("For predicting data from the default file (data/iris_test.txt) type 1")
+        print("For predicting the cluster from the default file (data/iris_test.txt) type 1")
         print("For custom guess (providing a vector) type 2 ")
-        print("For predicting data from custom file type 3")
+        print("For predicting the cluster from custom file type 3")
         choice = int(input(": "))
 
-    if choice == 1:
-        download_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
+    if choice == 1 or choice == 3:
+        if choice == 1:
+            download_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
+        if choice == 3:
+            path = str(input("Provide path: "))
+            download_data_set(path, TypeOfRead.PREDICTING)
 
         logging.debug(Variables.predict_data)
 
         predictions = [0 for _ in range(Variables.k)] 
-        actual_labels = [0 for _ in range(Variables.k)] 
+        actual_clusters = [0 for _ in range(Variables.k)] 
+        counter = Counter()
 
         for observation in Variables.predict_data:
-            label :tuple = predict_label(observation)
-            predictions[label[0]] += 1
-            actual_labels[label[1]] += 1
+            cluster_tuple :tuple = predict_cluster(observation)
+            logging.debug(cluster_tuple)
+            predictions[cluster_tuple[0]] += 1
+            actual_clusters[cluster_tuple[1]] += 1
+            counter[cluster_tuple[1]] += 1
 
-        accuracy_table = [1 - round((abs(predictions[i] - actual_labels[i])/actual_labels[i]), 3) for i in range(Variables.k)] 
+        # logging.error("here")
+        # print(counter)
+        # print(counter.get("abc"))
+        # print(counter.most_common())
+
+        accuracy_table = [1 - round((abs(predictions[i] - actual_clusters[i])/actual_clusters[i]), 3) for i in range(Variables.k)] 
         total_acc = 0
 
         for e in accuracy_table:
@@ -375,12 +396,28 @@ def predict():
 
         print("predictions:")
         print(predictions)
-        print("acutal labels:")
-        print(actual_labels)
-        print("accuracy_table: ")
+        print("acutal clusters:")
+        print(actual_clusters)
+        print("accuracy_table:")
         print(accuracy_table)
-        print("Total accuracy: ")
+        print("Total accuracy:")
         print(total_acc)
+
+    if choice == 2:
+        print(f"Enter a vector with {Variables.number_of_features} features plus it's actual cluster")
+        print(f"If the cluster is unknown enter {Variables.k} (k) there")
+        #custom_vector: tuple[int] = (0 for _ in range(Variables.number_of_features + 1))
+        # custom_vector: tuple[int] = tuple((0 for _ in range(Variables.number_of_features + 1)))
+        #custom_vector: list[int] = (0 for _ in range(Variables.number_of_features + 1))
+        custom_vector: list[int] = []
+        for i in range(Variables.number_of_features):
+            custom_vector.append((int(input(f"Input {i+1} feature: "))))
+        custom_vector.append(int(input("Input the cluster: ")))
+
+        cluster_tuple :tuple = predict_cluster(tuple(custom_vector))
+        logging.debug(cluster_tuple)
+
+
     
     print("^")
 
