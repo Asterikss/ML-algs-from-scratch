@@ -2,13 +2,20 @@
 # pyright: ignore - single line (# type: ignore)
 # pyright: ignore [reportUnusedVariable=] - single line
 # https://towardsdatascience.com/create-your-own-k-means-clustering-algorithm-in-python-d7d4c9077670
+# use pathlib later
+# use parsing library. json, pydantic
+
+# from dataclasses import dataclass
+# @dataclass
+## class classname(object):
+# class classname(order = True, frozen = True):
+#   pass
 
 # Iris-setosa = 0
 # Iris-versicolor = 1
 # Iris-virginica = 2
 import random
 from enum import Enum
-
 import logging
 
 class Variables:
@@ -25,7 +32,9 @@ class Variables:
 class DefaultVariables:
     max_iterations = 10
     threshold = 0.000001
-    logging.basicConfig(level = logging.DEBUG, format = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s")
+    level = logging.INFO
+    fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
+    logging.basicConfig(level = level, format = fmt)
     # Debug, Info, Warning, Error, Critical
     # filename = 'log_k-means.log'
     # filemode = "w"
@@ -36,6 +45,7 @@ class TypeOfRead(Enum):
     TRAINING = 0
     PREDICTING = 1
     # TRAINING, PREDICTING = range(2)
+
 
 def is_done_iterating() -> bool:
     logging.error("eeaea")
@@ -326,25 +336,25 @@ def download_data_set(data_loc :str, read_type: TypeOfRead):
     print("^")
 
 
-def predict_label(point :tuple) -> int:
+# Different way to return tuples maby
+def predict_label(point :tuple) -> tuple[int, int]:
     tmp_dist :list[float] = [0 for _ in range(Variables.k)]
-    # print(f"first_in_label {tmp_dist}")
 
     for i in range(Variables.k):
         tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
 
-    # print(f"second_in_label {tmp_dist}")
+    logging.debug(f"second_in_label {tmp_dist}")
     which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
-    #print(f"Prediction: predicted to be associated with label {which_mean_closest}")
-    #print(f"Prediction: To be associated with label {which_mean_closest}")
-    print(f"Prediction: Label {which_mean_closest}")
-    return which_mean_closest
+
+    print(f"Prediction: Label {which_mean_closest}. Actual label: {point[-1]}")
+    return which_mean_closest, point[-1]
 
 
 def predict():
-    print(f"Begin prediction")
+    print("v")
 
     choice = -1
+    #fix proper loop later
     while choice != 0 and choice != 1 and choice != 2:
         print("For predicting data from the default file (data/iris_test.txt) type 1")
         print("For custom guess (providing a vector) type 2 ")
@@ -353,29 +363,23 @@ def predict():
 
     if choice == 1:
         download_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
-        # with open("data/iris_test.txt", "r") as f:
-        #     for line in f:
-        #         print(line)
-        #         get_data(line, TypeOfRead.PREDICTING)
 
-        print(Variables.predict_data)
+        logging.debug(Variables.predict_data)
 
-        label_table = [0 for _ in range(Variables.k)] 
+        predictions = [0 for _ in range(Variables.k)] 
+        actual_labels = [0 for _ in range(Variables.k)] 
 
         for observation in Variables.predict_data:
-            label = predict_label(observation)
-            label_table[label] += 1
+            label :tuple = predict_label(observation)
+            predictions[label[0]] += 1
+            actual_labels[label[1]] += 1
 
-        # label = predict_label(Variables.predict_data[0])
-        # label_table = [0 for _ in range(Variables.k)] 
-
-        # label_table[label] += 1
-
-        print("lable_table:")
-        print(label_table)
-        
+        print("predictions:")
+        print(predictions)
+        print("acutal labels:")
+        print(actual_labels)
     
-    print(f"End prediction")
+    print("^")
 
 def train():
     download_data_set(Variables.data_loc, TypeOfRead.TRAINING)
@@ -386,8 +390,8 @@ def train():
 def main():
     logging.error("eeaea")
     ask_for_k_value_and_data_loc()
-    # train()
-    # predict()
+    train()
+    predict()
 
 
 
