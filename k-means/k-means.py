@@ -6,6 +6,7 @@
 # Iris-setosa = 0
 # Iris-versicolor = 1
 # Iris-virginica = 2
+from os import dup
 import random
 from enum import Enum
 
@@ -24,7 +25,9 @@ class Variables:
 
 
 class DefaultVariables:
-    max_iterations = 300
+    #max_iterations = 10
+    max_iterations = 10
+    threshold = 0.0009
 
 
 class TypeOfRead(Enum):
@@ -34,6 +37,23 @@ class TypeOfRead(Enum):
 # class DataLoc(Enum):
 #     DEFAULT = 0
 #     CUSTOM = 1
+
+def is_done_iterating() -> bool:
+    # k_long_list = [0 for _ in range(Variables.k)]
+
+    # for i in range(0, len(Variables.number_of_features)):
+    for i in range(Variables.k):
+        dist = 0
+        for j in range(Variables.number_of_features):
+            dist += (Variables.prev_k_means[i][j] - Variables.k_means[i][j]) ** 2
+
+        print("ASDASD")
+        print(dist)
+        if dist < DefaultVariables.threshold:
+            print("Reached threshold")
+            return True
+
+    return False
 
 def get_max() -> list:
     print("v")
@@ -243,9 +263,15 @@ def one_full_iter():
 def interation_loop():
     print("v")
     print("--Start of interation loop--")
-    i = 0
+    i = 1
+
     #while i < DefaultVariables.max_iterations and Variables.k_means != Variables.prev_k_means:
-    while i < 1 and Variables.k_means != Variables.prev_k_means:
+    #while i < 4 and Variables.k_means != Variables.prev_k_means:
+
+    #So the is_done_iterating() does not crash (no prev_k_means)
+    one_full_iter()
+    print(f"inter {i}")
+    while i < DefaultVariables.max_iterations and not is_done_iterating():
         one_full_iter()
         i += 1
         print(f"inter {i}")
