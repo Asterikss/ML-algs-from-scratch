@@ -9,8 +9,7 @@
 import random
 from enum import Enum
 
-# import logging
-# logging.basicConfig(filename='log_k-means.log', level=logging.DEBUG)
+import logging
 
 class Variables:
     k = 0
@@ -26,14 +25,20 @@ class Variables:
 class DefaultVariables:
     max_iterations = 10
     threshold = 0.000001
+    logging.basicConfig(level = logging.DEBUG, format = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s")
+    # Debug, Info, Warning, Error, Critical
+    # filename = 'log_k-means.log'
+    # filemode = "w"
+    # format = "%(name)s:%(funcName)s:%(asctime)s"
 
 
 class TypeOfRead(Enum):
     TRAINING = 0
     PREDICTING = 1
-
+    # TRAINING, PREDICTING = range(2)
 
 def is_done_iterating() -> bool:
+    logging.error("eeaea")
     for i in range(Variables.k):
         dist = 0
         for j in range(Variables.number_of_features):
@@ -379,9 +384,10 @@ def train():
 
 
 def main():
+    logging.error("eeaea")
     ask_for_k_value_and_data_loc()
-    train()
-    predict()
+    # train()
+    # predict()
 
 
 
