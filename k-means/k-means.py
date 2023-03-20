@@ -334,15 +334,21 @@ def predict():
         print(total_acc)
 
     if choice == "2":
+        end = False
         print(f"Enter a vector with {Variables.number_of_features} features plus it's actual cluster")
         print(f"If the cluster is unknown enter {Variables.k} (k) there")
-        custom_vector: list[int] = []
-        for i in range(Variables.number_of_features):
-            custom_vector.append((int(input(f"Input {i+1} feature: "))))
-        custom_vector.append(int(input("Input the cluster: ")))
+        while not end:
+            custom_vector: list[int] = []
+            for i in range(Variables.number_of_features):
+                custom_vector.append((int(input(f"Input {i+1} feature: "))))
+            custom_vector.append(int(input("Input the cluster: ")))
 
-        cluster_tuple :tuple = predict_cluster(tuple(custom_vector))
-        logging.debug(cluster_tuple)
+            cluster_tuple :tuple = predict_cluster(tuple(custom_vector))
+            logging.debug(cluster_tuple)
+    
+            q = input("Type q to exit. Otherwise hit enter: ")
+            if q == "q":
+                end = True
     
     print("^")
 
