@@ -23,6 +23,54 @@ class TypeOfRead(Enum):
     PREDICTING = 1
 
 
+def step_func(x):
+    logging.debug(x >= 0)
+    return x >= 0
+
+
+def dot_product(X: list, weights: list) -> int:
+    return 4
+    
+
+class Perceptron:
+
+    def __init__(self, learning_rate=0.01, n_iters=100) -> None:
+        self.lr = learning_rate
+        self.n_iters = n_iters
+        self.activation_func = step_func
+        self.weights = [1, 4, 2]
+        self.bias = None
+
+
+    def train(self) -> None:
+        for _ in range(self.n_iters):
+            for i, x_i in enumerate(Variables.train_data):
+                output = dot_product(x_i[:-1], self.weights)
+                prediction = self.activation_func(output)
+
+                update = (prediction - x_i[-1]) * self.lr 
+                logging.debug("---")
+                logging.debug(self.weights)
+                logging.debug(x_i)
+                logging.debug("---")
+
+                #for x, w in zip(x_i, self.weights):
+                for j, x in enumerate(x_i):
+                    #x_i[i] *= update
+                    # x *= update
+                    self.weights[j] += x * update
+
+                logging.debug("---")
+                logging.debug(x_i)
+                logging.debug(self.weights)
+                logging.debug("---")
+
+                # for elem in self.weights:
+                #     elem += 
+        
+    def predict(self, X) -> bool:
+        return self.activation_func(dot_product(X[:-1], self.weights))
+
 def ask_for_data_loc():
     missing_input = True
     while missing_input:
@@ -57,7 +105,11 @@ def get_data(line: str, read_type: TypeOfRead):
     parsed_tmp_list2 = []
     for i in range(len(tmp_list) - 1):
         parsed_tmp_list2.append(eval(tmp_list[i]))
-    parsed_tmp_list2.append(tmp_list[-1])
+    if tmp_list[-1] == "Iris-setosa":
+        parsed_tmp_list2.append(1)
+    else:
+        parsed_tmp_list2.append(0)
+
 
     logging.debug(parsed_tmp_list2)
     # maby later change every chosen flower into 1 else 0
@@ -82,6 +134,7 @@ def download_data_set(data_loc :str, read_type: TypeOfRead):
         Variables.number_of_features = len(Variables.train_data[0]) - 1
         logging.info(f"number of features {len(Variables.train_data[0]) - 1}")
     logging.info("^")
+
 
 
 def train():
