@@ -1,21 +1,17 @@
-
 from enum import Enum
 import logging
 
 
 class Variables:
-    # k = 0
     data_loc = ""
     train_data = []
-    # k_means = []
-    number_of_features = 0
-    # prev_k_means = []
     predict_data = []
+    number_of_features = 0
+
 
 class DefaultVariables:
     # max_iterations = 10
-    # threshold = 0.000001
-    #level = logging.INFO
+    # level = logging.INFO
     level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
     logging.basicConfig(level = level, format = fmt)
@@ -25,6 +21,7 @@ class DefaultVariables:
 class TypeOfRead(Enum):
     TRAINING = 0
     PREDICTING = 1
+
 
 def ask_for_data_loc():
     missing_input = True
