@@ -25,7 +25,7 @@ class TypeOfRead(Enum):
  
 
 def step_func(x) -> int:
-    logging.StreamHandler.terminator = ""
+    logging.StreamHandler.terminator = "  "
     if x >= 0:
         logging.debug("  1 ret")
         logging.StreamHandler.terminator = "\n"
@@ -173,7 +173,7 @@ class State():
     # perceptron = None
     perceptron = Perceptron()   
     # Can't write None here, does not work
-    # perceptron will be overriten and is not used
+    # this Perceptron() will be overriten and is not used
 
 
 def dot_product(X: list, weights: list) -> int:
