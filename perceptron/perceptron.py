@@ -2,12 +2,12 @@ from enum import Enum
 import logging
 import random
 
-
 class Variables:
     data_loc = ""
     train_data = []
     predict_data = []
     number_of_features = 0
+    default_bias = -3
 
 
 class DefaultVariables:
@@ -22,29 +22,47 @@ class DefaultVariables:
 class TypeOfRead(Enum):
     TRAINING = 0
     PREDICTING = 1
-    
+ 
 
+def step_func(x) -> int:
+    if x >= 0:
+        logging.debug("1 ret")
+        return 1
+    else:
+        logging.debug("0 ret")
+        return 0
+
+
+# [-0.43, 1.35, -2.0, 1.69]
 class Perceptron:
 
-    def __init__(self, learning_rate=0.01, n_iters=1
-                 ) -> None:
+    #def __init__(self, learning_rate=0.05, n_iters=6) -> None:
+    def __init__(self, learning_rate=0.02, n_iters=6) -> None:
         self.lr = learning_rate
         self.n_iters = n_iters
         self.activation_func = step_func
-        self.weights = [int(random.uniform(1, 4)) for _ in range(Variables.number_of_features)]
-        self.bias = -3 
+        #self.weights = [int(random.uniform(-1, 3)) for _ in range(Variables.number_of_features)]
+        # self.weights = [int(random.uniform(-0.5, 4)) for _ in range(Variables.number_of_features)]
+        self.weights = [int(random.uniform(0, 4)) for _ in range(Variables.number_of_features)]
+        self.bias = Variables.default_bias
 
 
     def train(self, data_set) -> None:
-        for _ in range(self.n_iters):
+        logging.debug(self.weights)
+        for idx in range(self.n_iters):
+            logging.debug(f"~~~~~~inter {idx + 1}")
             #for i, x_i in enumerate(Variables.train_data):
             a = 0
             for x_i in data_set:
                 # a+=1
                 # if a > 47:
                     # break
-                output = dot_product(x_i[:-1], self.weights) + self.bias
+                #output = dot_product(x_i[:-1], self.weights) + self.bias
+                output = dot_product(x_i[:-1], self.weights)
+                # logging.debug("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
+                # logging.debug(output)
                 prediction = self.activation_func(output)
+                logging.debug(f"acutal label: {x_i[-1]}")
 
                 if prediction != x_i[-1]:
                     update = (x_i[-1] - prediction) * self.lr 
@@ -69,20 +87,41 @@ class Perceptron:
                     logging.debug(self.weights)
                     logging.debug(x_i)
                     logging.debug("---")
+                # elif abs(output - x_i[-1]) < 0.5:
+                #     logging.debug(f"in elif {output - x_i[-1]}")
+                #     ...
                 else:
                     logging.debug("corre")
+
+
+    def predict_data_set(self, data_set) -> None:
+        logging.info("prediciting data set")
+
+        n_correct = 0
+        for vector in data_set:
+            prediction = self.predict(vector)
+            actual_anwser = vector[-1]
+            logging.info(f"prediction: {prediction} Actual label: {actual_anwser}")
+
+            if prediction == actual_anwser:
+                n_correct+=1
+
+        logging.info(f"Accuracy: {(n_correct/len(data_set)) * 100}%")
+
+
+
 
 
     def predict(self, X) -> int:
         return self.activation_func(dot_product(X[:-1], self.weights))
 
 
-def step_func(x) -> int:
-    if x >= 0:
-        logging.debug("1 ret")
-        return 1
-    logging.debug("0 ret")
-    return 0
+class State():
+    # perceptron: object = None
+    # perceptron = None
+    perceptron = Perceptron()   
+    # Can't write None here, does not work
+    # perceptron will be overriten and is not used
 
 
 def dot_product(X: list, weights: list) -> int:
@@ -106,6 +145,7 @@ def ask_for_data_loc():
             missing_input = False
         else:
             print("Enter valid input")
+
 
 
 def get_data(line: str, read_type: TypeOfRead):
@@ -163,12 +203,35 @@ def train():
     perceptron = Perceptron()
     perceptron.train(Variables.train_data)
     logging.debug(perceptron.weights)
+    State.perceptron = perceptron
 
+
+def predict():
+    perceptron = State.perceptron
+
+    missing_input = True
+    data_location = ""
+    while missing_input:
+        data_loc = int(input("For default data location for prediciton type 1. Otherwise type 0: "))
+        if data_loc == 1:
+            data_location = "data/iris_test.txt"
+            missing_input = False
+        elif data_loc == 0:
+            data_location = str(input("Enter custom data location: "))
+            data_loc = data_loc
+            missing_input = False
+        else:
+            print("Enter valid input")
+
+    download_data_set(data_location, TypeOfRead.PREDICTING)
+    logging.debug(Variables.predict_data)
+    perceptron.predict_data_set(Variables.predict_data)
 
 
 def main():
     ask_for_data_loc()
     train()
+    predict()
 
 
 if __name__ == "__main__":
