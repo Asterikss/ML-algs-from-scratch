@@ -7,16 +7,14 @@ class Variables:
     train_data = []
     predict_data = []
     number_of_features = 0
-    default_bias = -3
 
 
 class DefaultVariables:
-    # max_iterations = 10
     level = logging.INFO
     # level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
     logging.basicConfig(level = level, format = fmt)
-    # filename = 'log_k-means.log', filemode = "w"
+    # filename = 'log_x.log', filemode = "w"
 
 
 class TypeOfRead(Enum):
@@ -39,14 +37,15 @@ def step_func(x) -> int:
 # [-0.43, 1.35, -2.0, 1.69]
 class Perceptron:
 
-    #def __init__(self, learning_rate=0.05, n_iters=6) -> None:
-    def __init__(self, learning_rate=0.02, n_iters=6) -> None:
+    def __init__(self, learning_rate=0.02, n_iters=3) -> None:
+    # def __init__(self, learning_rate=0.02, n_iters=9) -> None:
         self.lr = learning_rate
         self.n_iters = n_iters
         self.activation_func = step_func
         #self.weights = [int(random.uniform(-1, 3)) for _ in range(Variables.number_of_features)]
         # self.weights = [int(random.uniform(-0.5, 4)) for _ in range(Variables.number_of_features)]
-        self.weights = [int(random.uniform(-1, 2)) for _ in range(Variables.number_of_features)]
+        #self.weights = [int(random.uniform(-1, 2)) for _ in range(Variables.number_of_features)]
+        self.weights = [int(random.uniform(-1, 1)) for _ in range(Variables.number_of_features)]
         #self.bias = Variables.default_bias
         self.bias = round(random.uniform(-1, 1), 2)
 
@@ -85,13 +84,17 @@ class Perceptron:
 
                     #for x, w in zip(x_i, self.weights):
                     for j in range(len(x_i) - 1):
-                    # for j, x in enumerate(x_i):
-                        #x_i[i] *= update
-                        # x *= update
                         logging.debug(x_i[j])
                         logging.debug(f"ubdate: {update}")
                         logging.debug(x_i[j] * update)
-                        self.weights[j] += x_i[j] * update # w sumie to x_i
+                        self.weights[j] += x_i[j] * update
+                        # Multiplying the error by the input feature in the
+                        # weight update rule is important because it tells us how
+                        # much each input feature contributes to the error. By
+                        # updating the weights proportionally to the contribution
+                        # of each input feature, we can adjust the perceptron's
+                        # decision boundary in the direction that reduces the
+                        # error.
 
                     for i in range(len(self.weights)):
                         self.weights[i] = round(self.weights[i] , 3)
