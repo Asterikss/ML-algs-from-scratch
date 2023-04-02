@@ -25,11 +25,14 @@ class TypeOfRead(Enum):
  
 
 def step_func(x) -> int:
+    logging.StreamHandler.terminator = ""
     if x >= 0:
-        logging.debug("1 ret")
+        logging.debug("  1 ret")
+        logging.StreamHandler.terminator = "\n"
         return 1
     else:
-        logging.debug("0 ret")
+        logging.debug("  0 ret")
+        logging.StreamHandler.terminator = "\n"
         return 0
 
 
@@ -52,7 +55,8 @@ class Perceptron:
         for idx in range(self.n_iters):
             logging.debug(f"~~~~~~inter {idx + 1}")
             #for i, x_i in enumerate(Variables.train_data):
-            a = 0
+            # a = 0
+            n_correct = 0
             for x_i in data_set:
                 # a+=1
                 # if a > 47:
@@ -63,6 +67,8 @@ class Perceptron:
                 # logging.debug(output)
                 prediction = self.activation_func(output)
                 logging.debug(f"acutal label: {x_i[-1]}")
+
+                n_correct = 0
 
                 if prediction != x_i[-1]:
                     update = (x_i[-1] - prediction) * self.lr 
@@ -78,7 +84,7 @@ class Perceptron:
                         logging.debug(x_i[j])
                         logging.debug(f"ubdate: {update}")
                         logging.debug(x_i[j] * update)
-                        self.weights[j] += x_i[j] * update
+                        self.weights[j] += x_i[j] * update # dlaczego od x_i
 
                     for i in range(len(self.weights)):
                         self.weights[i] = round(self.weights[i] , 3)
@@ -91,25 +97,71 @@ class Perceptron:
                 #     logging.debug(f"in elif {output - x_i[-1]}")
                 #     ...
                 else:
-                    logging.debug("corre")
+                    n_correct+=1
+                    # logging.debug("corre")
+
+            logging.info("~~~~~~~~~~~~~~~~")
+            logging.info(f"Accuracy for {idx + 1} iteration: {round((n_correct/len(Variables.train_data)) * 100, 2)}%")
+            logging.info("~~~~~~~~~~~~~~~~")
 
 
-    def predict_data_set(self, data_set) -> None:
+    def predict_data_set(self) -> None:
+        logging.info("v")
         logging.info("prediciting data set")
 
-        n_correct = 0
-        for vector in data_set:
-            prediction = self.predict(vector)
-            actual_anwser = vector[-1]
-            logging.info(f"prediction: {prediction} Actual label: {actual_anwser}")
+        choice = -1
+        print("For predicting the cluster from the default file (data/iris_test.txt) type 1")
+        print("For custom guess (providing a vector) type 2 ")
+        print("For predicting the cluster from custom file type 3")
 
-            if prediction == actual_anwser:
-                n_correct+=1
+        while choice != "0" and choice != "1" and choice != "2":
+            choice = input(": ")
 
-        logging.info(f"Accuracy: {(n_correct/len(data_set)) * 100}%")
+        if choice == "1" or choice == "3":
+
+            if choice == "1":
+                download_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
+            if choice == "3":
+                path = str(input("Provide path: "))
+                download_data_set(path, TypeOfRead.PREDICTING)
+
+            logging.debug(Variables.predict_data)
+
+            n_correct = 0
+            for vector in Variables.predict_data:
+                prediction = self.predict(vector)
+                actual_anwser = vector[-1]
+                logging.info(f"prediction: {prediction} Actual label: {actual_anwser}")
+
+                if prediction == actual_anwser:
+                    n_correct+=1
+
+            logging.info(f"Accuracy: {(n_correct/len(Variables.predict_data)) * 100}%")
+
+        if choice == "2":
+            end = False
+            print(f"Enter a vector with {Variables.number_of_features} features plus it's actual label")
+            print(f"If the label is unknown enter 2 there")
+            while not end:
+                custom_vector: list[int] = []
+                for i in range(Variables.number_of_features):
+                    custom_vector.append((int(input(f"Input {i+1} feature: "))))
+                custom_vector.append(int(input("Input the cluster: ")))
+
+                prediction = self.predict(custom_vector)
+                actual_anwser = custom_vector[-1]
+
+                if actual_anwser != 0 and actual_anwser != 1:
+                    logging.info(f"prediction: {prediction} Actual label: unknown")
+                else:
+                    logging.info(f"prediction: {prediction} Actual label: {actual_anwser}")
 
 
+                q = input("Type q to exit. Otherwise hit enter: ")
+                if q == "q":
+                    end = True
 
+        logging.info("^")
 
 
     def predict(self, X) -> int:
@@ -128,7 +180,9 @@ def dot_product(X: list, weights: list) -> int:
     result = 0
     for x, y in zip(X, weights):
         result += x * y
+    logging.StreamHandler.terminator = "  "
     logging.debug(int(result))
+    logging.StreamHandler.terminator = "\n"
     return int(result)
 
 
@@ -194,8 +248,8 @@ def download_data_set(data_loc :str, read_type: TypeOfRead):
     if read_type == TypeOfRead.TRAINING:
         Variables.number_of_features = len(Variables.train_data[0]) - 1
         logging.info(f"number of features {len(Variables.train_data[0]) - 1}")
-    logging.info("^")
 
+    logging.info("^")
 
 
 def train():
@@ -209,29 +263,29 @@ def train():
 def predict():
     perceptron = State.perceptron
 
-    missing_input = True
-    data_location = ""
-    while missing_input:
-        data_loc = int(input("For default data location for prediciton type 1. Otherwise type 0: "))
-        if data_loc == 1:
-            data_location = "data/iris_test.txt"
-            missing_input = False
-        elif data_loc == 0:
-            data_location = str(input("Enter custom data location: "))
-            data_loc = data_loc
-            missing_input = False
-        else:
-            print("Enter valid input")
-
-    download_data_set(data_location, TypeOfRead.PREDICTING)
-    logging.debug(Variables.predict_data)
-    perceptron.predict_data_set(Variables.predict_data)
+    # missing_input = True
+    # data_location = ""
+    # while missing_input:
+    #     data_loc = int(input("For default data location for prediciton type 1. Otherwise type 0: "))
+    #     if data_loc == 1:
+    #         data_location = "data/iris_test.txt"
+    #         missing_input = False
+    #     elif data_loc == 0:
+    #         data_location = str(input("Enter custom data location: "))
+    #         data_loc = data_loc
+    #         missing_input = False
+    #     else:
+    #         print("Enter valid input")
+    #
+    # download_data_set(data_location, TypeOfRead.PREDICTING)
+    # logging.debug(Variables.predict_data)
+    perceptron.predict_data_set()
 
 
 def main():
     ask_for_data_loc()
     train()
-    predict()
+    # predict()
 
 
 if __name__ == "__main__":
