@@ -12,8 +12,8 @@ class Variables:
 
 class DefaultVariables:
     # max_iterations = 10
-    # level = logging.INFO
-    level = logging.DEBUG
+    level = logging.INFO
+    # level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
     logging.basicConfig(level = level, format = fmt)
     # filename = 'log_k-means.log', filemode = "w"
@@ -46,14 +46,18 @@ class Perceptron:
         self.activation_func = step_func
         #self.weights = [int(random.uniform(-1, 3)) for _ in range(Variables.number_of_features)]
         # self.weights = [int(random.uniform(-0.5, 4)) for _ in range(Variables.number_of_features)]
-        self.weights = [int(random.uniform(0, 4)) for _ in range(Variables.number_of_features)]
-        self.bias = Variables.default_bias
+        self.weights = [int(random.uniform(-1, 2)) for _ in range(Variables.number_of_features)]
+        #self.bias = Variables.default_bias
+        self.bias = round(random.uniform(-1, 1), 2)
 
 
     def train(self, data_set) -> None:
-        logging.debug(self.weights)
         for idx in range(self.n_iters):
             logging.debug(f"~~~~~~inter {idx + 1}")
+            logging.debug(self.weights)
+            logging.debug(self.bias)
+            logging.debug("~~~~~~")
+
             #for i, x_i in enumerate(Variables.train_data):
             # a = 0
             n_correct = 0
@@ -61,18 +65,21 @@ class Perceptron:
                 # a+=1
                 # if a > 47:
                     # break
-                #output = dot_product(x_i[:-1], self.weights) + self.bias
-                output = dot_product(x_i[:-1], self.weights)
+                output = dot_product(x_i[:-1], self.weights) + self.bias
+                logging.StreamHandler.terminator = "  "
+                logging.debug(f"+bias {round(output, 2)}")
+                logging.StreamHandler.terminator = "\n"
+                # output = dot_product(x_i[:-1], self.weights)
                 # logging.debug("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
                 # logging.debug(output)
                 prediction = self.activation_func(output)
                 logging.debug(f"acutal label: {x_i[-1]}")
 
-                n_correct = 0
-
                 if prediction != x_i[-1]:
                     update = (x_i[-1] - prediction) * self.lr 
+                    
                     logging.debug("---")
+                    logging.debug(self.bias)
                     logging.debug(self.weights)
                     logging.debug(x_i)
 
@@ -84,12 +91,16 @@ class Perceptron:
                         logging.debug(x_i[j])
                         logging.debug(f"ubdate: {update}")
                         logging.debug(x_i[j] * update)
-                        self.weights[j] += x_i[j] * update # dlaczego od x_i
+                        self.weights[j] += x_i[j] * update # w sumie to x_i
 
                     for i in range(len(self.weights)):
                         self.weights[i] = round(self.weights[i] , 3)
 
+                    self.bias += (x_i[-1] - prediction) * self.lr
+                    self.bias = round(self.bias, 2)
+
                     logging.debug("---")
+                    logging.debug(self.bias)
                     logging.debug(self.weights)
                     logging.debug(x_i)
                     logging.debug("---")
@@ -100,6 +111,7 @@ class Perceptron:
                     n_correct+=1
                     # logging.debug("corre")
 
+            # logging.debug(n_correct)
             logging.info("~~~~~~~~~~~~~~~~")
             logging.info(f"Accuracy for {idx + 1} iteration: {round((n_correct/len(Variables.train_data)) * 100, 2)}%")
             logging.info("~~~~~~~~~~~~~~~~")
@@ -165,7 +177,8 @@ class Perceptron:
 
 
     def predict(self, X) -> int:
-        return self.activation_func(dot_product(X[:-1], self.weights))
+        return self.activation_func(dot_product(X[:-1], self.weights) + self.bias)
+        # return self.activation_func(dot_product(X[:-1], self.weights))
 
 
 class State():
@@ -181,9 +194,9 @@ def dot_product(X: list, weights: list) -> int:
     for x, y in zip(X, weights):
         result += x * y
     logging.StreamHandler.terminator = "  "
-    logging.debug(int(result))
+    logging.debug(round(result, 2))
     logging.StreamHandler.terminator = "\n"
-    return int(result)
+    return round(result, 2)
 
 
 def ask_for_data_loc():
@@ -285,7 +298,7 @@ def predict():
 def main():
     ask_for_data_loc()
     train()
-    # predict()
+    predict()
 
 
 if __name__ == "__main__":
