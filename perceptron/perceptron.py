@@ -1,4 +1,4 @@
-"Pereptron that predicts if a flower is an Iris-setosa"
+"Pereptron that predicts if a flower is an Iris-setosa (1)"
 from enum import Enum
 import logging
 import random
@@ -34,16 +34,14 @@ def step_func(x) -> int:
         logging.StreamHandler.terminator = "\n"
         return 0
 
-# 1 - Iris-setosa
+
 class Perceptron:
 
-    # def __init__(self, learning_rate=0.02, n_iters=3) -> None:
     def __init__(self, learning_rate=0.02, n_iters=7) -> None:
         self.lr = learning_rate
         self.n_iters = n_iters
         self.activation_func = step_func
         self.weights = [round(random.uniform(-1, 1), 2) for _ in range(Variables.number_of_features)]
-        # TODO see the change
         self.bias = round(random.uniform(-1, 1), 2)
 
 
@@ -172,14 +170,14 @@ class Perceptron:
 
     def predict(self, X) -> int:
         return self.activation_func(dot_product(X[:-1], self.weights) + self.bias)
-        # return self.activation_func(dot_product(X[:-1], self.weights))
 
 
-class State():
+# For future reference
+# class State():
     # perceptron: object = None
     # perceptron = None
-    perceptron = Perceptron()   
-    # Can't write None here, does not work
+    # perceptron = Perceptron()   
+    # Can't write None here, doesn't work later
     # this Perceptron() will be overriten and is not used
 
 
@@ -212,23 +210,19 @@ def ask_for_data_loc():
 def get_data(line: str, read_type: TypeOfRead):
     tmp_list: list = line.split()
 
-    parsed_tmp_list2 = []
+    parsed_tmp_list = []
     for i in range(len(tmp_list) - 1):
-        parsed_tmp_list2.append(eval(tmp_list[i]))
+        parsed_tmp_list.append(eval(tmp_list[i]))
+
     if tmp_list[-1] == "Iris-setosa":
-        parsed_tmp_list2.append(1)
+        parsed_tmp_list.append(1)
     else:
-        parsed_tmp_list2.append(0)
+        parsed_tmp_list.append(0)
 
-
-    # logging.debug(parsed_tmp_list2)
-        
     if read_type == TypeOfRead.TRAINING:
-        # Variables.train_data.append(parsed_tmp_list)
-        Variables.train_data.append(parsed_tmp_list2)
+        Variables.train_data.append(parsed_tmp_list)
     else:
-        # Variables.predict_data.append(parsed_tmp_list)
-        Variables.predict_data.append(parsed_tmp_list2)
+        Variables.predict_data.append(parsed_tmp_list)
 
 
 def download_data_set(data_loc :str, read_type: TypeOfRead):
@@ -246,40 +240,22 @@ def download_data_set(data_loc :str, read_type: TypeOfRead):
     logging.info("^")
 
 
-def train():
+def train() -> Perceptron:
     download_data_set(Variables.data_loc, TypeOfRead.TRAINING)
     perceptron = Perceptron()
     perceptron.train(Variables.train_data)
     logging.debug(perceptron.weights)
-    State.perceptron = perceptron
+    return perceptron
 
 
-def predict():
-    perceptron = State.perceptron
-
-    # missing_input = True
-    # data_location = ""
-    # while missing_input:
-    #     data_loc = int(input("For default data location for prediciton type 1. Otherwise type 0: "))
-    #     if data_loc == 1:
-    #         data_location = "data/iris_test.txt"
-    #         missing_input = False
-    #     elif data_loc == 0:
-    #         data_location = str(input("Enter custom data location: "))
-    #         data_loc = data_loc
-    #         missing_input = False
-    #     else:
-    #         print("Enter valid input")
-    #
-    # download_data_set(data_location, TypeOfRead.PREDICTING)
-    # logging.debug(Variables.predict_data)
+def predict(perceptron):
     perceptron.predict_data_set()
 
 
 def main():
     ask_for_data_loc()
-    train()
-    predict()
+    perceptron = train()
+    predict(perceptron)
 
 
 if __name__ == "__main__":
