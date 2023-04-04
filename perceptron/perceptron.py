@@ -1,4 +1,4 @@
-"Pereptron that tries to classify if a flower is an Iris-setosa"
+"Pereptron that predicts if a flower is an Iris-setosa"
 from enum import Enum
 import logging
 import random
@@ -34,11 +34,11 @@ def step_func(x) -> int:
         logging.StreamHandler.terminator = "\n"
         return 0
 
-
+# 1 - Iris-setosa
 class Perceptron:
 
-    def __init__(self, learning_rate=0.02, n_iters=3) -> None:
-    # def __init__(self, learning_rate=0.02, n_iters=9) -> None:
+    # def __init__(self, learning_rate=0.02, n_iters=3) -> None:
+    def __init__(self, learning_rate=0.02, n_iters=7) -> None:
         self.lr = learning_rate
         self.n_iters = n_iters
         self.activation_func = step_func
@@ -48,26 +48,21 @@ class Perceptron:
 
 
     def train(self, data_set) -> None:
+        logging.info("v")
         for idx in range(self.n_iters):
             logging.debug(f"~~~~~~inter {idx + 1}")
             logging.debug(self.weights)
             logging.debug(self.bias)
             logging.debug("~~~~~~")
 
-            #for i, x_i in enumerate(Variables.train_data):
-            # a = 0
             n_correct = 0
             for x_i in data_set:
-                # a+=1
-                # if a > 47:
-                    # break
                 output = dot_product(x_i[:-1], self.weights) + self.bias
+
                 logging.StreamHandler.terminator = "  "
                 logging.debug(f"+bias {round(output, 2)}")
                 logging.StreamHandler.terminator = "\n"
-                # output = dot_product(x_i[:-1], self.weights)
-                # logging.debug("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
-                # logging.debug(output)
+
                 prediction = self.activation_func(output)
                 logging.debug(f"acutal label: {x_i[-1]}")
 
@@ -79,7 +74,6 @@ class Perceptron:
                     logging.debug(self.weights)
                     logging.debug(x_i)
 
-                    #for x, w in zip(x_i, self.weights):
                     for j in range(len(x_i) - 1):
                         logging.debug(x_i[j])
                         logging.debug(f"ubdate: {update}")
@@ -104,17 +98,17 @@ class Perceptron:
                     logging.debug(self.weights)
                     logging.debug(x_i)
                     logging.debug("---")
-                # elif abs(output - x_i[-1]) < 0.5:
-                #     logging.debug(f"in elif {output - x_i[-1]}")
-                #     ...
                 else:
                     n_correct+=1
-                    # logging.debug("corre")
 
-            # logging.debug(n_correct)
+            acc = round((n_correct/len(Variables.train_data)) * 100, 2)
             logging.info("~~~~~~~~~~~~~~~~")
-            logging.info(f"Accuracy for {idx + 1} iteration: {round((n_correct/len(Variables.train_data)) * 100, 2)}%")
+            logging.info(f"Accuracy for {idx + 1} iteration: {acc}%")
             logging.info("~~~~~~~~~~~~~~~~")
+            if acc == 100:
+                logging.info("Acc 100% reached")
+                break
+        logging.info("^")
 
 
     def predict_data_set(self) -> None:
@@ -155,9 +149,9 @@ class Perceptron:
             print(f"Enter a vector with {Variables.number_of_features} features plus it's actual label")
             print(f"If the label is unknown enter 2 there")
             while not end:
-                custom_vector: list[int] = []
+                custom_vector: list[float] = []
                 for i in range(Variables.number_of_features):
-                    custom_vector.append((int(input(f"Input {i+1} feature: "))))
+                    custom_vector.append((float(input(f"Input {i+1} feature: "))))
                 custom_vector.append(int(input("Input the cluster: ")))
 
                 prediction = self.predict(custom_vector)
@@ -217,20 +211,7 @@ def ask_for_data_loc():
 
 def get_data(line: str, read_type: TypeOfRead):
     tmp_list: list = line.split()
-    # logging.debug(tmp_list)
 
-    # cast to tuple?
-    # parsed_tmp_list = [eval(i) for i in tmp_list]
-    # parsed_tmp_list = []
-    # logging.debug(eval(tmp_list[1]))
-    # i = 0
-    # for i in range(len(tmp_list) - 1):
-    # # for i in range(1):
-    #     parsed_tmp_list.append(eval(tmp_list[i]))
-    # logging.debug(parsed_tmp_list)
-    # logging.debug(tmp_list)
-
-    # code for dealing with clusters described using a string
     parsed_tmp_list2 = []
     for i in range(len(tmp_list) - 1):
         parsed_tmp_list2.append(eval(tmp_list[i]))
