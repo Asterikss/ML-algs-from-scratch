@@ -14,8 +14,7 @@ class DefaultVariables:
     level = logging.INFO
     # level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
-    logging.basicConfig(level = level, format = fmt)
-    # filename = 'log_x.log', filemode = "w"
+    logging.basicConfig(level = level, format = fmt) # filename = 'log_x.log', filemode = "w"
 
 
 class TypeOfRead(Enum):
@@ -65,6 +64,7 @@ class Perceptron:
                 logging.debug(f"acutal label: {x_i[-1]}")
 
                 if prediction != x_i[-1]:
+                    # update weights
                     update = (x_i[-1] - prediction) * self.lr 
                     
                     logging.debug("---")
@@ -204,7 +204,6 @@ def ask_for_data_loc():
             missing_input = False
         else:
             print("Enter valid input")
-
 
 
 def get_data(line: str, read_type: TypeOfRead):
