@@ -1,3 +1,4 @@
+"Pereptron that tries to classify if a flower is an Iris-setosa"
 from enum import Enum
 import logging
 import random
@@ -34,7 +35,6 @@ def step_func(x) -> int:
         return 0
 
 
-# [-0.43, 1.35, -2.0, 1.69]
 class Perceptron:
 
     def __init__(self, learning_rate=0.02, n_iters=3) -> None:
@@ -42,11 +42,8 @@ class Perceptron:
         self.lr = learning_rate
         self.n_iters = n_iters
         self.activation_func = step_func
-        #self.weights = [int(random.uniform(-1, 3)) for _ in range(Variables.number_of_features)]
-        # self.weights = [int(random.uniform(-0.5, 4)) for _ in range(Variables.number_of_features)]
-        #self.weights = [int(random.uniform(-1, 2)) for _ in range(Variables.number_of_features)]
-        self.weights = [int(random.uniform(-1, 1)) for _ in range(Variables.number_of_features)]
-        #self.bias = Variables.default_bias
+        self.weights = [round(random.uniform(-1, 1), 2) for _ in range(Variables.number_of_features)]
+        # TODO see the change
         self.bias = round(random.uniform(-1, 1), 2)
 
 
