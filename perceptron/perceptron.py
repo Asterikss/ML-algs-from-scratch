@@ -114,9 +114,9 @@ class Perceptron:
         logging.info("prediciting data set")
 
         choice = -1
-        print("For predicting the cluster from the default file (data/iris_test.txt) type 1")
+        print("For predicting the labels from the default file (data/iris_test.txt) type 1")
         print("For custom guess (providing a vector) type 2 ")
-        print("For predicting the cluster from custom file type 3")
+        print("For predicting the label from custom file type 3")
 
         while choice != "0" and choice != "1" and choice != "2":
             choice = input(": ")
@@ -150,7 +150,7 @@ class Perceptron:
                 custom_vector: list[float] = []
                 for i in range(Variables.number_of_features):
                     custom_vector.append((float(input(f"Input {i+1} feature: "))))
-                custom_vector.append(int(input("Input the cluster: ")))
+                custom_vector.append(int(input("Input the label: ")))
 
                 prediction = self.predict(custom_vector)
                 actual_anwser = custom_vector[-1]
