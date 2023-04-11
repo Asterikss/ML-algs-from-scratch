@@ -1,0 +1,24 @@
+Równania Naviera-Stokesa (nazwane na cześć Claude’a-Louis Naviera i George’a
+Gabriela Stokesa) – zestaw równań opisujących zasadę zachowania pędu dla
+poruszającego się płynu. Według nich zmiany pędu elementu płynu zależą jedynie
+od sił masowych, zewnętrznego ciśnienia i wewnętrznych sił lepkości w płynie.
+
+Dla płynu idealnego o zerowej lepkości równania mówią, że przyspieszenie jest
+proporcjonalne do gradientu ciśnienia.
+
+Równania są wyrażone w postaci różniczkowej, dla danego problemu fizycznego
+muszą być znalezione na drodze rachunku różniczkowego i całkowego. W praktyce
+jedynie najprostsze przypadki mogą być rozwiązane analitycznie, na przykład
+nieturbulentnego (laminarnego), stacjonarnego przepływu (niezmieniającego się w
+czasie), w których liczba Reynoldsa ma małą wartość.
+
+W bardziej złożonych przypadkach, jak prognozowanie pogody na Ziemi, analiza El
+Niño lub obliczenia siły nośnej skrzydeł samolotów, rozwiązania równań
+Naviera-Stokesa mogą być znalezione jedynie metodami numerycznymi przy pomocy
+komputerów. Jest to oddzielna dziedzina nauki zwana obliczeniową mechaniką
+płynów.
+
+W 2000 roku Instytut Matematyczny Claya ogłosił równania Naviera-Stokesa jednym
+z siedmiu problemów milenijnych matematyki i zaoferował 1 000 000 dolarów
+nagrody za podanie rozwiązania lub kontrprzykładu[1]. Oficjalny opis problemu
+przedstawił Charles Fefferman.

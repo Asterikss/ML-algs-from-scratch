@@ -1,0 +1,24 @@
+Kodowanie Huffmana (ang. Huffman coding) – jedna z najprostszych i łatwych w
+implementacji metod kompresji bezstratnej[1]. Została opracowana w 1952 roku
+przez Amerykanina Davida Huffmana[2].
+
+Algorytm Huffmana nie należy do najefektywniejszych obliczeniowo systemów
+bezstratnej kompresji danych, dlatego też praktycznie nie używa się go
+samodzielnie. Często wykorzystuje się go jako ostatni etap w różnych systemach
+kompresji, zarówno bezstratnej, jak i stratnej, np. MP3 lub JPEG. Pomimo że nie
+jest doskonały, stosuje się go ze względu na prostotę oraz brak ograniczeń
+patentowych. Jest to przykład wykorzystania algorytmu zachłannego.
+
+Dany jest alfabet źródłowy (zbiór symboli) � = { � 1 , … , � � } {\displaystyle
+S=\{x_{1},\dots ,x_{n}\}} oraz zbiór stowarzyszonych z nim prawdopodobieństw �
+= { � 1 , … , � � } . {\displaystyle P=\{p_{1},\dots ,p_{n}\}.} Symbolami są
+najczęściej bajty, choć nie ma żadnych przeszkód żeby było nimi coś innego (np.
+pary znaków). Prawdopodobieństwa mogą zostać z góry określone dla danego
+zestawu danych, np. poprzez wyznaczenie częstotliwości występowania znaków w
+tekstach danego języka. Częściej jednak wyznacza się je indywidualnie dla
+każdego zestawu danych.
+
+Kodowanie Huffmana polega na utworzeniu słów kodowych (ciągów bitowych),
+których długość jest odwrotnie proporcjonalna do prawdopodobieństwa � � .
+{\displaystyle p_{i}.} Tzn. im częściej dany symbol występuje (może wystąpić) w
+ciągu danych, tym mniej zajmie bitów.

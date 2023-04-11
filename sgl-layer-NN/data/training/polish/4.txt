@@ -1,0 +1,13 @@
+Problem NP (ang. nondeterministic polynomial, niedeterministycznie
+wielomianowy) – problem decyzyjny, dla którego rozwiązanie można zweryfikować w
+czasie wielomianowym. Równoważna definicja mówi, że problem jest w klasie NP,
+jeśli może być rozwiązany w wielomianowym czasie na niedeterministycznej
+maszynie Turinga.
+
+Różnica pomiędzy problemami P i NP polega na tym, że w przypadku P znalezienie
+rozwiązania ma mieć złożoność wielomianową, podczas gdy dla NP sprawdzenie
+podanego z zewnątrz rozwiązania ma mieć taką złożoność.
+
+Przykładowy problem:
+Czy jakikolwiek niepusty podzbiór zadanego zbioru (np. { − 2 , 6 , − 3 , 72 ,
+10 , − 11 } {\displaystyle \{-2,6,-3,72,10,-11\}}) sumuje się do zera?

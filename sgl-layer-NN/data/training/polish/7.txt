@@ -1,0 +1,25 @@
+Kompresja danych (ang. data compression) – zmiana sposobu zapisu informacji w
+celu zmniejszenia redundancji i tym samym objętości zbioru. Innymi słowy chodzi
+o wyrażenie tego samego zestawu informacji, lecz za pomocą mniejszej liczby
+bitów.
+
+Działaniem przeciwnym do kompresji jest dekompresja.
+
+Kompresja dzieli się na bezstratną – w której z postaci skompresowanej można
+odzyskać identyczną postać pierwotną oraz stratną – w której takie odzyskanie
+jest niemożliwe, jednak główne właściwości zostają zachowane. Np. jeśli
+kompresowany jest obrazek, nie widać znaczących różnic w stosunku do oryginału.
+Pomimo to może się już nie nadawać do dalszej przeróbki czy do wydruku, gdyż w
+tych zastosowaniach wymaga się zachowania innych właściwości.
+
+Algorytmy kompresji dzieli się na algorytmy zastosowania ogólnego oraz
+algorytmy do danego typu danych. Z definicji nie istnieją algorytmy kompresji
+stratnej zastosowania ogólnego, ponieważ dla różnych typów danych konieczne
+jest zachowanie różnych właściwości. Na przykład kompresja dźwięku używa
+specjalnego modelu psychoakustycznego, który nie ma sensu w zastosowaniu do
+obrazu, poza bardzo ogólnymi przesłankami dotyczącymi sposobu postrzegania
+rzeczywistości przez człowieka.
+
+Większość algorytmów bezstratnych to algorytmy zastosowania ogólnego oraz ich
+drobne przeróbki, dzięki którym lepiej działają z określonymi typami danych.
+Nawet drobne poprawki mogą znacząco polepszyć wyniki dla pewnych typów danych.

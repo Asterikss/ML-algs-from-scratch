@@ -1,0 +1,16 @@
+Hipoteza Riemanna – sformułowana w 1859 roku hipoteza, dotycząca badanej
+przez niemieckiego matematyka Bernharda Riemanna funkcji dzeta. Jest jednym z
+największych nierozwiązanych problemów w matematyce obok hipotezy Goldbacha.
+Mówi ona, że wszystkie tzw. nietrywialne zera (nierzeczywiste) tej funkcji mają
+część rzeczywistą równą 1/2. Problem ten ma duże znaczenie dla całej
+matematyki – w szczególności dla teorii liczb, ale również dla statystyki oraz
+fizyki. Jest jednym z problemów milenijnych, ogłoszonych przez Instytut
+Matematyczny Claya w roku 2000. Clay Mathematics Institute (CMI) ufundował
+nagrodę w wysokości miliona dolarów za dowód lub obalenie tej hipotezy.
+Hipoteza Riemanna jest ósmym problemem z listy problemów Hilberta.
+
+Prawdziwość hipotezy Riemanna pozwalałaby na wzmocnienie pewnych nierówności
+dotyczących liczb pierwszych oraz równości asymptotycznych. Okazuje się na
+przykład, że hipoteza Riemanna jest równoważna poniższej równości (π(n) to
+liczba liczb pierwszych w przedziale od 1 do n), będącej wzmocnieniem
+twierdzenia o liczbach pierwszych
