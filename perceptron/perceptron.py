@@ -2,7 +2,7 @@
 from enum import Enum
 import logging
 import random
-
+# normalize vectors!!
 class Variables:
     data_loc = ""
     train_data = []

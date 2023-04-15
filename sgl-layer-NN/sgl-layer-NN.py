@@ -1,5 +1,5 @@
 "Single layer neural network used for predicting the language of a piece of text"
-from enum import Enum
+# from enum import Enum
 from dataclasses import dataclass
 import logging
 import random
@@ -21,9 +21,9 @@ class Vars:
     train_data = []
 
 
-class TypeOfRead(Enum):
-    TRAINING = 0
-    PREDICTING = 1
+# class TypeOfRead(Enum):
+#     TRAINING = 0
+#     PREDICTING = 1
 
 
 def sigmoid_func(x) -> float: # pure
@@ -38,7 +38,7 @@ def dot_product(X: list, weights) -> float: # pure
     logging.StreamHandler.terminator = "  "
     logging.debug(round(result, 3))
     logging.StreamHandler.terminator = "\n"
-    return round(result, 3)
+    return round(result, 3) # maby without round
 
 
 class Neuron:
@@ -46,16 +46,16 @@ class Neuron:
         self.lr: float = learning_rate
         self.activation_func = activ_func
         self.weights = [round(random.uniform(-1, 1), 3) for _ in range(n_inputs)]
-        self.bias = round(random.uniform(-1, 1), 3)
+        self.bias = round(random.uniform(-1, 1), 3) # maby without round
         self.n_inputs = n_inputs
 
 
     def output(self, X) -> float:
         return self.activation_func(dot_product(X[:-1], self.weights) + self.bias)
-    
-    def n_of_inputs(self) -> int:
-        return self.n_inputs
 
+    
+    def get_n_of_inputs(self) -> int:
+        return self.n_inputs
 
 
 class Layer:
@@ -70,6 +70,19 @@ class Layer:
         return outputs
 
 
+def normalization(X) -> list[float]: # pure
+    logging.debug(f"norm {X}")
+    sq_sum = 0
+    for i in range(len(X) - 1):
+        sq_sum += math.pow(X[i], 2)
+    # logging.debug(sq_sum)
+    magnitude = math.sqrt(sq_sum)
+    # logging.debug(magnitude)
+    for i in range(len(X) - 1):
+        X[i] /= magnitude
+    logging.debug(f"norm {X}")
+    return X
+
 
 class NeuralNetwork():
     def __init__(self, n_inputs, layers: list[int]) -> None:
@@ -77,8 +90,9 @@ class NeuralNetwork():
         self.layers += [Layer(layers[i], layers[i+1]) for i in range(len(layers) - 1)]
         self.n_inputs = n_inputs
 
+
     def feed_forward(self, X) -> list[float]:
-        input = X
+        input = normalization(X)
         for layer in self.layers:
             input = layer.output(input)
         return input
@@ -91,12 +105,13 @@ class NeuralNetwork():
 
         print(output)
 
+
     def show_arch(self):
         print(f"{self.n_inputs} -> ", end="")
         for layer in self.layers:
             print("| ", end="")
             for neuron in layer.neurons:
-                print(f"N {neuron.n_of_inputs()}", end=" ")
+                print(f"N({neuron.get_n_of_inputs()})", end=" ")
         print("| ", end="")
 
 
@@ -161,8 +176,9 @@ def main():
     data_loc = ask_for_data_loc()
     train_data = download_data_set(data_loc)
     neural_network: NeuralNetwork = NeuralNetwork(26, [3, 4, 2])
-    logging.debug(neural_network.show_arch())
-    # neural_network.train(train_data)
+    neural_network.show_arch()
+    # print("SDDDDDDDDDDDDDDDDDDDDDDD")
+    neural_network.train(train_data)
 
 
 if __name__ == "__main__":
