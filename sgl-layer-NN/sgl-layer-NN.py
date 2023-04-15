@@ -47,10 +47,15 @@ class Neuron:
         self.activation_func = activ_func
         self.weights = [round(random.uniform(-1, 1), 3) for _ in range(n_inputs)]
         self.bias = round(random.uniform(-1, 1), 3)
+        self.n_inputs = n_inputs
 
 
     def output(self, X) -> float:
         return self.activation_func(dot_product(X[:-1], self.weights) + self.bias)
+    
+    def n_of_inputs(self) -> int:
+        return self.n_inputs
+
 
 
 class Layer:
@@ -58,23 +63,42 @@ class Layer:
         self.neurons: list[Neuron] = [Neuron(n_inputs) for _ in range(n_neurons)]
 
     
-    def feed_forward(self, X) -> list[float]:
+    def output(self, X) -> list[float]:
         outputs = []
         for neuron in self.neurons:
             outputs.append(neuron.output(X)) 
         return outputs
 
 
+
 class NeuralNetwork():
     def __init__(self, n_inputs, layers: list[int]) -> None:
         self.layers = [Layer(n_inputs, layers[0])]
         self.layers += [Layer(layers[i], layers[i+1]) for i in range(len(layers) - 1)]
+        self.n_inputs = n_inputs
+
+    def feed_forward(self, X) -> list[float]:
+        input = X
+        for layer in self.layers:
+            input = layer.output(input)
+        return input
 
 
     def train(self, train_data: list[list[int]]):
-        example_one = train_data[0]
-        self.layers[0].feed_forward(example_one)
-        ...
+        output = []
+        for X in train_data:
+            output: list[float] = self.feed_forward(X)
+
+        print(output)
+
+    def show_arch(self):
+        print(f"{self.n_inputs} -> ", end="")
+        for layer in self.layers:
+            print("| ", end="")
+            for neuron in layer.neurons:
+                print(f"N {neuron.n_of_inputs()}", end=" ")
+        print("| ", end="")
+
 
 
 def ask_for_data_loc() -> str: # pure
@@ -136,9 +160,9 @@ def download_data_set(root_directory: str) -> list[list[int]]: # pure
 def main():
     data_loc = ask_for_data_loc()
     train_data = download_data_set(data_loc)
-    neural_network: NeuralNetwork = NeuralNetwork(26, [3])
-    logging.debug(neural_network)
-    neural_network.train(train_data)
+    neural_network: NeuralNetwork = NeuralNetwork(26, [3, 4, 2])
+    logging.debug(neural_network.show_arch())
+    # neural_network.train(train_data)
 
 
 if __name__ == "__main__":
