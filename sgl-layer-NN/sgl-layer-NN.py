@@ -1,5 +1,5 @@
 "Single layer neural network used for predicting the language of a piece of text"
-# from enum import Enum
+from enum import Enum
 from dataclasses import dataclass
 import logging
 import random
@@ -20,17 +20,24 @@ class Vars:
     train_data = []
 
 
-# class TypeOfRead(Enum):
-#     TRAINING = 0
-#     PREDICTING = 1
+class ActivationType(Enum):
+    SIGMOID = 0
 
 
-def sigmoid_func(x) -> float: # pure
-    logging.StreamHandler.terminator = "  "
-    logging.debug(f"sig: {x}")
-    logging.StreamHandler.terminator = "\n"
-    logging.debug(f"sig: {1/(1+ math.exp(-x))}")
-    return 1/(1+ math.exp(-x))
+def get_activation_and_derivative(activation_type: ActivationType): # pure
+    def sigmoid_func(x) -> float: # pure
+        logging.StreamHandler.terminator = "  "
+        logging.debug(f"sig: {x}")
+        logging.StreamHandler.terminator = "\n"
+        logging.debug(f"sig: {1/(1+ math.exp(-x))}")
+        return 1/(1+ math.exp(-x))
+
+    def sigmoid_derivative(a):
+        return a * (1-a)
+
+
+    if activation_type == ActivationType.SIGMOID:
+        return sigmoid_func, sigmoid_derivative
 
 
 def dot_product(X: list, weights) -> float: # pure
@@ -44,9 +51,8 @@ def dot_product(X: list, weights) -> float: # pure
 
 
 class Neuron:
-    def __init__(self, n_inputs, activ_func=sigmoid_func, learning_rate=0.02) -> None:
-        self.lr: float = learning_rate
-        self.activation_func = activ_func
+    def __init__(self, n_inputs, activ_type=ActivationType.SIGMOID) -> None:
+        self.activation_func, self.derivative = get_activation_and_derivative(activ_type)
         self.weights = [round(random.uniform(-1, 1), 3) for _ in range(n_inputs)]
         self.bias = round(random.uniform(-1, 1), 3) # maby without round
         self.n_inputs = n_inputs
@@ -94,6 +100,7 @@ def calc_error(output: float, expected_output: int) -> float: # pure
     return math.pow(output - expected_output, 2)
 
 
+# rename to calc_layer_error maby
 def calc_full_error(output: list[float], expected_output: list[int]) -> float: # pure
     sum = 0
     for i in range(len(output)):
@@ -111,13 +118,13 @@ class NeuralNetwork():
 
     def feed_forward(self, X) -> list[float]:
         input: list = normalization(X)
-        # maby this should be done in a defferent place
+        # maby this should be done in a defferent place. no
         for layer in self.layers:
             input = layer.output(input)
         return input
 
 
-    def train(self, train_data: list[list[int]]):
+    def train(self, train_data: list[list[int]], learning_rate=0.2):
         output = []
         # expected_out = []
         for X in train_data:
@@ -125,14 +132,23 @@ class NeuralNetwork():
             output: list[float] = self.feed_forward(X)
             expected_out: list[int] = expected_output(X[-1], self.n_outputs)
             full_error = calc_full_error(output, expected_out) 
-            print(f" output ---> {output}  expected output: {expected_out} ")
+            print(f" output ---> {output}  expected output: {expected_out} full error: {full_error}")
 
 
             for layer in reversed(self.layers):
-                for i in range(len(layer.neurons)):
+                # for neuron, idx in range(len(layer.neurons)):
+                for i, neuron in enumerate(layer.neurons):
                     # error = calc_error(layer.neurons[i], expected_out[i]) 
                     error = calc_error(output[i], expected_out[i]) 
                     logging.debug(error)
+
+                    logging.debug(f"old w: {neuron.weights}")
+                    for idx in range(len(neuron.weights)):
+                        neuron.weights[idx] += learning_rate * (expected_out[i] - output[i]) * neuron.derivative(output[i]) * X[idx]
+                    logging.debug(f"new w: {neuron.weights}")
+                    # output2: list[float] = self.feed_forward(X)
+                    # logging.debug(f"new output: {output2}")
+
 
 
     def show_arch(self):
