@@ -9,7 +9,6 @@ import math
 
 @dataclass(frozen=True)
 class DefaultVars:
-    n_neurons = 4 # display it later
     # level = logging.INFO
     level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
@@ -30,8 +29,8 @@ def sigmoid_func(x) -> float: # pure
     logging.StreamHandler.terminator = "  "
     logging.debug(f"sig: {x}")
     logging.StreamHandler.terminator = "\n"
-    logging.debug(f"sig: {x/(1+ math.exp(-x))}")
-    return x/(1+ math.exp(-x))
+    logging.debug(f"sig: {1/(1+ math.exp(-x))}")
+    return 1/(1+ math.exp(-x))
 
 
 def dot_product(X: list, weights) -> float: # pure
@@ -87,8 +86,19 @@ def normalization(X) -> list[float]: # pure
     return X
 
 
-def actual_label(label, n_outputs) -> list[int]:
+def expected_output(label, n_outputs) -> list[int]: # pure
     return [1 if i == label else 0 for i in range(n_outputs)]
+
+
+def calc_error(output: float, expected_output: int) -> float: # pure
+    return math.pow(output - expected_output, 2)
+
+
+def calc_full_error(output: list[float], expected_output: list[int]) -> float: # pure
+    sum = 0
+    for i in range(len(output)):
+        sum += calc_error(output[i], expected_output[i])
+    return sum
 
 
 class NeuralNetwork():
@@ -109,10 +119,20 @@ class NeuralNetwork():
 
     def train(self, train_data: list[list[int]]):
         output = []
+        # expected_out = []
         for X in train_data:
             # logging.debug(f"{i}")
             output: list[float] = self.feed_forward(X)
-            print(f" output ---> {output}  actual label: {actual_label(X[-1], self.n_outputs)}")
+            expected_out: list[int] = expected_output(X[-1], self.n_outputs)
+            full_error = calc_full_error(output, expected_out) 
+            print(f" output ---> {output}  expected output: {expected_out} ")
+
+
+            for layer in reversed(self.layers):
+                for i in range(len(layer.neurons)):
+                    # error = calc_error(layer.neurons[i], expected_out[i]) 
+                    error = calc_error(output[i], expected_out[i]) 
+                    logging.debug(error)
 
 
     def show_arch(self):
@@ -184,7 +204,7 @@ def download_data_set(root_directory: str) -> list[list[int]]: # pure
 def main():
     data_loc = ask_for_data_loc()
     train_data = download_data_set(data_loc)
-    neural_network: NeuralNetwork = NeuralNetwork(26, [3, 4, 2])
+    neural_network: NeuralNetwork = NeuralNetwork(26, [4])
     neural_network.show_arch()
     # print("SDDDDDDDDDDDDDDDDDDDDDDD")
     print(train_data)
