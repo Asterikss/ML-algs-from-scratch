@@ -27,6 +27,9 @@ class Vars:
 
 
 def sigmoid_func(x) -> float: # pure
+    logging.StreamHandler.terminator = "  "
+    logging.debug(f"sig: {x}")
+    logging.StreamHandler.terminator = "\n"
     logging.debug(f"sig: {x/(1+ math.exp(-x))}")
     return x/(1+ math.exp(-x))
 
@@ -84,15 +87,21 @@ def normalization(X) -> list[float]: # pure
     return X
 
 
+def actual_label(label, n_outputs) -> list[int]:
+    return [1 if i == label else 0 for i in range(n_outputs)]
+
+
 class NeuralNetwork():
     def __init__(self, n_inputs, layers: list[int]) -> None:
         self.layers = [Layer(n_inputs, layers[0])]
         self.layers += [Layer(layers[i], layers[i+1]) for i in range(len(layers) - 1)]
         self.n_inputs = n_inputs
+        self.n_outputs = layers[-1]
 
 
     def feed_forward(self, X) -> list[float]:
-        input = normalization(X)
+        input: list = normalization(X)
+        # maby this should be done in a defferent place
         for layer in self.layers:
             input = layer.output(input)
         return input
@@ -101,9 +110,9 @@ class NeuralNetwork():
     def train(self, train_data: list[list[int]]):
         output = []
         for X in train_data:
+            # logging.debug(f"{i}")
             output: list[float] = self.feed_forward(X)
-
-        print(output)
+            print(f" output ---> {output}  actual label: {actual_label(X[-1], self.n_outputs)}")
 
 
     def show_arch(self):
@@ -112,7 +121,7 @@ class NeuralNetwork():
             print("| ", end="")
             for neuron in layer.neurons:
                 print(f"N({neuron.get_n_of_inputs()})", end=" ")
-        print("| ", end="")
+        print("|")
 
 
 
@@ -178,6 +187,7 @@ def main():
     neural_network: NeuralNetwork = NeuralNetwork(26, [3, 4, 2])
     neural_network.show_arch()
     # print("SDDDDDDDDDDDDDDDDDDDDDDD")
+    print(train_data)
     neural_network.train(train_data)
 
 
