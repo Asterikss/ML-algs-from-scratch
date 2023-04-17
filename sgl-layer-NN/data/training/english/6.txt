@@ -1,0 +1,23 @@
+A binary digit, characterized as 0 or 1, is used both as a unit of information
+and, when errors are ignored, a storage/symbol state to represent information
+in classical computers or classical communications. Then, a bit as a unit is
+mostly identical to a bit as a storage/symbol. However, when errors are not
+negligible, a state of a bit as a storage/symbol or a qubit, is not exactly 0
+or 1 from which less than a bit, as a unit, of Shannon information can be
+retrieved/decoded.
+
+With classical optical symbols, the average number of photons of which are
+considerably larger than 1, more than 1 bit of information may be encoded into
+or decoded from the symbols. For example, with PDM-QPSK encoding, 2 bits of
+information are encoded as polarization states (two mutually orthogonal linear
+ones and two circular ones with different chirality) and 2 more bits are
+encoded as relative phase relative to other symbols.
+
+But, if a symbol consists of a single photon and no other symbols are
+considered, there is no relative phase to carry information. Moreover, upon
+decoding, a beam-splitting polarizer can not split the photon and the photon is
+output only at a single output port. Depending on which output port the photon
+is detected, a binary result is obtained, which is how a symbol consisting of a
+single photon act as a qubit or a bit as a binary symbol. So far, a
+polarization state of a photon is used for encoding, which is no different from
+similar encoding on classical optical symbols.

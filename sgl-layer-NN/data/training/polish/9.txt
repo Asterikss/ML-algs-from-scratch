@@ -1,0 +1,28 @@
+Podstawowy tryb gry wymaga dwóch graczy, istnieją także reguły dla czterech lub
+więcej graczy. Każdy gracz zaczyna z dwudziestoma punktami życia i przegrywa,
+kiedy straci je wszystkie (lub zostanie otruty trucizną, [poison counters]
+którą dysponują „zarażające” stwory, wtedy trzeba zadać tylko 10 punktów
+obrażeń). Gracze tracą życie, kiedy otrzymują obrażenia od przyzwanych stworów
+lub kiedy różne zagrania i inne karty zabierają im życie bezpośrednio. Choć
+zmniejszenie liczby punktów życia przeciwnika do zera to najpopularniejszy
+sposób wygrania, to grę można wygrać także na inne sposoby. Gracz przegrywa
+także wówczas, gdy musi dobrać kartę, ale jego talia (zwana w grze
+„biblioteką”) jest pusta. Niektóre karty określają inne sposoby wygrania lub
+przegrania gry.
+
+Każdy gracz dysponuje swoją talią z wybranymi wcześniej kartami. Od doboru kart
+zależy strategia jego gry. Trzema podstawowymi typami kart są działania,
+stworzenia oraz lądy. Lądy zapewniają dostęp do many, energii, która jest
+używana jako paliwo spalane podczas rzucania zagrań. Gracze mogą zagrywać tylko
+jeden ląd na turę. Silniejsze czary kosztują więcej many, więc w późniejszej
+fazie gry ilość i moc zagrań rośnie. Niektóre karty wymagają zapłaty
+dodatkowych kosztów, takich jak punkty życia czy karty w grze. Zagrania różnią
+się między sobą. Karty typu Sorcery oraz Instant to typy kart, które mają
+jednokrotny efekt, po czym umieszczane są na cmentarzu (graveyard, stos kart
+odrzuconych). Umagicznienia i artefakty (Enchantment, Artifact) pozostają na
+stole i dają pewien stały efekt. Przyzwane stwory (Creature) mogą atakować i
+ranić przeciwnika. Dodatek Lorwyn wprowadził nowy typ karty: Planeswalker,
+który reprezentuje w grze sojusznika, używającego własnej magii, której poziom
+zależy od ich lojalności wobec gracza. Stworzenia mogą mieć kilka typów, np.
+artefaktyczne stwory (Artifact Creature) mają wszystkie korzyści i wady bycia
+zarówno artefaktem, jak i stworem.

@@ -1,0 +1,27 @@
+The entropy of a system depends on its internal energy and its external
+parameters, such as its volume. In the thermodynamic limit, this fact leads to
+an equation relating the change in the internal energy � U to changes in the
+entropy and the external parameters. This relation is known as the fundamental
+thermodynamic relation. If external pressure � p bears on the volume � V as the
+only external parameter, this relation is:
+
+and entropy are monotonic functions of temperature � T, implying that the
+internal energy is fixed when one specifies the entropy and the volume, this
+relation is valid even if the change from one state of thermal equilibrium to
+another with infinitesimally larger entropy and volume happens in a
+non-quasistatic way (so during this change the system may be very far out of
+thermal equilibrium and then the whole-system entropy, pressure, and
+temperature may not exist).
+
+The fundamental thermodynamic relation implies many thermodynamic identities
+that are valid in general, independent of the microscopic details of the
+system. Important examples are the Maxwell relations and the relations between
+heat capacities.
+
+Entropy in chemical thermodynamics Thermodynamic entropy is central in chemical
+thermodynamics, enabling changes to be quantified and the outcome of reactions
+predicted. The second law of thermodynamics states that entropy in an isolated
+system – the combination of a subsystem under study and its surroundings –
+increases during all spontaneous chemical and physical processes. The Clausius
+describes the direction and quantifies the magnitude of simple changes such as
+heat transfer between systems – always from hotter to cooler spontaneously.

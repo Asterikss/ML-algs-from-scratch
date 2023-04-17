@@ -1,0 +1,25 @@
+In particle physics and physical cosmology, Planck units are a set of units of
+measurement defined exclusively in terms of four universal physical constants,
+in such a manner that these physical constants take on the numerical value of 1
+when expressed in terms of these units. Originally proposed in 1899 by German
+physicist Max Planck, these units are a system of natural units because their
+definition is based on properties of nature, more specifically the properties
+of free space, rather than a choice of prototype object. They are relevant in
+research on unified theories such as quantum gravity.
+
+The term Planck scale refers to quantities of space, time, energy and other
+units that are similar in magnitude to corresponding Planck units. This region
+may be characterized by particle energies of around 1019 GeV or 109 J, time
+intervals of around 10−43 s and lengths of around 10−35 m (approximately the
+energy-equivalent of the Planck mass, the Planck time and the Planck length,
+respectively). At the Planck scale, the predictions of the Standard Model,
+quantum field theory and general relativity are not expected to apply, and
+quantum effects of gravity are expected to dominate. The best-known example is
+represented by the conditions in the first 10−43 seconds of our universe after
+the Big Bang, approximately 13.8 billion years ago.
+
+The four universal constants that, by definition, have a numeric value 1 when
+expressed in these units are:
+
+the speed of light in vacuum, c, the gravitational constant, G, the reduced
+Planck constant, ħ, and the Boltzmann constant, kB.

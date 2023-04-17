@@ -1,0 +1,26 @@
+openpilot is an open source, semi-automated driving system developed by
+comma.ai. openpilot operates as a replacement for OEM advanced
+driver-assistance systems with the objective of improving visual perception and
+electromechanical actuator control. It allows users to modify their existing
+car with increased computing power, enhanced sensors, and continuously-updated
+driver assistance features that improve with user-submitted data.
+
+As of March 2021 the total distance driven by users of openpilot is over 40
+million miles (64,000,000 km).[1][2]
+
+History comma.ai was founded in September 2015 by George Hotz.[3] The first
+version of openpilot was revealed a few months later in a Bloomberg article,
+showing functionality on a 2016 Acura ILX.[4] The video and article instigated
+a cease and desist letter from the California Department of Motor Vehicles,
+claiming comma.ai was testing a self-driving car without a license.
+
+openpilot was packaged into a small, shippable device called the "comma one",
+announced at TechCrunch Disrupt.[5] On October 27, 2016, NHTSA issued a Special
+Order to comma.ai demanding detailed information about the comma one, to
+determine if the device complies with legally required Federal Motor Vehicle
+Safety Standards.[6] comma.ai responded in a tweet from Shenzhen, China,
+announcing the cancellation of the comma one.[7]
+
+comma.ai open-sourced openpilot a month later, on November 30, 2016,
+emphasizing its intended use for research, without any warranty.[8][9]
+

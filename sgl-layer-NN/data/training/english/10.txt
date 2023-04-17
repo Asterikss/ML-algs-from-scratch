@@ -1,0 +1,27 @@
+Cards in Magic: The Gathering have a consistent format, with half of the face
+of the card showing the card's art, and the other half listing the card's
+mechanics, often relying on commonly-reused keywords to simplify the card's
+text.[citation needed] Cards fall into generally two classes: lands and
+spells.[citation needed] Lands produce mana, or magical energy. Players usually
+can only play one land card per turn, with most land providing a specific color
+of mana when they are "tapped" (usually by rotating the card 90 degrees to show
+it has been used that turn); each land can be tapped for mana only once per
+turn.[13] Meanwhile, spells consume mana, typically requiring at least one mana
+of a specific color. More powerful spells cost more, and more specifically
+colored, mana, so as the game progresses, more land will be in play, more mana
+will be available, and the quantity and relative power of the spells played
+tends to increase. Spells come in several varieties: non-permanents like
+"sorceries" and "instants" have a single, one-time effect before they go to the
+"graveyard" (discard pile); "enchantments" and "artifacts" that remain in play
+after being cast to provide a lasting magical effect; and "creature" spells
+summon creatures that can attack and damage an opponent as well as used to
+defend from the opponent's creature attacks; "planeswalker" spells that summon
+powerful allies that act similarly to other players.[14][15] Land,
+enchantments, artifacts, and creature cards are considered "permanents" as they
+remain in play until removed by other spells, ability, or combat effects.[15]
+
+Players begin the game by shuffling their decks and then drawing seven
+cards.[16] On each player's turn, following a set phase order, they draw a
+card, tap their lands and other permanents as necessary to gain mana as to cast
+spells, engage their creatures in a single attack round against their opponent
+who may use their own creatures to block the attack, and then complete other

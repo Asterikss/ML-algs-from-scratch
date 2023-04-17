@@ -1,0 +1,26 @@
+El Wii Remote tiene la capacidad de detectar la aceleración a lo largo de tres
+ejes mediante la utilización de un acelerómetro ADXL330. El Wiimote también
+cuenta con un sensor óptico PixArt, lo que le permite determinar el lugar al
+que el Wiimote está apuntando; además de agregar una brújula electrónica en el
+WiiMotionPlus.
+
+A diferencia de un mando que detecta la luz de una pantalla de televisión, el
+Wiimote detecta la luz de la Barra sensor de la consola (número de modelo
+RVL-014), lo que permite el uso coherente, independientemente del tipo o tamaño
+de la televisión. Esta barra mide aproximadamente 20 cm de longitud y cuenta
+con diez LED infrarrojos, con cinco LED dispuestos en cada extremo de la barra.
+En cada grupo de cinco LED, el LED más lejano fuera del centro apunta
+ligeramente lejos del centro, el LED más cercano al centro apunta ligeramente
+hacia el centro, mientras que los tres LED entre ellos están apuntando
+directamente hacia adelante y agrupados. El cable de la barra sensor mide 353
+cm de longitud. La barra puede ser colocada por encima o por debajo de la
+televisión, y debe centrarse. Si está colocada por encima, el sensor debe estar
+alineado con la parte delantera de la televisión, y si coloca en la parte
+inferior, debe alinearse con la parte delantera de la superficie de la
+televisión en la que se coloca. No es necesario señalar directamente a la barra
+sensor, pero apuntar significativamente fuera de la barra de posición
+perturbará la capacidad de detección debido al limitado ángulo de visión del
+Wiimote.
+
+El uso de la barra de sensores permite al Wiimote ser utilizado como un
+dispositivo de señalamiento preciso de hasta 5 metros de distancia de la barra.

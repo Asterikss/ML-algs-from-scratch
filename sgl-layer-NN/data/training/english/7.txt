@@ -1,0 +1,23 @@
+Any two-level quantum-mechanical system can be used as a qubit. Multilevel
+systems can be used as well, if they possess two states that can be effectively
+decoupled from the rest (e.g., ground state and first excited state of a
+nonlinear oscillator). There are various proposals. Several physical
+implementations that approximate two-level systems to various degrees were
+successfully realized. Similarly to a classical bit where the state of a
+transistor in a processor, the magnetization of a surface in a hard disk and
+the presence of current in a cable can all be used to represent bits in the
+same computer, an eventual quantum computer is likely to use various
+combinations of qubits in its design.
+
+All physical implementations are affected by noise. The so-called T1 lifetime
+and T2 dephasing time are a time to characterize the physical implementation
+and represent their sensitivity to noise. A higher time does not necessarily
+mean that one or the other qubit is better suited for quantum computing because
+gate times and fidelities need to be considered, too.
+
+Different applications like Quantum sensing, Quantum computing and Quantum
+communication are using different implementations of qubits to suit their
+application.
+
+The following is an incomplete list of physical implementations of qubits, and
+the choices of basis are by convention only.
