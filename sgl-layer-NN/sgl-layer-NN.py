@@ -33,9 +33,8 @@ def get_activation_and_derivative(activation_type: ActivationType): # pure
         # logging.debug(f"sig: {1/(1+ math.exp(-x))}")
         return 1/(1+ math.exp(-x))
 
-    def sigmoid_derivative(a):
+    def sigmoid_derivative(a): # pure
         return a * (1-a)
-
 
     if activation_type == ActivationType.SIGMOID:
         return sigmoid_func, sigmoid_derivative
@@ -48,15 +47,12 @@ def dot_product(X: list, weights) -> float: # pure
     # logging.StreamHandler.terminator = "  "
     # logging.debug(round(result, 3))
     # logging.StreamHandler.terminator = "\n"
-    # return round(result, 3) # maby without round
-    return result # maby without round
+    return result
 
 
 class Neuron:
     def __init__(self, n_inputs, activ_type=ActivationType.SIGMOID) -> None:
         self.activation_func, self.activation_derivative = get_activation_and_derivative(activ_type)
-        # self.weights: list[float] = [round(random.uniform(-1, 1), 3) for _ in range(n_inputs)]
-        # self.bias: float = round(random.uniform(-1, 1), 3) # maby without round
         self.weights: list[float] = [round(random.uniform(-0.5, 0.5), 3) for _ in range(n_inputs)]
         self.bias: float = round(random.uniform(-0.5, 0.5), 3) # maby without round
         self.n_inputs = n_inputs
@@ -186,9 +182,6 @@ class NeuralNetwork():
         print("|")
 
 
-
-
-
 def ask_for_data_loc() -> str: # pure
     while True:
         answer = int(input("For default data location type 1. Otherwise type 0: "))
@@ -200,43 +193,35 @@ def ask_for_data_loc() -> str: # pure
             print("Enter valid input")
 
 
-def download_data_set(root_directory: str) -> list[list[int]]: # pure
-    logging.info("v")
-    logging.info("downloading data set")
+def download_data_set(root_directory: str, langs=DefaultVars.langs) -> list[list[int]]: # pure
+    logging.info("v - downloading data set")
     collected_data = []
     # Iterate over all files and directories in the root directory recursively
-    # for dirpath, dirnames, filenames in os.walk(root_directory):
-    for dirpath, _, filenames in os.walk(root_directory):
+    for dirpath, _, filenames in os.walk(root_directory): # _ = dirnames
         for fname in filenames:
-            if fname.endswith(".txt"): # check later if this is needed
+            if fname.endswith(".txt"):
                 dir_name = os.path.basename(dirpath)
 
                 with open(os.path.join(dirpath, fname), 'r') as file:
                     data = file.read() # Maby there is smth more effc
                 
-                vec = [0 for _ in range(27)]
-                for char in data:
-                    # logging.StreamHandler.terminator = "  " #
-                    # logging.debug(char) #
-                    # logging.StreamHandler.terminator = "\n" #
-                    in_ascii = ord(char.lower())
-                    if 96 < in_ascii < 123:
-                        vec[in_ascii - 97] += 1
+                vec = convert_txt_to_vector(data)
     
                 logging.debug(dir_name)
-                if dir_name == "english":
-                    vec[-1] = 0
-                if dir_name == "polish":
-                    vec[-1] = 1
+                
+                for idx, lang in enumerate(langs):
+                    if dir_name == lang:
+                        vec.append(idx)
+                
                 logging.debug(vec)
                 collected_data.append(vec)
-                # break
 
+    logging.info("^")
     return collected_data
 
 
 def convert_txt_to_vector(txt: str) -> list[int]: # pure
-    vec = [0 for _ in range(27)]
+    vec = [0 for _ in range(26)]
     for char in txt:
         # logging.StreamHandler.terminator = "  " #
         # logging.debug(char) #
@@ -277,7 +262,7 @@ def main():
     train_data = download_data_set(data_loc)
     neural_network: NeuralNetwork = NeuralNetwork(26, [2])
     neural_network.show_arch()
-    print(train_data)
+    logging.debug(train_data)
     neural_network.train(train_data)
 
 
