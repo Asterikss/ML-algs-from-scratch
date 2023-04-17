@@ -126,7 +126,7 @@ class NeuralNetwork():
         return input
 
 
-    def train(self, train_data: list[list[int]], learning_rate=0.5, error_gate=0.1, max_iterations=9):
+    def train(self, train_data: list[list[int]], learning_rate_w=0.8, learning_rate_b=0.2, error_gate=0.1, max_iterations=12):
         for j in range(max_iterations):
             logging.info(f"v {j+1} iteration")
             total_error = 0
@@ -136,7 +136,7 @@ class NeuralNetwork():
                 expected_out: list[int] = expected_output(X[-1], self.n_outputs)
                 full_error = calc_full_error(output, expected_out) 
                 total_error += full_error
-                # logging.info(f"output ---> {output}  expected output: {expected_out} full error: {full_error}")
+                # logging.debug(f"output ---> {output}  expected output: {expected_out} full error: {full_error}")
                 print(f"output ---> {output}  expected output: {expected_out} full error: {full_error}")
 
 
@@ -151,12 +151,12 @@ class NeuralNetwork():
                         # neuron.bias += learning_rate * (expected_out[i] - output[i]) #costGradientB[neuron]
 
                         # (expected_out[i] - output[i]) could be swaped for actuall derivative. Then the sign is lost
-                        neuron.bias += 0.2 * (expected_out[i] - output[i]) * neuron.activation_derivative(output[i])
+                        neuron.bias += learning_rate_b * (expected_out[i] - output[i]) * neuron.activation_derivative(output[i])
                                 # logging.debug(f"new b: {neuron.bias}")
                                 # logging.debug(f"old w: {neuron.weights}")
                         for idx in range(len(neuron.weights)):
                             # neuron.weights[idx] += learning_rate * (expected_out[i] - output[i]) * neuron.derivative(output[i]) * X[idx]
-                            neuron.weights[idx] += learning_rate * (expected_out[i] - output[i]) * neuron.activation_derivative(output[i]) * X[idx]
+                            neuron.weights[idx] += learning_rate_w * (expected_out[i] - output[i]) * neuron.activation_derivative(output[i]) * X[idx]
                                 # logging.debug(f"new w: {neuron.weights}")
 
 
@@ -164,7 +164,6 @@ class NeuralNetwork():
 
             if total_error <= error_gate:
                 logging.info("error threshold reached")
-                # logging.info(f"total error: {total_error}")
                 break
  
 
@@ -252,9 +251,13 @@ def display_hr_output(output: list[float]):
 
 
 def custom_prediction(NN: NeuralNetwork):
-    txt = str(input("Paste the text here: "))
-    input_vec = convert_txt_to_vector(txt)
-    NN.custom_prediction(input_vec)
+    while True:
+        txt = str(input("Paste the text here: "))
+        input_vec = convert_txt_to_vector(txt)
+        NN.custom_prediction(input_vec)
+
+        if int(input("q to quit. Otherwise hit enter") == "q"):
+            break
     
 
 def main():
