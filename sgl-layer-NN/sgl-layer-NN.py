@@ -9,6 +9,7 @@ import math
 
 @dataclass(frozen=True)
 class DefaultVars:
+    langs = ["english", "polish"]
     # level = logging.INFO
     level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
@@ -234,7 +235,7 @@ def download_data_set(root_directory: str) -> list[list[int]]: # pure
     return collected_data
 
 
-def convert_txt_to_vector(txt: str) -> list[int]:
+def convert_txt_to_vector(txt: str) -> list[int]: # pure
     vec = [0 for _ in range(27)]
     for char in txt:
         # logging.StreamHandler.terminator = "  " #
@@ -247,8 +248,7 @@ def convert_txt_to_vector(txt: str) -> list[int]:
 
 
 def translate_output(vector: list) -> str: # pure
-    # langs = ["english", "polish", "unknown", "unknown"] # maby in Vars.
-    langs = ["english", "polish"] # maby in Vars.
+    langs = DefaultVars.langs
     idx = vector.index(max(vector))
     if idx < len(langs):
         return langs[idx]
@@ -258,9 +258,12 @@ def translate_output(vector: list) -> str: # pure
 def display_hr_output(output: list[float]):
     print(f"Prediction --> {translate_output(output)}")
     print("Confidence:")
-    langs = ["english", "polish", "unknown", "unknown"]
+    langs = DefaultVars.langs
     for i, out in enumerate(output):
-        print(f"  {langs[i]} - {out}")
+        if i < len(langs):
+            print(f"  {langs[i]} - {out}")
+        else:
+            print(f"  unknown - {out}")
 
 
 def custom_prediction(NN: NeuralNetwork):
