@@ -29,6 +29,10 @@ class NumberOfOutputsError(Exception):
     pass
 
 
+class InadequateInputLen(Exception):
+    pass
+
+
 def get_activation_and_derivative(activation_type: ActivationType): # pure
     def sigmoid_func(x) -> float: # pure
         # logging.StreamHandler.terminator = "  "
@@ -108,7 +112,6 @@ def calc_error(output: float, expected_output: int) -> float: # pure
     return math.pow(output - expected_output, 2)
 
 
-# rename to calc_layer_error maby
 def calc_full_error(output: list[float], expected_output: list[int]) -> float: # pure
     sum = 0
     for i in range(len(output)):
@@ -132,13 +135,18 @@ class NeuralNetwork():
         return input
 
 
-    # def train(self, train_data: list[list[int]], learning_rate_w=3.0, learning_rate_b=0.2, error_gate=0.1, max_iterations=1):
+    # currenlty supports training of only a single layer network
     def train(self, train_data: list[list[int]], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.1, max_iterations=32):
+        if len(train_data[0]) - 1 != self.n_inputs:
+            logging.warning("The number of inputs to the network does no match the length of the input vector")
+            logging.warning(f"length of the vector must be {self.n_inputs} plus one for the label")
+            logging.warning("Aborting the training")
+            raise InadequateInputLen("Read warning above")
+
         for j in range(max_iterations):
             logging.info(f"v {j+1} iteration")
             total_error = 0
             for X in train_data:
-                # logging.debug(f"{i}")
                 output: list[float] = self.feed_forward(X)
                 expected_out: list[int] = expected_output(X[-1], self.n_outputs)
                 full_error = calc_full_error(output, expected_out) 
@@ -263,7 +271,7 @@ def custom_prediction(NN: NeuralNetwork):
         input_vec = convert_txt_to_vector(txt)
         NN.custom_prediction(input_vec)
 
-        if int(input("q to quit. Otherwise hit enter") == "q"):
+        if int(input("q to quit. Otherwise hit enter: ") == "q"):
             break
     
 
@@ -274,16 +282,15 @@ def main():
     neural_network.show_arch()
     neural_network.train(train_data)
 
-
-    logging.debug("##############################")
-    for example in train_data:
-        output: list[float] = neural_network.feed_forward(example)
-        expected_out = expected_output(example[-1], 4)
-        full_error = calc_full_error(output, expected_out) 
-        logging.debug(f"output: {output}  -- {translate_output(output)}; expect -- {translate_output(expected_out)}; err - {full_error}")
-
-    logging.debug("##############################")
     custom_prediction(neural_network)
+    # logging.debug("##############################")
+    # for example in train_data:
+    #     output: list[float] = neural_network.feed_forward(example)
+    #     expected_out = expected_output(example[-1], 4)
+    #     full_error = calc_full_error(output, expected_out) 
+    #     logging.debug(f"output: {output}  -- {translate_output(output)}; expect -- {translate_output(expected_out)}; err - {full_error}")
+
+    # logging.debug("##############################")
     
 
 if __name__ == "__main__":
