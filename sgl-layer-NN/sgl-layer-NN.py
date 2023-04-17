@@ -171,7 +171,7 @@ class NeuralNetwork():
                 break
  
 
-    def custom_prediction(self, X: list[float]):
+    def custom_prediction(self, X: list):
         output = self.feed_forward(X)
         display_hr_output(output)
 
@@ -256,21 +256,23 @@ def translate_output(vector: list) -> str: # pure
 
 
 def display_hr_output(output: list[float]):
-    print(f"Prediciton --> {translate_output(output)}")
+    print(f"Prediction --> {translate_output(output)}")
     print("Confidence:")
     langs = ["english", "polish", "unknown", "unknown"]
     for i, out in enumerate(output):
         print(f"  {langs[i]} - {out}")
 
 
-def custom_prediction():
-    txt = str(input("Paste a text here: "))
+def custom_prediction(NN: NeuralNetwork):
+    txt = str(input("Paste the text here: "))
+    input_vec = convert_txt_to_vector(txt)
+    NN.custom_prediction(input_vec)
     
 
 def main():
     data_loc = ask_for_data_loc()
     train_data = download_data_set(data_loc)
-    neural_network: NeuralNetwork = NeuralNetwork(26, [4])
+    neural_network: NeuralNetwork = NeuralNetwork(26, [2])
     neural_network.show_arch()
     print(train_data)
     neural_network.train(train_data)
@@ -284,6 +286,7 @@ def main():
         logging.debug(f"output: {output}  -- {translate_output(output)}; expect -- {translate_output(expected_out)}; err - {full_error}")
 
     logging.debug("##############################")
+    custom_prediction(neural_network)
     
 
 if __name__ == "__main__":
