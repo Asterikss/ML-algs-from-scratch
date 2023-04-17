@@ -120,36 +120,34 @@ class NeuralNetwork():
 
 
     def feed_forward(self, X) -> list[float]:
-        logging.info("v")
+        # logging.info("v")
         logging.info("feed forward")
         input: list = normalization(X)
-        # maby this should be done in a defferent place. no
         for layer in self.layers:
             input = layer.output(input)
-        logging.info("^")
+        # logging.info("^")
         return input
 
 
-    def train(self, train_data: list[list[int]], learning_rate=0.5, expected_error=0.1):
-        output = []
-        # expected_out = []
-        # for _ in range(1):
-        for _ in range(9):
-        # for _ in range(3):
+    def train(self, train_data: list[list[int]], learning_rate=0.5, error_gate=0.1, max_iterations=9):
+        for j in range(max_iterations):
+            logging.info(f"v {j+1} iteration")
+            total_error = 0
             for X in train_data:
                 # logging.debug(f"{i}")
                 output: list[float] = self.feed_forward(X)
                 expected_out: list[int] = expected_output(X[-1], self.n_outputs)
                 full_error = calc_full_error(output, expected_out) 
-                print(f" output ---> {output}  expected output: {expected_out} full error: {full_error}")
+                total_error += full_error
+                # logging.info(f"output ---> {output}  expected output: {expected_out} full error: {full_error}")
+                print(f"output ---> {output}  expected output: {expected_out} full error: {full_error}")
 
 
                 for layer in reversed(self.layers):
-                    # for neuron, idx in range(len(layer.neurons)):
                     for i, neuron in enumerate(layer.neurons):
                         # error = calc_error(layer.neurons[i], expected_out[i]) 
-                        error = calc_error(output[i], expected_out[i]) 
-                        logging.debug(error)
+                            # error = calc_error(output[i], expected_out[i]) 
+                        # logging.debug(error)
         
                                 # logging.debug(f"old b: {neuron.bias}")
                         # or -= ?
@@ -164,8 +162,18 @@ class NeuralNetwork():
                             neuron.weights[idx] += learning_rate * (expected_out[i] - output[i]) * neuron.activation_derivative(output[i]) * X[idx]
                                 # logging.debug(f"new w: {neuron.weights}")
 
-            # break
 
+            logging.info(f"^ error for {j+1} iteration -> {total_error}")
+
+            if total_error <= error_gate:
+                logging.info("error threshold reached")
+                # logging.info(f"total error: {total_error}")
+                break
+ 
+
+    def custom_prediction(self, X: list[float]):
+        output = self.feed_forward(X)
+        display_hr_output(output)
 
 
     def show_arch(self):
@@ -175,6 +183,8 @@ class NeuralNetwork():
             for neuron in layer.neurons:
                 print(f"N({neuron.get_n_of_inputs()})", end=" ")
         print("|")
+
+
 
 
 
@@ -224,14 +234,38 @@ def download_data_set(root_directory: str) -> list[list[int]]: # pure
     return collected_data
 
 
+def convert_txt_to_vector(txt: str) -> list[int]:
+    vec = [0 for _ in range(27)]
+    for char in txt:
+        # logging.StreamHandler.terminator = "  " #
+        # logging.debug(char) #
+        # logging.StreamHandler.terminator = "\n" #
+        in_ascii = ord(char.lower())
+        if 96 < in_ascii < 123:
+            vec[in_ascii - 97] += 1
+    return vec
+
+
 def translate_output(vector: list) -> str: # pure
+    # langs = ["english", "polish", "unknown", "unknown"] # maby in Vars.
+    langs = ["english", "polish"] # maby in Vars.
     idx = vector.index(max(vector))
-    if idx == 0:
-        return "english"
-    elif idx == 1:
-        return "polish"
+    if idx < len(langs):
+        return langs[idx]
     return "unknown"
 
+
+def display_hr_output(output: list[float]):
+    print(f"Prediciton --> {translate_output(output)}")
+    print("Confidence:")
+    langs = ["english", "polish", "unknown", "unknown"]
+    for i, out in enumerate(output):
+        print(f"  {langs[i]} - {out}")
+
+
+def custom_prediction():
+    txt = str(input("Paste a text here: "))
+    
 
 def main():
     data_loc = ask_for_data_loc()
@@ -249,6 +283,8 @@ def main():
         full_error = calc_full_error(output, expected_out) 
         logging.debug(f"output: {output}  -- {translate_output(output)}; expect -- {translate_output(expected_out)}; err - {full_error}")
 
+    logging.debug("##############################")
+    
 
 if __name__ == "__main__":
     main()
