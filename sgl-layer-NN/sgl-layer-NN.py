@@ -9,7 +9,7 @@ import math
 
 @dataclass(frozen=True)
 class DefaultVars:
-    langs = ["english", "polish"]
+    langs = ["english", "polish", "spanish"] # display it?
     level = logging.INFO
     # level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
@@ -23,6 +23,10 @@ class Vars:
 
 class ActivationType(Enum):
     SIGMOID = 0
+
+
+class NumberOfOutputsError(Exception):
+    pass
 
 
 def get_activation_and_derivative(activation_type: ActivationType): # pure
@@ -96,6 +100,7 @@ def expected_output(label: int, n_outputs: int) -> list[int]: # pure
     if label >= n_outputs:
         logging.warning("Number of outputs (number of neurons in the last layer) is too small to represent this label")
         logging.warning("Please update the neural network and repeat the process")
+        raise NumberOfOutputsError("Read the warning above")
     return [1 if i == label else 0 for i in range(n_outputs)]
 
 
@@ -127,7 +132,8 @@ class NeuralNetwork():
         return input
 
 
-    def train(self, train_data: list[list[int]], learning_rate_w=3.0, learning_rate_b=0.2, error_gate=0.1, max_iterations=12):
+    # def train(self, train_data: list[list[int]], learning_rate_w=3.0, learning_rate_b=0.2, error_gate=0.1, max_iterations=1):
+    def train(self, train_data: list[list[int]], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.1, max_iterations=32):
         for j in range(max_iterations):
             logging.info(f"v {j+1} iteration")
             total_error = 0
@@ -208,7 +214,6 @@ def download_data_set(root_directory: str, langs=DefaultVars.langs) -> list[list
                 vec = convert_txt_to_vector(data)
     
                 logging.debug(dir_name)
-                
                 # If you remove a lang data set that is in the beggining or in the middle
                 # of the lang list (DefaultVars.langs) and then you reduce the number
                 # of neurons in the final layer this appproach will couse problems.
@@ -227,9 +232,6 @@ def download_data_set(root_directory: str, langs=DefaultVars.langs) -> list[list
 def convert_txt_to_vector(txt: str) -> list[int]: # pure
     vec = [0 for _ in range(26)]
     for char in txt:
-        # logging.StreamHandler.terminator = "  " #
-        # logging.debug(char) #
-        # logging.StreamHandler.terminator = "\n" #
         in_ascii = ord(char.lower())
         if 96 < in_ascii < 123:
             vec[in_ascii - 97] += 1
@@ -268,9 +270,8 @@ def custom_prediction(NN: NeuralNetwork):
 def main():
     data_loc = ask_for_data_loc()
     train_data = download_data_set(data_loc)
-    neural_network: NeuralNetwork = NeuralNetwork(26, [2])
+    neural_network: NeuralNetwork = NeuralNetwork(26, [3]) # check for wrong len of input
     neural_network.show_arch()
-    logging.debug(train_data)
     neural_network.train(train_data)
 
 
@@ -282,7 +283,7 @@ def main():
         logging.debug(f"output: {output}  -- {translate_output(output)}; expect -- {translate_output(expected_out)}; err - {full_error}")
 
     logging.debug("##############################")
-    # custom_prediction(neural_network)
+    custom_prediction(neural_network)
     
 
 if __name__ == "__main__":
