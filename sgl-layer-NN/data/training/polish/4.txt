@@ -11,3 +11,14 @@ podanego z zewnątrz rozwiązania ma mieć taką złożoność.
 Przykładowy problem:
 Czy jakikolwiek niepusty podzbiór zadanego zbioru (np. { − 2 , 6 , − 3 , 72 ,
 10 , − 11 } {\displaystyle \{-2,6,-3,72,10,-11\}}) sumuje się do zera?
+
+Złożona fabuła dla gry stwarzana była stopniowo. Najpierw pojawiła się w
+krótkich opowiadaniach dołączonych do reguł gry. Później pojawiły się pierwsze
+książki (wydawane przez HarperPrism) oraz komiksy (wydawnictwo Acclaim). Fabuła
+przeżyła tzw. Rewizję gdy Wizards of the Coast przejęła proces wydawnictwa
+książek i niektóre historie opowiedziane zostały od nowa. Od tej pory kolejne
+pozycje wydawane były regularnie. Od czasu dodatku Nemesis książki miały ten
+sam tytuł co edycja (z małymi wyjątkami w nowszych edycjach) i były wydawane
+razem z nimi. Wraz z dodatkiem Shards of Alara, wydawana jest tylko jedna
+książka na blok dodatków, za to wznowiono wydawanie książek nie związanych
+bezpośrednio z nowymi edycjami.

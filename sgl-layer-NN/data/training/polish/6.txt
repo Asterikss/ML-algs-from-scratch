@@ -13,4 +13,8 @@ Prawdziwość hipotezy Riemanna pozwalałaby na wzmocnienie pewnych nierównośc
 dotyczących liczb pierwszych oraz równości asymptotycznych. Okazuje się na
 przykład, że hipoteza Riemanna jest równoważna poniższej równości (π(n) to
 liczba liczb pierwszych w przedziale od 1 do n), będącej wzmocnieniem
-twierdzenia o liczbach pierwszych
+twierdzenia o liczbach pierwszych. Karty są sprzedawane w zestawach 15 losowych
+kart (boosterach) lub w zestawach zawierających gotową do gry talię, złożoną z
+kart z jednego dodatku. Do bloku Lorwyn włącznie sprzedawano też tzw.
+tournament packi – zestawy 45 losowych kart i 30 kart zwanych lądami
+podstawowymi.

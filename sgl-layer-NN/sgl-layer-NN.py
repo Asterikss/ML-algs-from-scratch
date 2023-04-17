@@ -26,10 +26,10 @@ class ActivationType(Enum):
 
 def get_activation_and_derivative(activation_type: ActivationType): # pure
     def sigmoid_func(x) -> float: # pure
-        logging.StreamHandler.terminator = "  "
-        logging.debug(f"sig: {x}")
-        logging.StreamHandler.terminator = "\n"
-        logging.debug(f"sig: {1/(1+ math.exp(-x))}")
+        # logging.StreamHandler.terminator = "  "
+        # logging.debug(f"sig: {x}")
+        # logging.StreamHandler.terminator = "\n"
+        # logging.debug(f"sig: {1/(1+ math.exp(-x))}")
         return 1/(1+ math.exp(-x))
 
     def sigmoid_derivative(a):
@@ -44,17 +44,20 @@ def dot_product(X: list, weights) -> float: # pure
     result = 0
     for x_n, w_n in zip(X, weights):
         result += x_n * w_n
-    logging.StreamHandler.terminator = "  "
-    logging.debug(round(result, 3))
-    logging.StreamHandler.terminator = "\n"
-    return round(result, 3) # maby without round
+    # logging.StreamHandler.terminator = "  "
+    # logging.debug(round(result, 3))
+    # logging.StreamHandler.terminator = "\n"
+    # return round(result, 3) # maby without round
+    return result # maby without round
 
 
 class Neuron:
     def __init__(self, n_inputs, activ_type=ActivationType.SIGMOID) -> None:
-        self.activation_func, self.derivative = get_activation_and_derivative(activ_type)
-        self.weights = [round(random.uniform(-1, 1), 3) for _ in range(n_inputs)]
-        self.bias = round(random.uniform(-1, 1), 3) # maby without round
+        self.activation_func, self.activation_derivative = get_activation_and_derivative(activ_type)
+        # self.weights: list[float] = [round(random.uniform(-1, 1), 3) for _ in range(n_inputs)]
+        # self.bias: float = round(random.uniform(-1, 1), 3) # maby without round
+        self.weights: list[float] = [round(random.uniform(-0.5, 0.5), 3) for _ in range(n_inputs)]
+        self.bias: float = round(random.uniform(-0.5, 0.5), 3) # maby without round
         self.n_inputs = n_inputs
 
 
@@ -79,7 +82,7 @@ class Layer:
 
 
 def normalization(X) -> list[float]: # pure
-    logging.debug(f"norm {X}")
+    # logging.debug(f"norm {X}")
     sq_sum = 0
     for i in range(len(X) - 1):
         sq_sum += math.pow(X[i], 2)
@@ -88,7 +91,7 @@ def normalization(X) -> list[float]: # pure
     # logging.debug(magnitude)
     for i in range(len(X) - 1):
         X[i] /= magnitude
-    logging.debug(f"norm {X}")
+    # logging.debug(f"norm {X}")
     return X
 
 
@@ -117,37 +120,51 @@ class NeuralNetwork():
 
 
     def feed_forward(self, X) -> list[float]:
+        logging.info("v")
+        logging.info("feed forward")
         input: list = normalization(X)
         # maby this should be done in a defferent place. no
         for layer in self.layers:
             input = layer.output(input)
+        logging.info("^")
         return input
 
 
-    def train(self, train_data: list[list[int]], learning_rate=0.2):
+    def train(self, train_data: list[list[int]], learning_rate=0.5, expected_error=0.1):
         output = []
         # expected_out = []
-        for X in train_data:
-            # logging.debug(f"{i}")
-            output: list[float] = self.feed_forward(X)
-            expected_out: list[int] = expected_output(X[-1], self.n_outputs)
-            full_error = calc_full_error(output, expected_out) 
-            print(f" output ---> {output}  expected output: {expected_out} full error: {full_error}")
+        # for _ in range(1):
+        for _ in range(9):
+        # for _ in range(3):
+            for X in train_data:
+                # logging.debug(f"{i}")
+                output: list[float] = self.feed_forward(X)
+                expected_out: list[int] = expected_output(X[-1], self.n_outputs)
+                full_error = calc_full_error(output, expected_out) 
+                print(f" output ---> {output}  expected output: {expected_out} full error: {full_error}")
 
 
-            for layer in reversed(self.layers):
-                # for neuron, idx in range(len(layer.neurons)):
-                for i, neuron in enumerate(layer.neurons):
-                    # error = calc_error(layer.neurons[i], expected_out[i]) 
-                    error = calc_error(output[i], expected_out[i]) 
-                    logging.debug(error)
+                for layer in reversed(self.layers):
+                    # for neuron, idx in range(len(layer.neurons)):
+                    for i, neuron in enumerate(layer.neurons):
+                        # error = calc_error(layer.neurons[i], expected_out[i]) 
+                        error = calc_error(output[i], expected_out[i]) 
+                        logging.debug(error)
+        
+                                # logging.debug(f"old b: {neuron.bias}")
+                        # or -= ?
+                        # neuron.bias += learning_rate * (expected_out[i] - output[i]) #costGradientB[neuron]
 
-                    logging.debug(f"old w: {neuron.weights}")
-                    for idx in range(len(neuron.weights)):
-                        neuron.weights[idx] += learning_rate * (expected_out[i] - output[i]) * neuron.derivative(output[i]) * X[idx]
-                    logging.debug(f"new w: {neuron.weights}")
-                    # output2: list[float] = self.feed_forward(X)
-                    # logging.debug(f"new output: {output2}")
+                        # (expected_out[i] - output[i]) could be swaped for actuall derivative. Then the sign is lost
+                        neuron.bias += 0.2 * (expected_out[i] - output[i]) * neuron.activation_derivative(output[i])
+                                # logging.debug(f"new b: {neuron.bias}")
+                                # logging.debug(f"old w: {neuron.weights}")
+                        for idx in range(len(neuron.weights)):
+                            # neuron.weights[idx] += learning_rate * (expected_out[i] - output[i]) * neuron.derivative(output[i]) * X[idx]
+                            neuron.weights[idx] += learning_rate * (expected_out[i] - output[i]) * neuron.activation_derivative(output[i]) * X[idx]
+                                # logging.debug(f"new w: {neuron.weights}")
+
+            # break
 
 
 
@@ -202,19 +219,18 @@ def download_data_set(root_directory: str) -> list[list[int]]: # pure
                     vec[-1] = 1
                 logging.debug(vec)
                 collected_data.append(vec)
-                break
+                # break
 
     return collected_data
 
 
-# def init_layer():
-#     return Layer(26)
-
-
-# def train(data_loc: str) -> NeuralNetwork:
-#     train_data = download_data_set(data_loc)
-#     neural_network: NeuralNetwork = 
-#     return NeuralNetwork([3])
+def translate_output(vector: list) -> str: # pure
+    idx = vector.index(max(vector))
+    if idx == 0:
+        return "english"
+    elif idx == 1:
+        return "polish"
+    return "unknown"
 
 
 def main():
@@ -222,9 +238,16 @@ def main():
     train_data = download_data_set(data_loc)
     neural_network: NeuralNetwork = NeuralNetwork(26, [4])
     neural_network.show_arch()
-    # print("SDDDDDDDDDDDDDDDDDDDDDDD")
     print(train_data)
     neural_network.train(train_data)
+
+
+    logging.debug("##############################")
+    for example in train_data:
+        output: list[float] = neural_network.feed_forward(example)
+        expected_out = expected_output(example[-1], 4)
+        full_error = calc_full_error(output, expected_out) 
+        logging.debug(f"output: {output}  -- {translate_output(output)}; expect -- {translate_output(expected_out)}; err - {full_error}")
 
 
 if __name__ == "__main__":
