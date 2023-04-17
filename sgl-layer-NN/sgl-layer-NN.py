@@ -10,8 +10,8 @@ import math
 @dataclass(frozen=True)
 class DefaultVars:
     langs = ["english", "polish"]
-    # level = logging.INFO
-    level = logging.DEBUG
+    level = logging.INFO
+    # level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
     logging.basicConfig(level = level, format = fmt) # filename = 'log_x.log', filemode = "w"
 
@@ -92,7 +92,10 @@ def normalization(X) -> list[float]: # pure
     return X
 
 
-def expected_output(label, n_outputs) -> list[int]: # pure
+def expected_output(label: int, n_outputs: int) -> list[int]: # pure
+    if label >= n_outputs:
+        logging.warning("Number of outputs (number of neurons in the last layer) is too small to represent this label")
+        logging.warning("Please update the neural network and repeat the process")
     return [1 if i == label else 0 for i in range(n_outputs)]
 
 
@@ -117,16 +120,14 @@ class NeuralNetwork():
 
 
     def feed_forward(self, X) -> list[float]:
-        # logging.info("v")
-        logging.info("feed forward")
+        logging.debug("feed forward")
         input: list = normalization(X)
         for layer in self.layers:
             input = layer.output(input)
-        # logging.info("^")
         return input
 
 
-    def train(self, train_data: list[list[int]], learning_rate_w=0.8, learning_rate_b=0.2, error_gate=0.1, max_iterations=12):
+    def train(self, train_data: list[list[int]], learning_rate_w=3.0, learning_rate_b=0.2, error_gate=0.1, max_iterations=12):
         for j in range(max_iterations):
             logging.info(f"v {j+1} iteration")
             total_error = 0
@@ -136,8 +137,8 @@ class NeuralNetwork():
                 expected_out: list[int] = expected_output(X[-1], self.n_outputs)
                 full_error = calc_full_error(output, expected_out) 
                 total_error += full_error
-                # logging.debug(f"output ---> {output}  expected output: {expected_out} full error: {full_error}")
-                print(f"output ---> {output}  expected output: {expected_out} full error: {full_error}")
+                logging.debug(f"output ---> {output}  expected output: {expected_out} full error: {full_error}")
+                # print(f"output ---> {output}  expected output: {expected_out} full error: {full_error}")
 
 
                 for layer in reversed(self.layers):
@@ -177,7 +178,7 @@ class NeuralNetwork():
         for layer in self.layers:
             print("| ", end="")
             for neuron in layer.neurons:
-                print(f"N({neuron.get_n_of_inputs()})", end=" ")
+                print(f"({neuron.get_n_of_inputs()})N", end=" ")
         print("|")
 
 
@@ -208,6 +209,10 @@ def download_data_set(root_directory: str, langs=DefaultVars.langs) -> list[list
     
                 logging.debug(dir_name)
                 
+                # If you remove a lang data set that is in the beggining or in the middle
+                # of the lang list (DefaultVars.langs) and then you reduce the number
+                # of neurons in the final layer this appproach will couse problems.
+                # It is "handeled" in expected_output()
                 for idx, lang in enumerate(langs):
                     if dir_name == lang:
                         vec.append(idx)
@@ -277,7 +282,7 @@ def main():
         logging.debug(f"output: {output}  -- {translate_output(output)}; expect -- {translate_output(expected_out)}; err - {full_error}")
 
     logging.debug("##############################")
-    custom_prediction(neural_network)
+    # custom_prediction(neural_network)
     
 
 if __name__ == "__main__":
