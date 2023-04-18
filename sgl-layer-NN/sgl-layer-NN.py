@@ -197,7 +197,7 @@ def download_data_set(root_directory: str) -> tuple[list[list[int]], list[str]]:
                 dir_name = os.path.basename(dirpath)
 
                 logging.debug(os.path.join(dirpath, fname))
-                with open(os.path.join(dirpath, fname), 'r') as file:
+                with open(os.path.join(dirpath, fname), 'r', encoding="utf-8") as file:
                     data = file.read() # Maby there is smth more effc
                 
                 vec = convert_txt_to_vector(data)
