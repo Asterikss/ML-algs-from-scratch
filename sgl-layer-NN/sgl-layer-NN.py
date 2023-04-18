@@ -267,16 +267,13 @@ def init():
 
 def main():
     init()
-    print(DefaultVars.TEST)
-    DefaultVars.TEST = 5
-    print(DefaultVars.TEST)
     data_loc = ask_for_data_loc()
     train_data, lang_table = download_data_set(data_loc)
     neural_network: NeuralNetwork = NeuralNetwork(26, [3])
     neural_network.show_arch()
     neural_network.train(train_data, lang_table)
 
-    # custom_prediction(neural_network)
+    custom_prediction(neural_network)
 
     # logging.debug("##############################")
     # for example in train_data:
