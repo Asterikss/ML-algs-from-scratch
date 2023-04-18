@@ -35,10 +35,6 @@ class InadequateInputLen(Exception):
 
 def get_activation_and_derivative(activation_type: ActivationType): # pure
     def sigmoid_func(x) -> float: # pure
-        # logging.StreamHandler.terminator = "  "
-        # logging.debug(f"sig: {x}")
-        # logging.StreamHandler.terminator = "\n"
-        # logging.debug(f"sig: {1/(1+ math.exp(-x))}")
         return 1/(1+ math.exp(-x))
 
     def sigmoid_derivative(a): # pure
@@ -48,13 +44,10 @@ def get_activation_and_derivative(activation_type: ActivationType): # pure
         return sigmoid_func, sigmoid_derivative
 
 
-def dot_product(X: list, weights) -> float: # pure
+def dot_product(X: list, weights: list) -> float: # pure
     result = 0
     for x_n, w_n in zip(X, weights):
         result += x_n * w_n
-    # logging.StreamHandler.terminator = "  "
-    # logging.debug(round(result, 3))
-    # logging.StreamHandler.terminator = "\n"
     return result
 
 
@@ -136,7 +129,7 @@ class NeuralNetwork():
 
 
     # currenlty supports training of only a single layer network
-    def train(self, train_data: list[list[int]], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.1, max_iterations=32):
+    def train(self, train_data: list[list[int]], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.5, max_iterations=32):
         if len(train_data[0]) - 1 != self.n_inputs:
             logging.warning("The number of inputs to the network does no match the length of the input vector")
             logging.warning(f"length of the vector must be {self.n_inputs} plus one for the label")
