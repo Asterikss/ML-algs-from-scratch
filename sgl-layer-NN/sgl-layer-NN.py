@@ -80,20 +80,18 @@ class Layer:
 
 
 def normalization(X) -> list[float]: # pure
-    # logging.debug(f"norm {X}")
     sq_sum = 0
     for i in range(len(X) - 1):
         sq_sum += math.pow(X[i], 2)
-    # logging.debug(sq_sum)
+
     magnitude = math.sqrt(sq_sum)
-    # logging.debug(magnitude)
     for i in range(len(X) - 1):
         X[i] /= magnitude
-    # logging.debug(f"norm {X}")
+
     return X
 
 
-def expected_output(label: int, n_outputs: int) -> list[int]: # pure
+def expected_output(label: int, n_outputs: int) -> list[int]: # pure?
     if label >= n_outputs:
         logging.warning("Number of outputs (number of neurons in the last layer) is too small to represent this label")
         logging.warning("Please update the neural network and repeat the process")
@@ -145,25 +143,18 @@ class NeuralNetwork():
                 full_error = calc_full_error(output, expected_out) 
                 total_error += full_error
                 logging.debug(f"output ---> {output}  expected output: {expected_out} full error: {full_error}")
-                # print(f"output ---> {output}  expected output: {expected_out} full error: {full_error}")
-
 
                 for layer in reversed(self.layers):
                     for i, neuron in enumerate(layer.neurons):
-                        # error = calc_error(layer.neurons[i], expected_out[i]) 
                             # error = calc_error(output[i], expected_out[i]) 
-                        # logging.debug(error)
+                            # logging.debug(error)
         
                                 # logging.debug(f"old b: {neuron.bias}")
-                        # or -= ?
-                        # neuron.bias += learning_rate * (expected_out[i] - output[i]) #costGradientB[neuron]
-
                         # (expected_out[i] - output[i]) could be swaped for actuall derivative. Then the sign is lost
                         neuron.bias += learning_rate_b * (expected_out[i] - output[i]) * neuron.activation_derivative(output[i])
                                 # logging.debug(f"new b: {neuron.bias}")
                                 # logging.debug(f"old w: {neuron.weights}")
                         for idx in range(len(neuron.weights)):
-                            # neuron.weights[idx] += learning_rate * (expected_out[i] - output[i]) * neuron.derivative(output[i]) * X[idx]
                             neuron.weights[idx] += learning_rate_w * (expected_out[i] - output[i]) * neuron.activation_derivative(output[i]) * X[idx]
                                 # logging.debug(f"new w: {neuron.weights}")
 
@@ -215,10 +206,10 @@ def download_data_set(root_directory: str, langs=DefaultVars.langs) -> list[list
                 vec = convert_txt_to_vector(data)
     
                 logging.debug(dir_name)
-                # If you remove a lang data set that is in the beggining or in the middle
+                # If you remove a lang data set that is in the beginning or in the middle
                 # of the lang list (DefaultVars.langs) and then you reduce the number
-                # of neurons in the final layer this appproach will couse problems.
-                # It is "handeled" in expected_output()
+                # of neurons in the final layer to depict than, this appproach will couse
+                # problems. It is "handeled" in expected_output()
                 for idx, lang in enumerate(langs):
                     if dir_name == lang:
                         vec.append(idx)
@@ -282,8 +273,6 @@ def main():
     #     expected_out = expected_output(example[-1], 4)
     #     full_error = calc_full_error(output, expected_out) 
     #     logging.debug(f"output: {output}  -- {translate_output(output)}; expect -- {translate_output(expected_out)}; err - {full_error}")
-
-    # logging.debug("##############################")
     
 
 if __name__ == "__main__":
