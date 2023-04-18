@@ -1,6 +1,6 @@
 "Single layer neural network used for predicting the language of a piece of text. By default supports english, polish and spanish"
 from enum import Enum
-from dataclasses import dataclass
+# from dataclasses import dataclass
 import logging
 import random
 import os
@@ -8,13 +8,13 @@ import math
 
 
 # @dataclass(frozen=True)
-class DefaultVars:
-    langs = []
-    # langs2 = ["english", "polish", "spanish"] # display it?
-    level = logging.INFO
-    # level = logging.DEBUG
-    fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
-    logging.basicConfig(level = level, format = fmt) # filename = 'log_x.log', filemode = "w"
+# class DefaultVars:
+#     langs = []
+#     # langs2 = ["english", "polish", "spanish"] # display it?
+#     level = logging.INFO
+#     # level = logging.DEBUG
+#     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
+#     logging.basicConfig(level = level, format = fmt) # filename = 'log_x.log', filemode = "w"
 
 
 class ActivationType(Enum):
@@ -235,20 +235,16 @@ def convert_txt_to_vector(txt: str) -> list[int]: # pure
     return vec
 
 
-# def translate_output(vector: list) -> str: # pure
 def translate_output(vector: list, lang_table: list[str]) -> str: # pure
-    # langs = DefaultVars.langs
     idx = vector.index(max(vector))
     if idx < len(lang_table):
         return lang_table[idx]
     return "unknown"
 
 
-# def display_hr_output(output: list[float]):
 def display_hr_output(output: list[float], lang_table: list[str]):
     print(f"Prediction --> {translate_output(output, lang_table)}")
     print("Confidence:")
-    # langs = 
     for i, out in enumerate(output):
         if i < len(lang_table):
             print(f"  {lang_table[i]} - {out}")
@@ -266,15 +262,23 @@ def custom_prediction(NN: NeuralNetwork):
             break
     
 
+def init():
+    # level = logging.DEBUG
+    level = logging.INFO
+    fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
+    logging.basicConfig(level = level, format = fmt) # filename = 'log_x.log', filemode = "w"
+
+
 def main():
+    init()
     data_loc = ask_for_data_loc()
-    # train_data, DefaultVars.langs = download_data_set(data_loc)
     train_data, lang_table = download_data_set(data_loc)
-    neural_network: NeuralNetwork = NeuralNetwork(26, [3]) # check for wrong len of input
+    neural_network: NeuralNetwork = NeuralNetwork(26, [3])
     neural_network.show_arch()
     neural_network.train(train_data, lang_table)
 
     custom_prediction(neural_network)
+
     # logging.debug("##############################")
     # for example in train_data:
     #     output: list[float] = neural_network.feed_forward(example)
