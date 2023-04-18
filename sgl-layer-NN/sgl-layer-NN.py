@@ -1,20 +1,9 @@
 "Single layer neural network used for predicting the language of a piece of text. By default supports english, polish and spanish"
 from enum import Enum
-# from dataclasses import dataclass
 import logging
 import random
 import os
 import math
-
-
-# @dataclass(frozen=True)
-# class DefaultVars:
-#     langs = []
-#     # langs2 = ["english", "polish", "spanish"] # display it?
-#     level = logging.INFO
-#     # level = logging.DEBUG
-#     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
-#     logging.basicConfig(level = level, format = fmt) # filename = 'log_x.log', filemode = "w"
 
 
 class ActivationType(Enum):
@@ -26,6 +15,10 @@ class NumberOfOutputsError(Exception):
 
 
 class InadequateInputLen(Exception):
+    pass
+
+
+class TooManyLayers(Exception):
     pass
 
 
@@ -64,8 +57,8 @@ class Neuron:
 
 
 class Layer:
-    def __init__(self, n_inputs, n_neurons) -> None:
-        self.neurons: list[Neuron] = [Neuron(n_inputs) for _ in range(n_neurons)]
+    def __init__(self, n_inputs, n_neurons, activation_type=ActivationType.SIGMOID) -> None:
+        self.neurons: list[Neuron] = [Neuron(n_inputs, activ_type=activation_type) for _ in range(n_neurons)]
 
     
     def output(self, X) -> list[float]:
@@ -110,6 +103,7 @@ class NeuralNetwork():
     def __init__(self, n_inputs, layers: list[int]) -> None:
         self.layers = [Layer(n_inputs, layers[0])]
         self.layers += [Layer(layers[i], layers[i+1]) for i in range(len(layers) - 1)]
+        # Could use the softmax activation for the last layer
         self.n_inputs = n_inputs
         self.n_outputs = layers[-1]
 
@@ -125,6 +119,9 @@ class NeuralNetwork():
     # currenlty supports training of only a single layer network
     def train(self, train_data: list[list[int]], lang_table: list[str], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.5, max_iterations=32):
         self.lang_table = lang_table
+
+        if len(self.layers) > 1:
+            raise TooManyLayers("Currenlty train() supports only sigle layer network")
 
         if len(train_data[0]) - 1 != self.n_inputs:
             logging.warning("The number of inputs to the network does no match the length of the input vector")
@@ -206,7 +203,6 @@ def download_data_set(root_directory: str) -> tuple[list[list[int]], list[str]]:
                 vec = convert_txt_to_vector(data)
 
                 if dir_name not in lang_table:
-                    # DefaultVars.langs.append(dir_name)
                     lang_table.append(dir_name)
     
                 logging.debug(dir_name)
@@ -271,13 +267,16 @@ def init():
 
 def main():
     init()
+    print(DefaultVars.TEST)
+    DefaultVars.TEST = 5
+    print(DefaultVars.TEST)
     data_loc = ask_for_data_loc()
     train_data, lang_table = download_data_set(data_loc)
     neural_network: NeuralNetwork = NeuralNetwork(26, [3])
     neural_network.show_arch()
     neural_network.train(train_data, lang_table)
 
-    custom_prediction(neural_network)
+    # custom_prediction(neural_network)
 
     # logging.debug("##############################")
     # for example in train_data:
