@@ -1,4 +1,4 @@
-"Single layer neural network used for predicting the language of a piece of text"
+"Single layer neural network used for predicting the language of a piece of text. By default supports english, polish and spanish"
 from enum import Enum
 from dataclasses import dataclass
 import logging
@@ -7,18 +7,14 @@ import os
 import math
 
 
-@dataclass(frozen=True)
+# @dataclass(frozen=True)
 class DefaultVars:
-    langs = ["english", "polish", "spanish"] # display it?
+    langs = []
+    # langs2 = ["english", "polish", "spanish"] # display it?
     level = logging.INFO
     # level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
     logging.basicConfig(level = level, format = fmt) # filename = 'log_x.log', filemode = "w"
-
-
-class Vars:
-    data_loc = ""
-    train_data = []
 
 
 class ActivationType(Enum):
@@ -99,7 +95,7 @@ def expected_output(label: int, n_outputs: int) -> list[int]: # pure?
     return [1 if i == label else 0 for i in range(n_outputs)]
 
 
-def calc_error(output: float, expected_output: int) -> float: # pure
+def calc_error(output: float, expected_output: int) -> float:# pure
     return math.pow(output - expected_output, 2)
 
 
@@ -128,6 +124,7 @@ class NeuralNetwork():
 
     # currenlty supports training of only a single layer network
     def train(self, train_data: list[list[int]], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.5, max_iterations=32):
+    # def train(self, train_data: list[list[int]], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.5, max_iterations=1):
         if len(train_data[0]) - 1 != self.n_inputs:
             logging.warning("The number of inputs to the network does no match the length of the input vector")
             logging.warning(f"length of the vector must be {self.n_inputs} plus one for the label")
@@ -191,34 +188,41 @@ def ask_for_data_loc() -> str: # pure
             print("Enter valid input")
 
 
-def download_data_set(root_directory: str, langs=DefaultVars.langs) -> list[list[int]]: # pure
+def download_data_set(root_directory: str) -> tuple[list[list[int]], list[str]]: # pure
     logging.info("v - downloading data set")
     collected_data = []
+    lang_table = []
     # Iterate over all files and directories in the root directory recursively
     for dirpath, _, filenames in os.walk(root_directory): # _ = dirnames
         for fname in filenames:
             if fname.endswith(".txt"):
                 dir_name = os.path.basename(dirpath)
 
+                logging.debug(os.path.join(dirpath, fname))
                 with open(os.path.join(dirpath, fname), 'r') as file:
                     data = file.read() # Maby there is smth more effc
                 
                 vec = convert_txt_to_vector(data)
+
+                if dir_name not in lang_table:
+                    # DefaultVars.langs.append(dir_name)
+                    lang_table.append(dir_name)
     
                 logging.debug(dir_name)
                 # If you remove a lang data set that is in the beginning or in the middle
                 # of the lang list (DefaultVars.langs) and then you reduce the number
                 # of neurons in the final layer to depict than, this appproach will couse
                 # problems. It is "handeled" in expected_output()
-                for idx, lang in enumerate(langs):
+                # for idx, lang in enumerate(langs):
+                for idx, lang in enumerate(lang_table):
                     if dir_name == lang:
                         vec.append(idx)
                 
                 logging.debug(vec)
                 collected_data.append(vec)
-
+    logging.info(f"Detected languages: {lang_table}")
     logging.info("^")
-    return collected_data
+    return collected_data, lang_table
 
 
 def convert_txt_to_vector(txt: str) -> list[int]: # pure
@@ -261,7 +265,7 @@ def custom_prediction(NN: NeuralNetwork):
 
 def main():
     data_loc = ask_for_data_loc()
-    train_data = download_data_set(data_loc)
+    train_data, DefaultVars.langs = download_data_set(data_loc)
     neural_network: NeuralNetwork = NeuralNetwork(26, [3]) # check for wrong len of input
     neural_network.show_arch()
     neural_network.train(train_data)
