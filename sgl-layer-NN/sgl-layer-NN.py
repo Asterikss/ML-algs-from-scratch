@@ -123,8 +123,9 @@ class NeuralNetwork():
 
 
     # currenlty supports training of only a single layer network
-    def train(self, train_data: list[list[int]], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.5, max_iterations=32):
-    # def train(self, train_data: list[list[int]], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.5, max_iterations=1):
+    def train(self, train_data: list[list[int]], lang_table: list[str], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.5, max_iterations=32):
+        self.lang_table = lang_table
+
         if len(train_data[0]) - 1 != self.n_inputs:
             logging.warning("The number of inputs to the network does no match the length of the input vector")
             logging.warning(f"length of the vector must be {self.n_inputs} plus one for the label")
@@ -165,7 +166,7 @@ class NeuralNetwork():
 
     def custom_prediction(self, X: list):
         output = self.feed_forward(X)
-        display_hr_output(output)
+        display_hr_output(output, self.lang_table)
 
 
     def show_arch(self):
@@ -234,21 +235,23 @@ def convert_txt_to_vector(txt: str) -> list[int]: # pure
     return vec
 
 
-def translate_output(vector: list) -> str: # pure
-    langs = DefaultVars.langs
+# def translate_output(vector: list) -> str: # pure
+def translate_output(vector: list, lang_table: list[str]) -> str: # pure
+    # langs = DefaultVars.langs
     idx = vector.index(max(vector))
-    if idx < len(langs):
-        return langs[idx]
+    if idx < len(lang_table):
+        return lang_table[idx]
     return "unknown"
 
 
-def display_hr_output(output: list[float]):
-    print(f"Prediction --> {translate_output(output)}")
+# def display_hr_output(output: list[float]):
+def display_hr_output(output: list[float], lang_table: list[str]):
+    print(f"Prediction --> {translate_output(output, lang_table)}")
     print("Confidence:")
-    langs = DefaultVars.langs
+    # langs = 
     for i, out in enumerate(output):
-        if i < len(langs):
-            print(f"  {langs[i]} - {out}")
+        if i < len(lang_table):
+            print(f"  {lang_table[i]} - {out}")
         else:
             print(f"  unknown - {out}")
 
@@ -265,10 +268,11 @@ def custom_prediction(NN: NeuralNetwork):
 
 def main():
     data_loc = ask_for_data_loc()
-    train_data, DefaultVars.langs = download_data_set(data_loc)
+    # train_data, DefaultVars.langs = download_data_set(data_loc)
+    train_data, lang_table = download_data_set(data_loc)
     neural_network: NeuralNetwork = NeuralNetwork(26, [3]) # check for wrong len of input
     neural_network.show_arch()
-    neural_network.train(train_data)
+    neural_network.train(train_data, lang_table)
 
     custom_prediction(neural_network)
     # logging.debug("##############################")
