@@ -81,13 +81,6 @@ def normalization(X) -> list[float]: # pure
 
 
 def expected_output(label: int, n_outputs: int) -> list[int]: # pure?
-    # if label >= n_outputs:
-    #     # logging.warning("Number of outputs (number of neurons in the last layer) is too small to represent this label")
-    #     # logging.warning("Please update the neural network and repeat the process")
-    #     # raise NumberOfOutputsError("Read the warning above")
-    #     raise NumberOfOutputsError("Number of outputs (number of neurons in the last layer) " +
-    #                                "is too small to represent this label. " +
-    #                                "Please update the neural network and repeat the process")
     return [1 if i == label else 0 for i in range(n_outputs)]
 
 
@@ -119,7 +112,7 @@ class NeuralNetwork():
         return input
 
 
-    # currenlty supports training of only a single layer network
+    # Currenlty supports training of only a single layer network
     def train(self, train_data: list[list[int]], lang_table: list[str], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.5, max_iterations=32):
         self.lang_table = lang_table
 
@@ -217,11 +210,6 @@ def download_data_set(root_directory: str) -> tuple[list[list[int]], list[str]]:
                     lang_table.append(dir_name)
     
                 logging.debug(dir_name)
-                # If you remove a lang data set that is in the beginning or in the middle
-                # of the lang list (DefaultVars.langs) and then you reduce the number
-                # of neurons in the final layer to depict than, this appproach will couse
-                # problems. It is "handeled" in expected_output()
-                # for idx, lang in enumerate(langs):
                 for idx, lang in enumerate(lang_table):
                     if dir_name == lang:
                         vec.append(idx)
@@ -280,7 +268,7 @@ def main():
     init()
     data_loc = ask_for_data_loc()
     train_data, lang_table = download_data_set(data_loc)
-    neural_network: NeuralNetwork = NeuralNetwork(26, [2])
+    neural_network: NeuralNetwork = NeuralNetwork(26, [3])
     neural_network.show_arch()
     neural_network.train(train_data, lang_table)
 
