@@ -1,4 +1,4 @@
-"Single layer neural network used for predicting the language of a piece of text. By default supports english, polish and spanish"
+"Single layer neural network used for predicting the language of a piece of text"
 from enum import Enum
 import logging
 import random
@@ -81,10 +81,13 @@ def normalization(X) -> list[float]: # pure
 
 
 def expected_output(label: int, n_outputs: int) -> list[int]: # pure?
-    if label >= n_outputs:
-        logging.warning("Number of outputs (number of neurons in the last layer) is too small to represent this label")
-        logging.warning("Please update the neural network and repeat the process")
-        raise NumberOfOutputsError("Read the warning above")
+    # if label >= n_outputs:
+    #     # logging.warning("Number of outputs (number of neurons in the last layer) is too small to represent this label")
+    #     # logging.warning("Please update the neural network and repeat the process")
+    #     # raise NumberOfOutputsError("Read the warning above")
+    #     raise NumberOfOutputsError("Number of outputs (number of neurons in the last layer) " +
+    #                                "is too small to represent this label. " +
+    #                                "Please update the neural network and repeat the process")
     return [1 if i == label else 0 for i in range(n_outputs)]
 
 
@@ -120,14 +123,22 @@ class NeuralNetwork():
     def train(self, train_data: list[list[int]], lang_table: list[str], learning_rate_w=4.0, learning_rate_b=0.4, error_gate=0.5, max_iterations=32):
         self.lang_table = lang_table
 
+        # Check for potential errors
         if len(self.layers) > 1:
-            raise TooManyLayers("Currenlty train() supports only sigle layer network")
+            raise TooManyLayers("Currenlty train() supports only a sigle layer network")
+
 
         if len(train_data[0]) - 1 != self.n_inputs:
-            logging.warning("The number of inputs to the network does no match the length of the input vector")
-            logging.warning(f"length of the vector must be {self.n_inputs} plus one for the label")
-            logging.warning("Aborting the training")
-            raise InadequateInputLen("Read warning above")
+            raise InadequateInputLen("The number of inputs to the network does no match the length of the input vector " +
+                                     f"length of the vector must be {self.n_inputs} plus one for the label " +
+                                     "Aborting the training")
+
+
+        if len(lang_table) != self.n_outputs:
+            raise NumberOfOutputsError("Number of outputs (number of neurons in the last layer) " +
+                                       "does not much the number of detected languages in the data set. " +
+                                       "Please update the neural network accordingly and repeat the process")
+
 
         for j in range(max_iterations):
             logging.info(f"v {j+1} iteration")
@@ -141,17 +152,17 @@ class NeuralNetwork():
 
                 for layer in reversed(self.layers):
                     for i, neuron in enumerate(layer.neurons):
-                            # error = calc_error(output[i], expected_out[i]) 
-                            # logging.debug(error)
+                        # error = calc_error(output[i], expected_out[i]) 
+                        # logging.debug(error)
         
-                                # logging.debug(f"old b: {neuron.bias}")
                         # (expected_out[i] - output[i]) could be swaped for actuall derivative. Then the sign is lost
+                        logging.debug(f"old b: {neuron.bias}")
                         neuron.bias += learning_rate_b * (expected_out[i] - output[i]) * neuron.activation_derivative(output[i])
-                                # logging.debug(f"new b: {neuron.bias}")
-                                # logging.debug(f"old w: {neuron.weights}")
+                        logging.debug(f"new b: {neuron.bias}")
+                        logging.debug(f"old w: {neuron.weights}")
                         for idx in range(len(neuron.weights)):
                             neuron.weights[idx] += learning_rate_w * (expected_out[i] - output[i]) * neuron.activation_derivative(output[i]) * X[idx]
-                                # logging.debug(f"new w: {neuron.weights}")
+                        logging.debug(f"new w: {neuron.weights}")
 
 
             logging.info(f"^ error for {j+1} iteration -> {total_error}")
@@ -269,7 +280,7 @@ def main():
     init()
     data_loc = ask_for_data_loc()
     train_data, lang_table = download_data_set(data_loc)
-    neural_network: NeuralNetwork = NeuralNetwork(26, [3])
+    neural_network: NeuralNetwork = NeuralNetwork(26, [2])
     neural_network.show_arch()
     neural_network.train(train_data, lang_table)
 
