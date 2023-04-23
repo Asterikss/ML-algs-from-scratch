@@ -242,38 +242,8 @@ def interation_loop():
     print("^")
 
 
-def get_data(line: str, read_type: TypeOfRead):
-    tmp_list: list = line.split()
-    logging.debug(tmp_list)
-
-    parsed_tmp_list = [eval(i) for i in tmp_list]
-
-    # code for dealing with clusters described using a string
-    # parsed_tmp_list2 = []
-    # for i in range(len(tmp_list) - 1):
-    #     parsed_tmp_list2.append(eval(tmp_list[i]))
-    # parsed_tmp_list2.append(tmp_list[-1])
-        
-    if read_type == TypeOfRead.TRAINING:
-        Variables.points.append(parsed_tmp_list)
-        # Variables.points.append(parsed_tmp_list2)
-    else:
-        Variables.predict_data.append(parsed_tmp_list)
-        # Variables.predict_data.append(parsed_tmp_list2)
  
 
-def download_data_set(data_loc :str, read_type: TypeOfRead):
-    print("v")
-    print("downloading data set")
-
-    with open(data_loc, "r") as f:
-        for line in f:
-            get_data(line, read_type)
-
-    if read_type == TypeOfRead.TRAINING:
-        Variables.number_of_features = len(Variables.points[0]) - 1
-        print(f"number of features {len(Variables.points[0]) - 1}")
-    print("^")
 
 
 def predict_cluster(point :tuple) -> tuple[int, int]:
@@ -359,8 +329,50 @@ def predict():
     print("^")
 
 
-def train():
-    download_data_set(Variables.data_loc, TypeOfRead.TRAINING)
+#maby merge this function with download_data_set()
+def get_data(line: str, read_type: TypeOfRead) -> list[float]: #
+    tmp_list: list = line.split()
+    logging.debug(tmp_list)
+
+    parsed_tmp_list = [eval(i) for i in tmp_list]
+
+    # code for dealing with clusters described using a string
+    # parsed_tmp_list2 = []
+    # for i in range(len(tmp_list) - 1):
+    #     parsed_tmp_list2.append(eval(tmp_list[i]))
+    # parsed_tmp_list2.append(tmp_list[-1])
+        
+    if read_type == TypeOfRead.TRAINING:
+        Variables.points.append(parsed_tmp_list)
+        # Variables.points.append(parsed_tmp_list2)
+    else:
+        Variables.predict_data.append(parsed_tmp_list)
+        # Variables.predict_data.append(parsed_tmp_list2)
+
+    return parsed_tmp_list
+
+
+def download_data_set(data_loc :str, read_type: TypeOfRead) -> tuple[list[float], int]:  #
+    logging.info("v - downloading data set")
+    dataset = []
+    # number_of_features = 0
+
+    with open(data_loc, "r") as f:
+        for line in f:
+            # get_data(line, read_type)
+            dataset.append(get_data(line, read_type))
+
+    if read_type == TypeOfRead.TRAINING:
+        Variables.number_of_features = len(Variables.points[0]) - 1
+        print(f"number of features {len(Variables.points[0]) - 1}")
+    logging.info("^")
+    
+    return dataset, len(Variables.points[0]) - 1
+
+
+def train(k_value: int, data_loc: str):
+    # download_data_set(Variables.data_loc, TypeOfRead.TRAINING)
+    dataset, number_of_features = download_data_set(data_loc, TypeOfRead.TRAINING)
     pick_random_points()
     interation_loop()
 
@@ -376,7 +388,7 @@ def init():
 def main():
     init()
     k_value, data_loc = ask_for_k_value_and_data_loc()
-    train()
+    train(k_value, data_loc)
     predict()
 
 
