@@ -44,36 +44,6 @@ def is_done_iterating() -> bool:
     return False
 
 
-def get_max() -> list:
-    print("v")
-    print(f"calculating max for {Variables.number_of_features} features")
-    max: list = []
-
-    for j in range(0,  Variables.number_of_features):
-        max.append(Variables.points[0][j])
-        for i in range(1 , len(Variables.points)): #is inclusinve?
-            if max[j] < Variables.points[i][j]:
-                max[j] = Variables.points[i][j]
-    
-    logging.debug(f"max list: {max}")
-    print("^")
-    return max
-
-
-def get_min() -> list:
-    print("v")
-    print(f"calculating min for {Variables.number_of_features} features")
-    min: list = []
-
-    for j in range(0,  Variables.number_of_features):
-        min.append(Variables.points[0][j])
-        for i in range(1 , len(Variables.points)): #is inclusinve?
-            if min[j] > Variables.points[i][j]:
-                min[j] = Variables.points[i][j]
-    
-    logging.debug(f"min list: {min}")
-    print("^")
-    return min
 
 
 
@@ -261,7 +231,52 @@ def interation_loop(k_value: int, dataset: list[list[float]], max_iterations: in
     logging.info("^ - End of the interation loop")
 
 
-def pick_random_points(k_value:int, number_of_features: int) -> list[list[float]]: #
+def get_max(number_of_features: int, dataset: list[list[float]]) -> list:
+    print("v")
+    # print(f"calculating max for {Variables.number_of_features} features")
+    print(f"calculating max for {number_of_features} features")
+    max: list = []
+
+    # for j in range(0,  Variables.number_of_features):
+    for j in range(0,  number_of_features):
+        # max.append(Variables.points[0][j])
+        max.append(dataset[0][j])
+        # for i in range(1 , len(Variables.points)): #is inclusinve?
+        for i in range(1 , len(dataset)): #is inclusinve?
+            # if max[j] < Variables.points[i][j]:
+            if max[j] < dataset[i][j]:
+                # max[j] = Variables.points[i][j]
+                max[j] = dataset[i][j]
+    
+    logging.debug(f"max list: {max}")
+    print("^")
+    return max
+
+
+# compress get_max() and get_min() together later
+def get_min(number_of_features: int, dataset: list[list[float]]) -> list:
+    print("v")
+    # print(f"calculating min for {Variables.number_of_features} features")
+    print(f"calculating min for {number_of_features} features")
+    min: list = []
+
+    # for j in range(0,  Variables.number_of_features):
+    for j in range(0,  number_of_features):
+        # min.append(Variables.points[0][j])
+        min.append(dataset[0][j])
+        # for i in range(1 , len(Variables.points)): #is inclusinve?
+        for i in range(1 , len(dataset)): #is inclusinve?
+            # if min[j] > Variables.points[i][j]:
+            if min[j] > dataset[i][j]:
+                # min[j] = Variables.points[i][j]
+                min[j] = dataset[i][j]
+    
+    logging.debug(f"min list: {min}")
+    print("^")
+    return min
+
+
+def pick_random_points(k_value:int, number_of_features: int, dataset: list[list[float]]) -> list[list[float]]: #
     print("v")
     print("picking centroids")
     '''
@@ -275,8 +290,8 @@ def pick_random_points(k_value:int, number_of_features: int) -> list[list[float]
     '''
     rand_points :list[list[float]] = []
 
-    max_list = get_max()
-    min_list = get_min()
+    max_list = get_max(number_of_features, dataset)
+    min_list = get_min(number_of_features, dataset)
 
     # intervals :list = [round(max_list[i] - min_list[i], 2) for i in range(Variables.number_of_features)]
     intervals :list = [round(max_list[i] - min_list[i], 2) for i in range(number_of_features)]
@@ -350,7 +365,7 @@ def download_data_set(data_loc :str, read_type: TypeOfRead) -> tuple[list[list[f
 
 def train(k_value: int, data_loc: str):
     dataset, number_of_features = download_data_set(data_loc, TypeOfRead.TRAINING)
-    random_points = pick_random_points(k_value, number_of_features)
+    random_points = pick_random_points(k_value, number_of_features, dataset)
     interation_loop(k_value, dataset, DefaultVariables.max_iterations)
 
 
