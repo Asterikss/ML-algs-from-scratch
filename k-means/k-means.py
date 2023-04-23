@@ -44,10 +44,6 @@ def is_done_iterating() -> bool:
     return False
 
 
-
-
-
-
 def calc_means(points :list) -> list[float]:
     print("v")
     print("calculating means")
@@ -68,7 +64,8 @@ def calc_means(points :list) -> list[float]:
 
 
 
-def calc_euclidean_distance(a: tuple, b: tuple) -> float:
+# def calc_euclidean_distance(a: tuple, b: tuple) -> float:
+def calc_euclidean_distance(a: list[float], b: list[float]) -> float:
     if len(a) -1 != len(b):
         print("tuples (points) are of wrong size")
         print("'a'(first param) should be longer by 1 (last arg is the actual cluster) ")
@@ -82,7 +79,8 @@ def calc_euclidean_distance(a: tuple, b: tuple) -> float:
     return round(dist, 3)
 
 
-def predict_cluster(point :tuple) -> tuple[int, int]:
+# def predict_cluster(point :tuple) -> tuple[int, int]:
+def predict_cluster(point: list[float]) -> tuple[int, int]:
     tmp_dist :list[float] = [0 for _ in range(Variables.k)]
 
     for i in range(Variables.k):
@@ -96,7 +94,7 @@ def predict_cluster(point :tuple) -> tuple[int, int]:
         return which_mean_closest, -1
     
     print(f"Prediction: Cluster {which_mean_closest}. Actual cluster: {point[-1]}")
-    return which_mean_closest, point[-1]
+    return which_mean_closest, int(point[-1])
 
 
 def predict():
@@ -150,12 +148,13 @@ def predict():
         print(f"Enter a vector with {Variables.number_of_features} features plus it's actual cluster")
         print(f"If the cluster is unknown enter {Variables.k} (k) there")
         while not end:
-            custom_vector: list[int] = []
+            custom_vector: list[float] = []
             for i in range(Variables.number_of_features):
                 custom_vector.append((int(input(f"Input {i+1} feature: "))))
             custom_vector.append(int(input("Input the cluster: ")))
 
-            cluster_tuple :tuple = predict_cluster(tuple(custom_vector))
+            # cluster_tuple :tuple = predict_cluster(tuple(custom_vector))
+            cluster_tuple :tuple = predict_cluster(custom_vector)
             logging.debug(cluster_tuple)
     
             q = input("Type q to exit. Otherwise hit enter: ")
@@ -165,11 +164,12 @@ def predict():
     print("^")
 
 
-def one_full_iter(k_value: int, dataset: list[list[float]]):
+def one_full_iter(k_value: int, dataset: list[list[float]]) -> tuple[list[list[float]], list[list[float]]]:
     # points_sorted = [[] for _ in range(Variables.k)]
     points_sorted = [[] for _ in range(k_value)]
 
-    for point in Variables.points:
+    # for point in Variables.points:
+    for point in dataset:
         # tmp_dist :list[float] = [0 for _ in range(Variables.k)]
         tmp_dist :list[float] = [0 for _ in range(k_value)]
 
@@ -201,6 +201,7 @@ def one_full_iter(k_value: int, dataset: list[list[float]]):
     logging.debug(points_sorted)
 
     Variables.prev_k_means = Variables.k_means
+    prev_k_means = Variables.k_means
 
     # new_k_means :list[list[float]] = [[] for _ in range(Variables.k)]
     new_k_means :list[list[float]] = [[] for _ in range(k_value)]
@@ -214,13 +215,15 @@ def one_full_iter(k_value: int, dataset: list[list[float]]):
     
     Variables.k_means = new_k_means
 
+    return new_k_means, prev_k_means
+
 
 def interation_loop(k_value: int, dataset: list[list[float]], max_iterations: int):
     logging.info("v - Start of the interation loop")
     i = 1
 
     # So the is_done_iterating() does not crash (no prev_k_means)
-    print(f"-inter {i}-")
+    logging.info(f"-inter {i}-")
     one_full_iter(k_value, dataset)
     # while i < DefaultVariables.max_iterations and not is_done_iterating():
     while i < max_iterations and not is_done_iterating():
@@ -231,11 +234,11 @@ def interation_loop(k_value: int, dataset: list[list[float]], max_iterations: in
     logging.info("^ - End of the interation loop")
 
 
-def get_max(number_of_features: int, dataset: list[list[float]]) -> list:
+def get_max(number_of_features: int, dataset: list[list[float]]) -> list[float]: # pure
     print("v")
     # print(f"calculating max for {Variables.number_of_features} features")
     print(f"calculating max for {number_of_features} features")
-    max: list = []
+    max: list[float] = []
 
     # for j in range(0,  Variables.number_of_features):
     for j in range(0,  number_of_features):
@@ -254,11 +257,11 @@ def get_max(number_of_features: int, dataset: list[list[float]]) -> list:
 
 
 # compress get_max() and get_min() together later
-def get_min(number_of_features: int, dataset: list[list[float]]) -> list:
+def get_min(number_of_features: int, dataset: list[list[float]]) -> list[float]: # pure
     print("v")
     # print(f"calculating min for {Variables.number_of_features} features")
     print(f"calculating min for {number_of_features} features")
-    min: list = []
+    min: list[float] = []
 
     # for j in range(0,  Variables.number_of_features):
     for j in range(0,  number_of_features):
