@@ -31,19 +31,6 @@ class TypeOfRead(Enum):
     PREDICTING = 1
 
 
-def is_done_iterating() -> bool:
-    for i in range(Variables.k):
-        dist = 0
-        for j in range(Variables.number_of_features):
-            dist += (Variables.prev_k_means[i][j] - Variables.k_means[i][j]) ** 2
-
-        if dist < DefaultVariables.threshold:
-            print("~Threshold reached~")
-            return True
-
-    return False
-
-
 def calc_means(points :list) -> list[float]:
     print("v")
     print("calculating means")
@@ -60,23 +47,6 @@ def calc_means(points :list) -> list[float]:
 
     print("^")
     return new_single_k_mean
-
-
-
-
-# def calc_euclidean_distance(a: tuple, b: tuple) -> float:
-def calc_euclidean_distance(a: list[float], b: list[float]) -> float:
-    if len(a) -1 != len(b):
-        print("tuples (points) are of wrong size")
-        print("'a'(first param) should be longer by 1 (last arg is the actual cluster) ")
-        return -1
-
-    dist = 0
-    for i in range(0, len(b)):
-        dist += (a[i] - b[i]) ** 2
-
-    # return dist ** (1 / 2)
-    return round(dist, 3)
 
 
 # def predict_cluster(point :tuple) -> tuple[int, int]:
@@ -164,7 +134,43 @@ def predict():
     print("^")
 
 
-def one_full_iter(k_value: int, dataset: list[list[float]]) -> tuple[list[list[float]], list[list[float]]]:
+def is_done_iterating(new_centroids, prev_centroids, k_value, number_of_features, \
+        threshold=DefaultVariables.threshold) -> bool: # pure
+
+    # for i in range(Variables.k):
+    for i in range(k_value):
+        dist = 0
+        # for j in range(Variables.number_of_features):
+        for j in range(number_of_features):
+            # dist += (Variables.prev_k_means[i][j] - Variables.k_means[i][j]) ** 2
+            dist += (prev_centroids[i][j] - new_centroids[i][j]) ** 2
+
+        # if dist < DefaultVariables.threshold:
+        if dist < threshold:
+            print("~Threshold reached~")
+            return True
+
+    return False
+
+
+# def calc_euclidean_distance(a: tuple, b: tuple) -> float:
+def calc_euclidean_distance(a: list[float], b: list[float]) -> float: # pure
+    if len(a) -1 != len(b):
+        print("tuples (points) are of wrong size")
+        print("'a'(first param) should be longer by 1 (last arg is the actual cluster) ")
+        return -1
+
+    dist = 0
+    for i in range(0, len(b)):
+        dist += (a[i] - b[i]) ** 2
+
+    # return dist ** (1 / 2)
+    return round(dist, 3)
+
+
+def one_full_iter(k_value: int, dataset: list[list[float]], centroids: list[list[float]]) \
+        -> tuple[list[list[float]], list[list[float]]]:
+
     # points_sorted = [[] for _ in range(Variables.k)]
     points_sorted = [[] for _ in range(k_value)]
 
@@ -175,7 +181,8 @@ def one_full_iter(k_value: int, dataset: list[list[float]]) -> tuple[list[list[f
 
         # for i in range(Variables.k):
         for i in range(k_value):
-            tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
+            # tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
+            tmp_dist[i] = calc_euclidean_distance(point, centroids[i])
 
         logging.debug(tmp_dist)
         which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
@@ -201,37 +208,45 @@ def one_full_iter(k_value: int, dataset: list[list[float]]) -> tuple[list[list[f
     logging.debug(points_sorted)
 
     Variables.prev_k_means = Variables.k_means
-    prev_k_means = Variables.k_means
+    prev_centroids = centroids
 
     # new_k_means :list[list[float]] = [[] for _ in range(Variables.k)]
-    new_k_means :list[list[float]] = [[] for _ in range(k_value)]
+    # new_k_means :list[list[float]] = [[] for _ in range(k_value)]
+    new_centroids :list[list[float]] = [[] for _ in range(k_value)]
 
     # for i in range(Variables.k):
     for i in range(k_value):
-        new_k_means[i] = calc_means(points_sorted[i])
+        # new_k_means[i] = calc_means(points_sorted[i])
+        new_centroids[i] = calc_means(points_sorted[i])
 
-    logging.info(f"Prev k_means: {Variables.prev_k_means}")
-    logging.info(f"New k_means {new_k_means}")
+    # logging.info(f"Prev k_means: {Variables.prev_k_means}")
+    logging.info(f"Prev centroids: {prev_centroids}")
+    # logging.info(f"New k_means {new_k_means}")
+    logging.info(f"New centroids {new_centroids}")
     
-    Variables.k_means = new_k_means
+    # Variables.k_means = new_k_means
+    Variables.k_means = new_centroids
 
-    return new_k_means, prev_k_means
+    return new_centroids, prev_centroids
 
 
-def interation_loop(k_value: int, dataset: list[list[float]], max_iterations: int):
+def interation_loop(k_value: int, dataset: list[list[float]], centroids: list[list[float]], \
+        number_of_features: int, max_iterations: int) -> list[list[float]]:
+
     logging.info("v - Start of the interation loop")
     i = 1
 
     # So the is_done_iterating() does not crash (no prev_k_means)
     logging.info(f"-inter {i}-")
-    one_full_iter(k_value, dataset)
+    new_centroids, prev_centroids = one_full_iter(k_value, dataset, centroids)
     # while i < DefaultVariables.max_iterations and not is_done_iterating():
-    while i < max_iterations and not is_done_iterating():
+    while i < max_iterations and not is_done_iterating(new_centroids, prev_centroids, k_value, number_of_features):
         i += 1
         print(f"-inter {i}-")
-        one_full_iter(k_value, dataset)
+        new_centroids, prev_centroids = one_full_iter(k_value, dataset, centroids)
 
     logging.info("^ - End of the interation loop")
+    return new_centroids
 
 
 def get_max(number_of_features: int, dataset: list[list[float]]) -> list[float]: # pure
@@ -366,10 +381,10 @@ def download_data_set(data_loc :str, read_type: TypeOfRead) -> tuple[list[list[f
     return dataset, len(Variables.points[0]) - 1
 
 
-def train(k_value: int, data_loc: str):
+def train(k_value: int, data_loc: str, max_iterations: int):
     dataset, number_of_features = download_data_set(data_loc, TypeOfRead.TRAINING)
-    random_points = pick_random_points(k_value, number_of_features, dataset)
-    interation_loop(k_value, dataset, DefaultVariables.max_iterations)
+    centroids = pick_random_points(k_value, number_of_features, dataset)
+    final_centroids = interation_loop(k_value, dataset, centroids, number_of_features, max_iterations)
 
 
 def ask_for_k_value_and_data_loc() -> tuple[int, str]: #
@@ -417,7 +432,7 @@ def init():
 def main():
     init()
     k_value, data_loc = ask_for_k_value_and_data_loc()
-    train(k_value, data_loc)
+    train(k_value, data_loc, DefaultVariables.max_iterations)
     predict()
 
 
