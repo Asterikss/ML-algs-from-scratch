@@ -1,6 +1,4 @@
 # use pathlib later
-# @dataclass
-# class classname(frozen = True):
 
 # originally in default files
 # 0 = Iris-setosa
@@ -8,6 +6,7 @@
 # 2 = Iris-virginica
 import random
 from enum import Enum
+from dataclasses import dataclass
 import logging
 
 class Variables:
@@ -20,13 +19,11 @@ class Variables:
     predict_data = []
 
 
+@dataclass(frozen=True)
 class DefaultVariables:
     max_iterations = 10
     threshold = 0.000001
-    level = logging.INFO
-    fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
-    logging.basicConfig(level = level, format = fmt)
-    # filename = 'log_k-means.log', filemode = "w"
+
 
 class TypeOfRead(Enum):
     # TRAINING, PREDICTING = range(2) - this shows an error for some reason
@@ -136,29 +133,38 @@ def calc_means(points :list) -> list[float]:
     return new_single_k_mean
 
 
-def ask_for_k_value_and_data_loc():
-    missing_input = True
+def ask_for_k_value_and_data_loc() -> tuple[int, str]: #
+    # missing_input = True
 
-    while missing_input:
-        k = int(input("Enter k value: "))
-        if 0 < k < 7:
-            Variables.k = k
-            missing_input = False
+    # while missing_input:
+    while True:
+        k = int(input("Enter k value (int): "))
+        if 1 < k < 7:
+            Variables.k = k ##
+            break
+            # missing_input = False
         else:
-            print("K beetween 1 and 6")
+            print("K must be beetween 2 and 6")
 
-    missing_input = True
-    while missing_input:
-        data_loc = int(input("For default data location type 1. Otherwise type 0: "))
-        if data_loc == 1:
+    # missing_input = True
+    # while missing_input:
+    while True:
+        answer = int(input("For default data location type 1. Otherwise type 0: "))
+        if answer == 1:
             Variables.data_loc = "data/iris_training.txt"
-            missing_input = False
-        elif data_loc == 0:
-            data_loc = str(input("Enter custom data location: "))
-            Variables.data_loc = data_loc
-            missing_input = False
+            data_loc = "data/iris_training.txt"
+            # missing_input = False
+            break
+        elif answer == 0:
+            custom_path = str(input("Enter custom data location: "))
+            Variables.data_loc = custom_path
+            data_loc = custom_path
+            # missing_input = False
+            break
         else:
             print("Enter valid input")
+
+    return k, data_loc
 
 
 def calc_euclidean_distance(a: tuple, b: tuple) -> float:
@@ -359,8 +365,17 @@ def train():
     interation_loop()
 
 
+def init():
+    level = logging.INFO
+    # level = logging.DEBUG
+    fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
+    logging.basicConfig(level = level, format = fmt)
+    # logging.basicConfig(level = level, format = fmt, filename="log-k-means.log", filemode="w")
+
+
 def main():
-    ask_for_k_value_and_data_loc()
+    init()
+    k_value, data_loc = ask_for_k_value_and_data_loc()
     train()
     predict()
 
