@@ -76,43 +76,6 @@ def get_min() -> list:
     return min
 
 
-def pick_random_points():
-    print("v")
-    print("picking centroids")
-    '''
-    Calc min and max for each feature. Calc the interval beetween min and max for each of them.
-    Devide it by the number of means. Calc single feature in single mean by picking random value
-    beetween min and min + devided interval. Calc the same feature, but for the next mean - pick
-    a value beetween min + devided interval and min + devided interval * 2. And so on.
-    It makes in unlikely that there will be no points assigned to a given mean. Therefore no
-    need to populate in artificially or trying to drop it alltogether. Plus they are more
-    evenly distribuated which given reasonable data and k-value will improve results
-    '''
-    rand_points :list = []
-
-    max_list = get_max()
-    min_list = get_min()
-
-    intervals :list = [round(max_list[i] - min_list[i], 2) for i in range(Variables.number_of_features)]
-
-    logging.debug(f"intervals: {intervals}")
-
-    for i in range(Variables.number_of_features):
-        intervals[i] = round((intervals[i] / Variables.k), 1)
-
-    logging.debug(f"intervals2: {intervals}")
-
-    for i in range(1, Variables.k + 1):
-        tmp_rand_points :list = []
-
-        for j in range(Variables.number_of_features):
-            tmp_rand_points.append(round(random.uniform(min_list[j] + (intervals[j] * (i - 1)), min_list[j] + (intervals[j] * i)), 2))
-
-        rand_points.append(tmp_rand_points)
-    
-    print(f"means: {rand_points}")
-    Variables.k_means = rand_points
-    print("^")
 
 
 def calc_means(points :list) -> list[float]:
@@ -133,38 +96,6 @@ def calc_means(points :list) -> list[float]:
     return new_single_k_mean
 
 
-def ask_for_k_value_and_data_loc() -> tuple[int, str]: #
-    # missing_input = True
-
-    # while missing_input:
-    while True:
-        k = int(input("Enter k value (int): "))
-        if 1 < k < 7:
-            Variables.k = k ##
-            break
-            # missing_input = False
-        else:
-            print("K must be beetween 2 and 6")
-
-    # missing_input = True
-    # while missing_input:
-    while True:
-        answer = int(input("For default data location type 1. Otherwise type 0: "))
-        if answer == 1:
-            Variables.data_loc = "data/iris_training.txt"
-            data_loc = "data/iris_training.txt"
-            # missing_input = False
-            break
-        elif answer == 0:
-            custom_path = str(input("Enter custom data location: "))
-            Variables.data_loc = custom_path
-            data_loc = custom_path
-            # missing_input = False
-            break
-        else:
-            print("Enter valid input")
-
-    return k, data_loc
 
 
 def calc_euclidean_distance(a: tuple, b: tuple) -> float:
@@ -179,71 +110,6 @@ def calc_euclidean_distance(a: tuple, b: tuple) -> float:
 
     # return dist ** (1 / 2)
     return round(dist, 3)
-
-
-def one_full_iter():
-    points_sorted = [[] for _ in range(Variables.k)]
-
-    for point in Variables.points:
-        tmp_dist :list[float] = [0 for _ in range(Variables.k)]
-
-        for i in range(Variables.k):
-            tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
-
-        logging.debug(tmp_dist)
-        which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
-        logging.debug(which_mean_closest)
-
-        points_sorted[which_mean_closest].append(point)
-
-    # Sometimes, with few data points, there can be a situation where none
-    # of the points are closest to a particualr starting mean. Therefore
-    # an empty list is created. I'm populating it here with big numbers
-    # so none of the future points will be closest to that mean.
-    # Algorithm, by doing that, will suggest that their are less groups
-    # than entered by a user. Puting big numbers there is unnecesarry. 
-    # List can't be empty though, because I'm deviding by it's len later
-    for i in range(len(points_sorted)):
-        if len(points_sorted[i]) == 0:
-            points_sorted[i].append([1248 for _ in range(Variables.k)])
-            points_sorted[i][0].append(-1)
-            print("One of the lists created as an empty list.")
-            print("Now populated artificially.")
-            
-    logging.debug(points_sorted)
-
-    Variables.prev_k_means = Variables.k_means
-
-    new_k_means :list[list[float]] = [[] for _ in range(Variables.k)]
-
-    for i in range(Variables.k):
-        new_k_means[i] = calc_means(points_sorted[i])
-
-    print(f"Prev k_means: {Variables.prev_k_means}")
-    print(f"New k_means {new_k_means}")
-    
-    Variables.k_means = new_k_means
-
-
-def interation_loop():
-    print("v")
-    print("--Start of interation loop--")
-    i = 1
-
-    # So the is_done_iterating() does not crash (no prev_k_means)
-    print(f"-inter {i}-")
-    one_full_iter()
-    while i < DefaultVariables.max_iterations and not is_done_iterating():
-        i += 1
-        print(f"-inter {i}-")
-        one_full_iter()
-
-    print("--End of interation loop--")
-    print("^")
-
-
- 
-
 
 
 def predict_cluster(point :tuple) -> tuple[int, int]:
@@ -329,7 +195,119 @@ def predict():
     print("^")
 
 
-#maby merge this function with download_data_set()
+def one_full_iter(k_value: int, dataset: list[list[float]]):
+    # points_sorted = [[] for _ in range(Variables.k)]
+    points_sorted = [[] for _ in range(k_value)]
+
+    for point in Variables.points:
+        # tmp_dist :list[float] = [0 for _ in range(Variables.k)]
+        tmp_dist :list[float] = [0 for _ in range(k_value)]
+
+        # for i in range(Variables.k):
+        for i in range(k_value):
+            tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
+
+        logging.debug(tmp_dist)
+        which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
+        logging.debug(which_mean_closest)
+
+        points_sorted[which_mean_closest].append(point)
+
+    # Sometimes, with few data points, there can be a situation where none
+    # of the points are closest to a particualr starting mean. Therefore
+    # an empty list is created. I'm populating it here with big numbers
+    # so none of the future points will be closest to that mean.
+    # Algorithm, by doing that, will suggest that their are less groups
+    # than entered by a user. Puting big numbers there is unnecesarry. 
+    # List can't be empty though, because I'm deviding by it's len later
+    for i in range(len(points_sorted)):
+        if len(points_sorted[i]) == 0:
+            # points_sorted[i].append([1248 for _ in range(Variables.k)])
+            points_sorted[i].append([1248 for _ in range(k_value)])
+            points_sorted[i][0].append(-1)
+            print("One of the lists created as an empty list.")
+            print("Now populated artificially.")
+            
+    logging.debug(points_sorted)
+
+    Variables.prev_k_means = Variables.k_means
+
+    # new_k_means :list[list[float]] = [[] for _ in range(Variables.k)]
+    new_k_means :list[list[float]] = [[] for _ in range(k_value)]
+
+    # for i in range(Variables.k):
+    for i in range(k_value):
+        new_k_means[i] = calc_means(points_sorted[i])
+
+    logging.info(f"Prev k_means: {Variables.prev_k_means}")
+    logging.info(f"New k_means {new_k_means}")
+    
+    Variables.k_means = new_k_means
+
+
+def interation_loop(k_value: int, dataset: list[list[float]], max_iterations: int):
+    logging.info("v - Start of the interation loop")
+    i = 1
+
+    # So the is_done_iterating() does not crash (no prev_k_means)
+    print(f"-inter {i}-")
+    one_full_iter(k_value, dataset)
+    # while i < DefaultVariables.max_iterations and not is_done_iterating():
+    while i < max_iterations and not is_done_iterating():
+        i += 1
+        print(f"-inter {i}-")
+        one_full_iter(k_value, dataset)
+
+    logging.info("^ - End of the interation loop")
+
+
+def pick_random_points(k_value:int, number_of_features: int) -> list[list[float]]: #
+    print("v")
+    print("picking centroids")
+    '''
+    Calc min and max for each feature. Calc the interval beetween min and max for each of them.
+    Devide it by the number of means. Calc single feature in single mean by picking random value
+    beetween min and min + devided interval. Calc the same feature, but for the next mean - pick
+    a value beetween min + devided interval and min + devided interval * 2. And so on.
+    It makes in unlikely that there will be no points assigned to a given mean. Therefore no
+    need to populate in artificially or trying to drop it alltogether. Plus they are more
+    evenly distribuated which given reasonable data and k-value will improve results
+    '''
+    rand_points :list[list[float]] = []
+
+    max_list = get_max()
+    min_list = get_min()
+
+    # intervals :list = [round(max_list[i] - min_list[i], 2) for i in range(Variables.number_of_features)]
+    intervals :list = [round(max_list[i] - min_list[i], 2) for i in range(number_of_features)]
+
+    logging.debug(f"intervals: {intervals}")
+
+    # for i in range(Variables.number_of_features):
+    for i in range(number_of_features):
+        # intervals[i] = round((intervals[i] / Variables.k), 1)
+        intervals[i] = round((intervals[i] / k_value), 1)
+
+    logging.debug(f"intervals2: {intervals}")
+
+    # for i in range(1, Variables.k + 1):
+    for i in range(1, k_value + 1):
+        tmp_rand_points :list[float] = []
+
+        # for j in range(Variables.number_of_features):
+        for j in range(number_of_features):
+            tmp_rand_points.append(round(random.uniform(min_list[j] + (intervals[j] * (i - 1)), min_list[j] + (intervals[j] * i)), 2))
+
+        rand_points.append(tmp_rand_points)
+    
+    print(f"means: {rand_points}")
+    Variables.k_means = rand_points
+    print("^")
+
+    return rand_points
+
+
+# maby merge this function with download_data_set()
 def get_data(line: str, read_type: TypeOfRead) -> list[float]: #
     tmp_list: list = line.split()
     logging.debug(tmp_list)
@@ -352,9 +330,9 @@ def get_data(line: str, read_type: TypeOfRead) -> list[float]: #
     return parsed_tmp_list
 
 
-def download_data_set(data_loc :str, read_type: TypeOfRead) -> tuple[list[float], int]:  #
+def download_data_set(data_loc :str, read_type: TypeOfRead) -> tuple[list[list[float]], int]:  #
     logging.info("v - downloading data set")
-    dataset = []
+    dataset: list[list[float]] = []
     # number_of_features = 0
 
     with open(data_loc, "r") as f:
@@ -371,10 +349,43 @@ def download_data_set(data_loc :str, read_type: TypeOfRead) -> tuple[list[float]
 
 
 def train(k_value: int, data_loc: str):
-    # download_data_set(Variables.data_loc, TypeOfRead.TRAINING)
     dataset, number_of_features = download_data_set(data_loc, TypeOfRead.TRAINING)
-    pick_random_points()
-    interation_loop()
+    random_points = pick_random_points(k_value, number_of_features)
+    interation_loop(k_value, dataset, DefaultVariables.max_iterations)
+
+
+def ask_for_k_value_and_data_loc() -> tuple[int, str]: #
+    # missing_input = True
+
+    # while missing_input:
+    while True:
+        k = int(input("Enter k value (int): "))
+        if 1 < k < 7:
+            Variables.k = k ##
+            break
+            # missing_input = False
+        else:
+            print("K must be beetween 2 and 6")
+
+    # missing_input = True
+    # while missing_input:
+    while True:
+        answer = int(input("For default data location type 1. Otherwise type 0: "))
+        if answer == 1:
+            Variables.data_loc = "data/iris_training.txt"
+            data_loc = "data/iris_training.txt"
+            # missing_input = False
+            break
+        elif answer == 0:
+            custom_path = str(input("Enter custom data location: "))
+            Variables.data_loc = custom_path
+            data_loc = custom_path
+            # missing_input = False
+            break
+        else:
+            print("Enter valid input")
+
+    return k, data_loc
 
 
 def init():
