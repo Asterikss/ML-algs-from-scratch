@@ -41,6 +41,7 @@ def calc_means(points :list, number_of_features: int) -> list[float]: # pure
     return new_single_k_mean
 
 
+# TODO
 def predict_cluster(point: list[float], centroids: list[list[float]], k_value: int) \
         -> tuple[int, int]: # ~~pure
 
@@ -62,7 +63,6 @@ def predict_cluster(point: list[float], centroids: list[list[float]], k_value: i
 
 
 def predict_cluster2(point: list[float], centroids: list[list[float]]) -> int: # pure
-    # tmp_dist :list[float] = [0 for _ in range(k_value)]
     tmp_dist :list[float] = [0 for _ in range(len(centroids))]
 
     for i in range(len(centroids)):
@@ -79,7 +79,7 @@ def predict(centroids: list[list[float]]):
     print("For custom guess (providing a vector) type 2 ")
     print("For predicting the cluster from custom file type 3")
     #That's a terrible way probably
-    while choice != "0" and choice != "1" and choice != "2":
+    while choice != "1" and choice != "2" and choice != "3":
         choice = input(": ")
 
     # dataset = []
@@ -262,8 +262,8 @@ def one_full_iter(k_value: int, dataset: list[list[float]], centroids: list[list
     return new_centroids, prev_centroids
 
 
-def interation_loop(k_value: int, dataset: list[list[float]], centroids: list[list[float]], \
-        number_of_features: int, max_iterations: int) -> list[list[float]]:
+def iteration_loop(k_value: int, dataset: list[list[float]], centroids: list[list[float]], \
+        number_of_features: int, max_iterations: int) -> list[list[float]]: # pure
 
     logging.info("v - Start of the interation loop")
     i = 1
@@ -300,7 +300,7 @@ def get_min_and_max(number_of_features: int, dataset: list[list[float]]) -> tupl
     return max, min
 
 
-def pick_random_points(k_value:int, number_of_features: int, dataset: list[list[float]]) -> list[list[float]]: #
+def pick_random_points(k_value:int, number_of_features: int, dataset: list[list[float]]) -> list[list[float]]: # pure
     logging.info("v - picking centroids")
     '''
     Calc min and max for each feature. Calc the interval beetween min and max for each of them.
@@ -373,7 +373,7 @@ def download_data_set(data_loc :str) -> tuple[list[list[float]], int]:  # pure
 
 def train(k_value: int, dataset: list[list[float]], number_of_features: int, max_iterations: int) -> list[list[float]]:
     centroids = pick_random_points(k_value, number_of_features, dataset)
-    centroids =  interation_loop(k_value, dataset, centroids, number_of_features, max_iterations)
+    centroids =  iteration_loop(k_value, dataset, centroids, number_of_features, max_iterations)
     return centroids
 
 
