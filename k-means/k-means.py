@@ -9,6 +9,7 @@ from enum import Enum
 from dataclasses import dataclass
 import logging
 
+
 class Variables:
     k = 0
     data_loc = ""
@@ -50,7 +51,7 @@ def calc_means(points :list) -> list[float]:
 
 
 # def predict_cluster(point :tuple) -> tuple[int, int]:
-def predict_cluster(point: list[float]) -> tuple[int, int]:
+def predict_cluster(point: list[float], k_value: int) -> tuple[int, int]:
     tmp_dist :list[float] = [0 for _ in range(Variables.k)]
 
     for i in range(Variables.k):
@@ -64,10 +65,11 @@ def predict_cluster(point: list[float]) -> tuple[int, int]:
         return which_mean_closest, -1
     
     print(f"Prediction: Cluster {which_mean_closest}. Actual cluster: {point[-1]}")
+
     return which_mean_closest, int(point[-1])
 
 
-def predict():
+def predict(k_value: int):
     print("v")
 
     choice = -1
@@ -78,21 +80,29 @@ def predict():
     while choice != "0" and choice != "1" and choice != "2":
         choice = input(": ")
 
+    dataset = []
     if choice == "1" or choice == "3":
 
         if choice == "1":
-            download_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
-        if choice == "3":
+            # download_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
+            dataset, number_of_features = download_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
+            # maby check if the number of features is the same or smth
+        elif choice == "3":
             path = str(input("Provide path: "))
-            download_data_set(path, TypeOfRead.PREDICTING)
+            # download_data_set(path, TypeOfRead.PREDICTING)
+            dataset, number_of_features = download_data_set(path, TypeOfRead.PREDICTING)
 
-        logging.debug(Variables.predict_data)
+        # logging.debug(Variables.predict_data)
+        logging.debug(dataset)
 
-        predictions = [0 for _ in range(Variables.k)] 
-        actual_clusters = [0 for _ in range(Variables.k)] 
+        # predictions = [0 for _ in range(Variables.k)] 
+        predictions = [0 for _ in range(k_value)] 
+        # actual_clusters = [0 for _ in range(Variables.k)] 
+        actual_clusters = [0 for _ in range(k_value)] 
 
-        for observation in Variables.predict_data:
-            cluster_tuple :tuple = predict_cluster(observation)
+        # for observation in Variables.predict_data:
+        for observation in dataset:
+            cluster_tuple :tuple[int, int] = predict_cluster(observation, k_value)
             logging.debug(cluster_tuple)
             predictions[cluster_tuple[0]] += 1
             actual_clusters[cluster_tuple[1]] += 1
@@ -113,7 +123,7 @@ def predict():
         print("Total accuracy:")
         print(total_acc)
 
-    if choice == "2":
+    elif choice == "2":
         end = False
         print(f"Enter a vector with {Variables.number_of_features} features plus it's actual cluster")
         print(f"If the cluster is unknown enter {Variables.k} (k) there")
@@ -124,7 +134,7 @@ def predict():
             custom_vector.append(int(input("Input the cluster: ")))
 
             # cluster_tuple :tuple = predict_cluster(tuple(custom_vector))
-            cluster_tuple :tuple = predict_cluster(custom_vector)
+            cluster_tuple :tuple[int, int] = predict_cluster(custom_vector, k_value)
             logging.debug(cluster_tuple)
     
             q = input("Type q to exit. Otherwise hit enter: ")
@@ -377,14 +387,16 @@ def download_data_set(data_loc :str, read_type: TypeOfRead) -> tuple[list[list[f
         Variables.number_of_features = len(Variables.points[0]) - 1
         print(f"number of features {len(Variables.points[0]) - 1}")
     logging.info("^")
-    
-    return dataset, len(Variables.points[0]) - 1
+    number_of_features = len(Variables.points[0]) - 1
+
+    return dataset, number_of_features
 
 
-def train(k_value: int, data_loc: str, max_iterations: int):
+def train(k_value: int, data_loc: str, max_iterations: int) -> list[list[float]]:
     dataset, number_of_features = download_data_set(data_loc, TypeOfRead.TRAINING)
     centroids = pick_random_points(k_value, number_of_features, dataset)
     final_centroids = interation_loop(k_value, dataset, centroids, number_of_features, max_iterations)
+    return final_centroids
 
 
 def ask_for_k_value_and_data_loc() -> tuple[int, str]: #
@@ -432,8 +444,8 @@ def init():
 def main():
     init()
     k_value, data_loc = ask_for_k_value_and_data_loc()
-    train(k_value, data_loc, DefaultVariables.max_iterations)
-    predict()
+    Variables.k_means = train(k_value, data_loc, DefaultVariables.max_iterations)
+    predict(k_value)
 
 
 if __name__ == "__main__":
