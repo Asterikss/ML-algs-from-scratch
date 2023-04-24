@@ -233,8 +233,6 @@ def one_full_iter(k_value: int, dataset: list[list[float]], centroids: list[list
             print("One of the lists created as an empty list.")
             print("Now populated artificially.")
             
-    logging.debug(points_sorted)
-
     prev_centroids = centroids
 
     new_centroids :list[list[float]] = [[] for _ in range(k_value)]
@@ -258,6 +256,7 @@ def interation_loop(k_value: int, dataset: list[list[float]], centroids: list[li
     new_centroids, prev_centroids = one_full_iter(k_value, dataset, centroids, number_of_features)
 
     while i < max_iterations and not is_done_iterating(new_centroids, prev_centroids, k_value, number_of_features):
+    # while i < max_iterations:
         i += 1
         logging.info(f"-inter {i}-")
         new_centroids, prev_centroids = one_full_iter(k_value, dataset, new_centroids, number_of_features)
@@ -289,18 +288,20 @@ def pick_random_points(k_value:int, number_of_features: int, dataset: list[list[
     logging.info("v - picking centroids")
     '''
     Calc min and max for each feature. Calc the interval beetween min and max for each of them.
-    Devide it by the number of means. Calc single feature in single mean by picking random value
-    beetween min and min + devided interval. Calc the same feature, but for the next mean - pick
-    a value beetween min + devided interval and min + devided interval * 2. And so on.
+    Devide it by the number of clusters. Calc single feature in a single cluster by picking random value
+    beetween min and min + devided interval. Calc the same feature, but for the next cluster - pick
+    a value beetween min + devided interval and min + (devided interval * 2). And so on.
     It makes in unlikely that there will be no points assigned to a given mean. Therefore no
-    need to populate in artificially or trying to drop it alltogether. Plus they are more
-    evenly distribuated which given reasonable data and k-value will improve results
+    need to populate in artificially or to try to drop it alltogether. Plus they are more
+    evenly distribuated, which given reasonable data and k-value, will improve results.
     '''
     rand_points :list[list[float]] = []
 
+    max_list: list[float]
+    min_list: list[float]
     max_list, min_list = get_min_and_max(number_of_features, dataset)
 
-    intervals :list = [round(max_list[i] - min_list[i], 2) for i in range(number_of_features)]
+    intervals :list[float] = [round(max_list[i] - min_list[i], 2) for i in range(number_of_features)]
 
     logging.debug(f"intervals: {intervals}")
 
@@ -366,8 +367,8 @@ def ask_for_k_value_and_data_loc() -> tuple[int, str]: # pure
 
 
 def init():
-    level = logging.INFO
-    # level = logging.DEBUG
+    # level = logging.INFO
+    level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
     logging.basicConfig(level = level, format = fmt)
     # logging.basicConfig(level = level, format = fmt, filename="log-k-means.log", filemode="w")
