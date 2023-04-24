@@ -14,6 +14,10 @@ class IncompatiblePointsLength(Exception):
     pass
 
 
+class EmptyCluster(Exception):
+    pass
+
+
 @dataclass(frozen=True)
 class DefaultVariables:
     max_iterations = 10
@@ -38,15 +42,15 @@ def calc_means(points :list, number_of_features: int) -> list[float]: # pure
 
 
 def predict_cluster(point: list[float], centroids: list[list[float]], k_value: int) \
-        -> tuple[int, int]: # pure
+        -> tuple[int, int]: # ~~pure
 
     tmp_dist :list[float] = [0 for _ in range(k_value)]
 
     for i in range(k_value):
         tmp_dist[i] = calc_euclidean_distance(point, centroids[i])
 
-    logging.debug(f"second_in_label {tmp_dist}")
-    which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
+    # which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
+    which_mean_closest = tmp_dist.index(min(tmp_dist))
 
     if point[-1] == k_value:
         print(f"Prediction: Cluster {which_mean_closest}. Actual cluster: unknown")
@@ -57,7 +61,18 @@ def predict_cluster(point: list[float], centroids: list[list[float]], k_value: i
     return which_mean_closest, int(point[-1])
 
 
-def predict(k_value: int, number_of_features: int, centroids: list[list[float]]):
+def predict_cluster2(point: list[float], centroids: list[list[float]]) -> int: # pure
+    # tmp_dist :list[float] = [0 for _ in range(k_value)]
+    tmp_dist :list[float] = [0 for _ in range(len(centroids))]
+
+    for i in range(len(centroids)):
+        tmp_dist[i] = calc_euclidean_distance(point, centroids[i])
+
+    return tmp_dist.index(min(tmp_dist)) + 1
+
+
+def predict(centroids: list[list[float]]):
+    number_of_features = len(centroids[0])
 
     choice = -1
     print("For predicting the cluster from the default file (data/iris_test.txt) type 1")
@@ -67,62 +82,61 @@ def predict(k_value: int, number_of_features: int, centroids: list[list[float]])
     while choice != "0" and choice != "1" and choice != "2":
         choice = input(": ")
 
-    dataset = []
+    # dataset = []
     if choice == "1" or choice == "3":
+        pass
 
-        if choice == "1":
-            dataset, number_of_features = download_data_set("data/iris_test.txt")
-            # maby check if the number of features is the same or smth
-        elif choice == "3":
-            path = str(input("Provide path: "))
-            dataset, number_of_features = download_data_set(path)
-
-        logging.debug(dataset)
-
-        predictions = [0 for _ in range(k_value)] 
-        actual_clusters = [0 for _ in range(k_value)] 
-
-        for observation in dataset:
-            cluster_tuple :tuple[int, int] = predict_cluster(observation, centroids, k_value)
-            logging.debug(cluster_tuple)
-            predictions[cluster_tuple[0]] += 1
-            actual_clusters[cluster_tuple[1]] += 1
-
-        accuracy_table = [1 - round((abs(predictions[i] - actual_clusters[i])/actual_clusters[i]), 3) for i in range(k_value)] 
-        total_acc = 0
-
-        for e in accuracy_table:
-            total_acc += e
-        total_acc /= k_value
-
-        print("predictions:")
-        print(predictions)
-        print("acutal clusters:")
-        print(actual_clusters)
-        print("accuracy_table:")
-        print(accuracy_table)
-        print("Total accuracy:")
-        print(total_acc)
+        # TODO
+        # if choice == "1":
+        #     dataset, number_of_features = download_data_set("data/iris_test.txt")
+        #     # maby check if the number of features is the same or smth
+        # elif choice == "3":
+        #     path = str(input("Provide path: "))
+        #     dataset, number_of_features = download_data_set(path)
+        #
+        # predictions = [0 for _ in range(k_value)] 
+        # actual_clusters = [0 for _ in range(k_value)] 
+        #
+        # for observation in dataset:
+        #     cluster_tuple :tuple[int, int] = predict_cluster(observation, centroids, k_value)
+        #     logging.debug(cluster_tuple)
+        #     predictions[cluster_tuple[0]] += 1
+        #     actual_clusters[cluster_tuple[1]] += 1
+        #
+        # accuracy_table = [1 - round((abs(predictions[i] - actual_clusters[i])/actual_clusters[i]), 3) for i in range(k_value)] 
+        # total_acc = 0
+        #
+        # for e in accuracy_table:
+        #     total_acc += e
+        # total_acc /= k_value
+        #
+        # print("predictions:")
+        # print(predictions)
+        # print("acutal clusters:")
+        # print(actual_clusters)
+        # print("accuracy_table:")
+        # print(accuracy_table)
+        # print("Total accuracy:")
+        # print(total_acc)
 
     elif choice == "2":
         end = False
-        print(f"Enter a vector with {number_of_features} features plus it's actual cluster")
-        print(f"If the cluster is unknown enter {k_value} (k) there")
+        print(f"Enter a vector with {number_of_features} features")
         while not end:
             custom_vector: list[float] = []
             for i in range(number_of_features):
-                custom_vector.append((int(input(f"Input {i+1} feature: "))))
-            custom_vector.append(int(input("Input the cluster: ")))
+                custom_vector.append((float(input(f"Input {i+1} feature: "))))
 
-            cluster_tuple :tuple[int, int] = predict_cluster(custom_vector, centroids, k_value)
-            logging.debug(cluster_tuple)
+            predicted_cluster: int = predict_cluster2(custom_vector, centroids)
+            print(f"Prediction: Cluster {predicted_cluster}")
     
             q = input("Type q to exit. Otherwise hit enter: ")
             if q == "q":
                 end = True
 
 
-def display_results(centroids: list[list[float]], dataset: list[list[float]], k_value: int): # ~~pure
+def display_results(centroids: list[list[float]], dataset: list[list[float]]): # ~~pure
+    k_value = len(centroids)
 
     points_sorted = [[] for _ in range(k_value)]
     # labels_table: list[int] = [0 for _ in range(k_value)]
@@ -168,8 +182,6 @@ def display_results(centroids: list[list[float]], dataset: list[list[float]], k_
         print(f"Entropy: {entropy}")
 
 
-
-
 def is_done_iterating(new_centroids, prev_centroids, k_value, number_of_features, \
         threshold=DefaultVariables.threshold) -> bool: # pure
 
@@ -186,9 +198,9 @@ def is_done_iterating(new_centroids, prev_centroids, k_value, number_of_features
 
 
 def calc_euclidean_distance(point: list[float], centroid: list[float]) -> float: # pure
-    if len(point) -1 != len(centroid):
-        raise IncompatiblePointsLength("Points are of wrong size. " +
-                "First param should be longer by 1 (last arg is the centroid)")
+    # if len(point) -1 != len(centroid):
+    #     raise IncompatiblePointsLength("Points are of wrong size. " +
+    #             "First param should be longer by 1 (last arg is the centroid)")
 
     dist = 0
     for i in range(0, len(centroid)):
@@ -228,10 +240,14 @@ def one_full_iter(k_value: int, dataset: list[list[float]], centroids: list[list
     # List can't be empty though, because I'm deviding by it's len later
     for i in range(len(points_sorted)):
         if len(points_sorted[i]) == 0:
-            points_sorted[i].append([1248 for _ in range(k_value)])
-            points_sorted[i][0].append(-1)
-            print("One of the lists created as an empty list.")
-            print("Now populated artificially.")
+            raise EmptyCluster("One of the clusters is empty " +
+                "(no points are closest to it). There is not enough data to" +
+                " train on or value of k is too large or just bad variance." +
+                " Try again. If it fails reduce the value of k or add more data")
+            # points_sorted[i].append([1248 for _ in range(k_value)])
+            # points_sorted[i][0].append(-1)
+            # print("One of the lists created as an empty list.")
+            # print("Now populated artificially.")
             
     prev_centroids = centroids
 
@@ -317,7 +333,20 @@ def pick_random_points(k_value:int, number_of_features: int, dataset: list[list[
             tmp_rand_points.append(round(random.uniform(min_list[j] + (intervals[j] * (i - 1)), min_list[j] + (intervals[j] * i)), 2))
 
         rand_points.append(tmp_rand_points)
-    
+
+    logging.debug(f"rand_points1: {rand_points}")
+
+    # shuffle them (keeping the index of the feature) to be more random
+    for i in range(k_value):
+        for j in range(number_of_features):
+            rand_one: int = random.randint(0, k_value - 1)
+            if rand_one != i:
+                tmp: float = rand_points[i][j]
+                rand_points[i][j] = rand_points[rand_one][j] 
+                rand_points[rand_one][j] = tmp
+
+    logging.debug(f"rand_points2: {rand_points}")
+
     logging.info(f"initial centroids: {rand_points}")
     logging.info("^")
 
@@ -367,8 +396,8 @@ def ask_for_k_value_and_data_loc() -> tuple[int, str]: # pure
 
 
 def init():
-    # level = logging.INFO
-    level = logging.DEBUG
+    level = logging.INFO
+    # level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
     logging.basicConfig(level = level, format = fmt)
     # logging.basicConfig(level = level, format = fmt, filename="log-k-means.log", filemode="w")
@@ -379,8 +408,8 @@ def main():
     k_value, data_loc = ask_for_k_value_and_data_loc()
     dataset, number_of_features = download_data_set(data_loc)
     centroids = train(k_value, dataset, number_of_features, DefaultVariables.max_iterations)
-    display_results(centroids, dataset, k_value)
-    # predict(k_value, number_of_features, centroids)
+    display_results(centroids, dataset)
+    predict(centroids)
 
 
 if __name__ == "__main__":
