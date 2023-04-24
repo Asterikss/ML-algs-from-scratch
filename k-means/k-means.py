@@ -32,12 +32,14 @@ class TypeOfRead(Enum):
     PREDICTING = 1
 
 
-def calc_means(points :list) -> list[float]:
+def calc_means(points :list, number_of_features: int) -> list[float]:
     print("v")
     print("calculating means")
-    new_single_k_mean :list[float] = [0 for _ in range(Variables.number_of_features)]
+    # new_single_k_mean :list[float] = [0 for _ in range(Variables.number_of_features)]
+    new_single_k_mean :list[float] = [0 for _ in range(number_of_features)]
 
-    for i in range(Variables.number_of_features):
+    # for i in range(Variables.number_of_features):
+    for i in range(number_of_features):
         sum = 0.0
         mean = 0.0
         for j in range(len(points)):
@@ -51,16 +53,20 @@ def calc_means(points :list) -> list[float]:
 
 
 # def predict_cluster(point :tuple) -> tuple[int, int]:
-def predict_cluster(point: list[float], k_value: int) -> tuple[int, int]:
-    tmp_dist :list[float] = [0 for _ in range(Variables.k)]
+def predict_cluster(point: list[float], centroids: list[list[float]], k_value: int) -> tuple[int, int]:
+    # tmp_dist :list[float] = [0 for _ in range(Variables.k)]
+    tmp_dist :list[float] = [0 for _ in range(k_value)]
 
-    for i in range(Variables.k):
-        tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
+    # for i in range(Variables.k):
+    for i in range(k_value):
+        # tmp_dist[i] = calc_euclidean_distance(point, Variables.k_means[i])
+        tmp_dist[i] = calc_euclidean_distance(point, centroids[i])
 
     logging.debug(f"second_in_label {tmp_dist}")
     which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
 
-    if point[-1] == Variables.k:
+    # if point[-1] == Variables.k:
+    if point[-1] == k_value:
         print(f"Prediction: Cluster {which_mean_closest}. Actual cluster: unknown")
         return which_mean_closest, -1
     
@@ -69,7 +75,7 @@ def predict_cluster(point: list[float], k_value: int) -> tuple[int, int]:
     return which_mean_closest, int(point[-1])
 
 
-def predict(k_value: int):
+def predict(k_value: int, number_of_features: int, centroids: list[list[float]]):
     print("v")
 
     choice = -1
@@ -102,17 +108,19 @@ def predict(k_value: int):
 
         # for observation in Variables.predict_data:
         for observation in dataset:
-            cluster_tuple :tuple[int, int] = predict_cluster(observation, k_value)
+            cluster_tuple :tuple[int, int] = predict_cluster(observation, centroids, k_value)
             logging.debug(cluster_tuple)
             predictions[cluster_tuple[0]] += 1
             actual_clusters[cluster_tuple[1]] += 1
 
-        accuracy_table = [1 - round((abs(predictions[i] - actual_clusters[i])/actual_clusters[i]), 3) for i in range(Variables.k)] 
+        # accuracy_table = [1 - round((abs(predictions[i] - actual_clusters[i])/actual_clusters[i]), 3) for i in range(Variables.k)] 
+        accuracy_table = [1 - round((abs(predictions[i] - actual_clusters[i])/actual_clusters[i]), 3) for i in range(k_value)] 
         total_acc = 0
 
         for e in accuracy_table:
             total_acc += e
-        total_acc /= Variables.k
+        # total_acc /= Variables.k
+        total_acc /= k_value
 
         print("predictions:")
         print(predictions)
@@ -125,16 +133,19 @@ def predict(k_value: int):
 
     elif choice == "2":
         end = False
-        print(f"Enter a vector with {Variables.number_of_features} features plus it's actual cluster")
-        print(f"If the cluster is unknown enter {Variables.k} (k) there")
+        # print(f"Enter a vector with {Variables.number_of_features} features plus it's actual cluster")
+        print(f"Enter a vector with {number_of_features} features plus it's actual cluster")
+        # print(f"If the cluster is unknown enter {Variables.k} (k) there")
+        print(f"If the cluster is unknown enter {k_value} (k) there")
         while not end:
             custom_vector: list[float] = []
-            for i in range(Variables.number_of_features):
+            # for i in range(Variables.number_of_features):
+            for i in range(number_of_features):
                 custom_vector.append((int(input(f"Input {i+1} feature: "))))
             custom_vector.append(int(input("Input the cluster: ")))
 
             # cluster_tuple :tuple = predict_cluster(tuple(custom_vector))
-            cluster_tuple :tuple[int, int] = predict_cluster(custom_vector, k_value)
+            cluster_tuple :tuple[int, int] = predict_cluster(custom_vector, centroids, k_value)
             logging.debug(cluster_tuple)
     
             q = input("Type q to exit. Otherwise hit enter: ")
@@ -164,22 +175,22 @@ def is_done_iterating(new_centroids, prev_centroids, k_value, number_of_features
 
 
 # def calc_euclidean_distance(a: tuple, b: tuple) -> float:
-def calc_euclidean_distance(a: list[float], b: list[float]) -> float: # pure
-    if len(a) -1 != len(b):
-        print("tuples (points) are of wrong size")
-        print("'a'(first param) should be longer by 1 (last arg is the actual cluster) ")
+def calc_euclidean_distance(point: list[float], centroid: list[float]) -> float: # pure
+    if len(point) -1 != len(centroid):
+        logging.warning("points are of wrong size")
+        print("first param should be longer by 1 (last arg is the centroid) ")
         return -1
 
     dist = 0
-    for i in range(0, len(b)):
-        dist += (a[i] - b[i]) ** 2
+    for i in range(0, len(centroid)):
+        dist += (point[i] - centroid[i]) ** 2
 
     # return dist ** (1 / 2)
     return round(dist, 3)
 
 
-def one_full_iter(k_value: int, dataset: list[list[float]], centroids: list[list[float]]) \
-        -> tuple[list[list[float]], list[list[float]]]:
+def one_full_iter(k_value: int, dataset: list[list[float]], centroids: list[list[float]], \
+        number_of_features: int) -> tuple[list[list[float]], list[list[float]]]:
 
     # points_sorted = [[] for _ in range(Variables.k)]
     points_sorted = [[] for _ in range(k_value)]
@@ -227,7 +238,7 @@ def one_full_iter(k_value: int, dataset: list[list[float]], centroids: list[list
     # for i in range(Variables.k):
     for i in range(k_value):
         # new_k_means[i] = calc_means(points_sorted[i])
-        new_centroids[i] = calc_means(points_sorted[i])
+        new_centroids[i] = calc_means(points_sorted[i], number_of_features)
 
     # logging.info(f"Prev k_means: {Variables.prev_k_means}")
     logging.info(f"Prev centroids: {prev_centroids}")
@@ -248,12 +259,12 @@ def interation_loop(k_value: int, dataset: list[list[float]], centroids: list[li
 
     # So the is_done_iterating() does not crash (no prev_k_means)
     logging.info(f"-inter {i}-")
-    new_centroids, prev_centroids = one_full_iter(k_value, dataset, centroids)
+    new_centroids, prev_centroids = one_full_iter(k_value, dataset, centroids, number_of_features)
     # while i < DefaultVariables.max_iterations and not is_done_iterating():
     while i < max_iterations and not is_done_iterating(new_centroids, prev_centroids, k_value, number_of_features):
         i += 1
         print(f"-inter {i}-")
-        new_centroids, prev_centroids = one_full_iter(k_value, dataset, centroids)
+        new_centroids, prev_centroids = one_full_iter(k_value, dataset, centroids, number_of_features)
 
     logging.info("^ - End of the interation loop")
     return new_centroids
@@ -392,8 +403,9 @@ def download_data_set(data_loc :str, read_type: TypeOfRead) -> tuple[list[list[f
     return dataset, number_of_features
 
 
-def train(k_value: int, data_loc: str, max_iterations: int) -> list[list[float]]:
-    dataset, number_of_features = download_data_set(data_loc, TypeOfRead.TRAINING)
+# def train(k_value: int, data_loc: str, max_iterations: int) -> list[list[float]]:
+def train(k_value: int, dataset: list[list[float]], number_of_features: int, max_iterations: int) -> list[list[float]]:
+    # dataset, number_of_features = download_data_set(data_loc, TypeOfRead.TRAINING)
     centroids = pick_random_points(k_value, number_of_features, dataset)
     final_centroids = interation_loop(k_value, dataset, centroids, number_of_features, max_iterations)
     return final_centroids
@@ -444,8 +456,11 @@ def init():
 def main():
     init()
     k_value, data_loc = ask_for_k_value_and_data_loc()
-    Variables.k_means = train(k_value, data_loc, DefaultVariables.max_iterations)
-    predict(k_value)
+    dataset, number_of_features = download_data_set(data_loc, TypeOfRead.TRAINING)
+    # Variables.k_means = train(k_value, data_loc, DefaultVariables.max_iterations)
+    centroids = train(k_value, dataset, number_of_features, DefaultVariables.max_iterations)
+    Variables.k_means = centroids
+    predict(k_value, number_of_features, centroids)
 
 
 if __name__ == "__main__":
