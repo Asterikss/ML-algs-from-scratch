@@ -7,6 +7,7 @@
 import random
 from dataclasses import dataclass
 import logging
+import math
 
 
 class IncompatiblePointsLength(Exception):
@@ -121,6 +122,54 @@ def predict(k_value: int, number_of_features: int, centroids: list[list[float]])
                 end = True
 
 
+def display_results(centroids: list[list[float]], dataset: list[list[float]], k_value: int): # ~~pure
+
+    points_sorted = [[] for _ in range(k_value)]
+    # labels_table: list[int] = [0 for _ in range(k_value)]
+    # total_distance = 0
+
+    for point in dataset:
+        tmp_dist :list[float] = [0 for _ in range(k_value)]
+
+        for i in range(k_value):
+            tmp_dist[i] = calc_euclidean_distance(point, centroids[i])
+
+        logging.debug(tmp_dist)
+        # which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
+        # min_distance = min(tmp_dist)
+        # total_distance += min_distance
+        which_mean_closest = tmp_dist.index(min(tmp_dist))
+        # which_mean_closest = tmp_dist.index(min_distance)
+        logging.debug(which_mean_closest)
+
+        points_sorted[which_mean_closest].append(point)
+
+    logging.info("Clusters with the points associated with them: ")
+    for idx, centroid in enumerate(centroids):
+        labels_table: list[int] = [0 for _ in range(k_value)]
+
+        logging.info(f"\ncentroid nr {idx+1} - {centroid}:")
+        for point in points_sorted[idx]:
+            labels_table[point[-1]] += 1
+            print(point, end=" ")
+        print()
+
+        entropy = 0
+        n_of_points = len(points_sorted[idx])
+
+        for i, n_points_with_this_label in enumerate(labels_table):
+            if n_points_with_this_label != 0:
+                probabiliti = n_points_with_this_label / n_of_points
+                entropy += probabiliti * math.log(probabiliti, 2)
+
+        entropy *= -1                      
+
+        print(f"\n{labels_table}")
+        print(f"Entropy: {entropy}")
+
+
+
+
 def is_done_iterating(new_centroids, prev_centroids, k_value, number_of_features, \
         threshold=DefaultVariables.threshold) -> bool: # pure
 
@@ -149,9 +198,10 @@ def calc_euclidean_distance(point: list[float], centroid: list[float]) -> float:
 
 
 def one_full_iter(k_value: int, dataset: list[list[float]], centroids: list[list[float]], \
-        number_of_features: int) -> tuple[list[list[float]], list[list[float]]]:
+        number_of_features: int) -> tuple[list[list[float]], list[list[float]]]: # pure
 
     points_sorted = [[] for _ in range(k_value)]
+    total_distance = 0
 
     for point in dataset:
         tmp_dist :list[float] = [0 for _ in range(k_value)]
@@ -160,7 +210,11 @@ def one_full_iter(k_value: int, dataset: list[list[float]], centroids: list[list
             tmp_dist[i] = calc_euclidean_distance(point, centroids[i])
 
         logging.debug(tmp_dist)
-        which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
+        # which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
+        min_distance = min(tmp_dist)
+        total_distance += min_distance
+        # which_mean_closest = tmp_dist.index(min(tmp_dist))
+        which_mean_closest = tmp_dist.index(min_distance)
         logging.debug(which_mean_closest)
 
         points_sorted[which_mean_closest].append(point)
@@ -181,16 +235,15 @@ def one_full_iter(k_value: int, dataset: list[list[float]], centroids: list[list
             
     logging.debug(points_sorted)
 
-                    # Variables.prev_k_means = Variables.k_means
     prev_centroids = centroids
 
     new_centroids :list[list[float]] = [[] for _ in range(k_value)]
 
     for i in range(k_value):
         new_centroids[i] = calc_means(points_sorted[i], number_of_features)
-
+    logging.info(f"Summed distances between each point and their centroid: {total_distance}")
     logging.info(f"Prev centroids: {prev_centroids}")
-    logging.info(f"New centroids {new_centroids}")
+    logging.info(f"New centroids: {new_centroids}")
 
     return new_centroids, prev_centroids
 
@@ -207,55 +260,10 @@ def interation_loop(k_value: int, dataset: list[list[float]], centroids: list[li
     while i < max_iterations and not is_done_iterating(new_centroids, prev_centroids, k_value, number_of_features):
         i += 1
         logging.info(f"-inter {i}-")
-        new_centroids, prev_centroids = one_full_iter(k_value, dataset, centroids, number_of_features)
+        new_centroids, prev_centroids = one_full_iter(k_value, dataset, new_centroids, number_of_features)
 
     logging.info("^ - End of the interation loop")
     return new_centroids
-
-
-# def get_max(number_of_features: int, dataset: list[list[float]]) -> list[float]: # pure
-#     print("v")
-#     # print(f"calculating max for {Variables.number_of_features} features")
-#     print(f"calculating max for {number_of_features} features")
-#     max: list[float] = []
-#
-#     # for j in range(0,  Variables.number_of_features):
-#     for j in range(0,  number_of_features):
-#         # max.append(Variables.points[0][j])
-#         max.append(dataset[0][j])
-#         # for i in range(1 , len(Variables.points)): #is inclusinve?
-#         for i in range(1 , len(dataset)): #is inclusinve?
-#             # if max[j] < Variables.points[i][j]:
-#             if max[j] < dataset[i][j]:
-#                 # max[j] = Variables.points[i][j]
-#                 max[j] = dataset[i][j]
-#     
-#     logging.debug(f"max list: {max}")
-#     print("^")
-#     return max
-#
-#
-# # compress get_max() and get_min() together later
-# def get_min(number_of_features: int, dataset: list[list[float]]) -> list[float]: # pure
-#     print("v")
-#     # print(f"calculating min for {Variables.number_of_features} features")
-#     print(f"calculating min for {number_of_features} features")
-#     min: list[float] = []
-#
-#     # for j in range(0,  Variables.number_of_features):
-#     for j in range(0,  number_of_features):
-#         # min.append(Variables.points[0][j])
-#         min.append(dataset[0][j])
-#         # for i in range(1 , len(Variables.points)): #is inclusinve?
-#         for i in range(1 , len(dataset)): #is inclusinve?
-#             # if min[j] > Variables.points[i][j]:
-#             if min[j] > dataset[i][j]:
-#                 # min[j] = Variables.points[i][j]
-#                 min[j] = dataset[i][j]
-#     
-#     logging.debug(f"min list: {min}")
-#     print("^")
-#     return min
 
 
 def get_min_and_max(number_of_features: int, dataset: list[list[float]]) -> tuple[list[float], list[float]]: # pure
@@ -335,7 +343,8 @@ def download_data_set(data_loc :str) -> tuple[list[list[float]], int]:  # pure
 
 def train(k_value: int, dataset: list[list[float]], number_of_features: int, max_iterations: int) -> list[list[float]]:
     centroids = pick_random_points(k_value, number_of_features, dataset)
-    return interation_loop(k_value, dataset, centroids, number_of_features, max_iterations)
+    centroids =  interation_loop(k_value, dataset, centroids, number_of_features, max_iterations)
+    return centroids
 
 
 def ask_for_k_value_and_data_loc() -> tuple[int, str]: # pure
@@ -369,7 +378,8 @@ def main():
     k_value, data_loc = ask_for_k_value_and_data_loc()
     dataset, number_of_features = download_data_set(data_loc)
     centroids = train(k_value, dataset, number_of_features, DefaultVariables.max_iterations)
-    predict(k_value, number_of_features, centroids)
+    display_results(centroids, dataset, k_value)
+    # predict(k_value, number_of_features, centroids)
 
 
 if __name__ == "__main__":
