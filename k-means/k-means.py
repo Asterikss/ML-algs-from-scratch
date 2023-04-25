@@ -1,6 +1,6 @@
 # use pathlib later
 
-# originally in the files
+# originally in the file
 # 0 = Iris-setosa
 # 1 = Iris-versicolor
 # 2 = Iris-virginica
