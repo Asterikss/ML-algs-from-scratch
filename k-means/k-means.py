@@ -1,6 +1,6 @@
 # use pathlib later
 
-# originally in default files
+# originally in the files
 # 0 = Iris-setosa
 # 1 = Iris-versicolor
 # 2 = Iris-virginica
@@ -25,7 +25,6 @@ class DefaultVariables:
 
 
 def calc_means(points :list, number_of_features: int) -> list[float]: # pure
-    # logging.info("v - calculating means")
     new_single_k_mean :list[float] = [0 for _ in range(number_of_features)]
 
     for i in range(number_of_features):
@@ -37,7 +36,6 @@ def calc_means(points :list, number_of_features: int) -> list[float]: # pure
         mean = round(sum/len(points), 2)
         new_single_k_mean[i] = mean
 
-    # logging.info("^")
     return new_single_k_mean
 
 
@@ -71,6 +69,7 @@ def predict_cluster2(point: list[float], centroids: list[list[float]]) -> int: #
     return tmp_dist.index(min(tmp_dist)) + 1
 
 
+# TODO
 def predict(centroids: list[list[float]]):
     number_of_features = len(centroids[0])
 
@@ -139,8 +138,6 @@ def display_results(centroids: list[list[float]], dataset: list[list[float]]): #
     k_value = len(centroids)
 
     points_sorted = [[] for _ in range(k_value)]
-    # labels_table: list[int] = [0 for _ in range(k_value)]
-    # total_distance = 0
 
     for point in dataset:
         tmp_dist :list[float] = [0 for _ in range(k_value)]
@@ -148,13 +145,7 @@ def display_results(centroids: list[list[float]], dataset: list[list[float]]): #
         for i in range(k_value):
             tmp_dist[i] = calc_euclidean_distance(point, centroids[i])
 
-        logging.debug(tmp_dist)
-        # which_mean_closest = tmp_dist.index(min(tmp_dist)) if tmp_dist else -1
-        # min_distance = min(tmp_dist)
-        # total_distance += min_distance
-        which_mean_closest = tmp_dist.index(min(tmp_dist))
-        # which_mean_closest = tmp_dist.index(min_distance)
-        logging.debug(which_mean_closest)
+        which_mean_closest: int = tmp_dist.index(min(tmp_dist))
 
         points_sorted[which_mean_closest].append(point)
 
@@ -231,6 +222,7 @@ def one_full_iter(k_value: int, dataset: list[list[float]], centroids: list[list
 
         points_sorted[which_mean_closest].append(point)
 
+    # v - Just throwing an error for now
     # Sometimes, with few data points, there can be a situation where none
     # of the points are closest to a particualr starting mean. Therefore
     # an empty list is created. I'm populating it here with big numbers
@@ -371,7 +363,9 @@ def download_data_set(data_loc :str) -> tuple[list[list[float]], int]:  # pure
     return dataset, number_of_features
 
 
-def train(k_value: int, dataset: list[list[float]], number_of_features: int, max_iterations: int) -> list[list[float]]:
+def train(k_value: int, dataset: list[list[float]], number_of_features: int, \ 
+          max_iterations: int) -> list[list[float]]: # pure
+
     centroids = pick_random_points(k_value, number_of_features, dataset)
     centroids =  iteration_loop(k_value, dataset, centroids, number_of_features, max_iterations)
     return centroids
