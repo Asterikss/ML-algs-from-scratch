@@ -2,6 +2,7 @@
 from enum import Enum
 import logging
 import random
+import os
 class Variables:
     data_loc = ""
     train_data = []
@@ -198,7 +199,12 @@ def ask_for_data_loc():
             Variables.data_loc = "data/iris_training.txt"
             missing_input = False
         elif data_loc == 0:
-            data_loc = str(input("Enter custom data location: "))
+            # data_loc = str(input("Enter custom data location: "))
+            while True:
+                data_loc = str(input("Enter custom data location (with ""): "))
+                if os.path.exists(data_loc):
+                    break
+                print("The file does not exits")
             Variables.data_loc = data_loc
             missing_input = False
         else:
