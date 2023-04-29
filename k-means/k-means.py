@@ -371,7 +371,7 @@ def train(k_value: int, dataset: list[list[float]], number_of_features: int, max
     return centroids
 
 
-def ask_for_k_value_and_data_loc() -> tuple[int, str]: # pure
+def ask_for_k_value_and_data_loc() -> tuple[int, str]: # ~~pure
     while True:
         k = int(input("Enter k value (int): "))
         if 1 < k < 7:
@@ -387,11 +387,8 @@ def ask_for_k_value_and_data_loc() -> tuple[int, str]: # pure
             while True:
                 data_loc = str(input("Enter custom data location (with ""): "))
                 if os.path.exists(data_loc):
-                    break
+                    return k, str(input("Enter custom data location (with ""): "))
                 print("The file does not exits")
-            return k, str(input("Enter custom data location (with ""): "))
-        else:
-            print("Enter valid input")
 
 
 def init():

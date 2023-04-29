@@ -1,20 +1,15 @@
 "Pereptron that predicts if a flower is an Iris-setosa (1)"
+from dataclasses import dataclass
 from enum import Enum
 import logging
 import random
 import os
+from re import split
 class Variables:
     data_loc = ""
     train_data = []
     predict_data = []
     number_of_features = 0
-
-
-class DefaultVariables:
-    level = logging.INFO
-    # level = logging.DEBUG
-    fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
-    logging.basicConfig(level = level, format = fmt) # filename = 'log_x.log', filemode = "w"
 
 
 class TypeOfRead(Enum):
@@ -124,10 +119,13 @@ class Perceptron:
         if choice == "1" or choice == "3":
 
             if choice == "1":
-                download_data_set("data/iris_test.txt", TypeOfRead.PREDICTING)
+                dataset, number_of_features = download_data_set("data/iris_test.txt") 
+                Variables.predict_data = dataset
             if choice == "3":
                 path = str(input("Provide path: "))
-                download_data_set(path, TypeOfRead.PREDICTING)
+                dataset, number_of_features = download_data_set(path)
+                print(number_of_features)
+                Variables.predict_data = dataset
 
             logging.debug(Variables.predict_data)
 
@@ -191,61 +189,62 @@ def dot_product(X: list, weights: list) -> int:
     return round(result, 2)
 
 
-def ask_for_data_loc():
-    missing_input = True
-    while missing_input:
-        data_loc = int(input("For default data location type 1. Otherwise type 0: "))
-        if data_loc == 1:
-            Variables.data_loc = "data/iris_training.txt"
-            missing_input = False
-        elif data_loc == 0:
-            # data_loc = str(input("Enter custom data location: "))
+def ask_for_data_loc() -> str: # ~~pure
+    while True:
+        answer = int(input("For default data location type 1. Otherwise type 0: "))
+        if answer == 1:
+            return "data/iris_training.txt"
+        elif answer == 0:
             while True:
                 data_loc = str(input("Enter custom data location (with ""): "))
                 if os.path.exists(data_loc):
-                    break
+                    return data_loc
                 print("The file does not exits")
-            Variables.data_loc = data_loc
-            missing_input = False
-        else:
-            print("Enter valid input")
 
 
-def get_data(line: str, read_type: TypeOfRead):
-    tmp_list: list = line.split()
+# def get_data(line: str, read_type: TypeOfRead):
+#     tmp_list: list = line.split()
+#
+#     parsed_tmp_list = []
+#     for i in range(len(tmp_list) - 1):
+#         parsed_tmp_list.append(eval(tmp_list[i]))
+#
+#     if tmp_list[-1] == "Iris-setosa":
+#         parsed_tmp_list.append(1)
+#     else:
+#         parsed_tmp_list.append(0)
+#
+#     if read_type == TypeOfRead.TRAINING:
+#         Variables.train_data.append(parsed_tmp_list)
+#     else:
+#         Variables.predict_data.append(parsed_tmp_list)
 
-    parsed_tmp_list = []
-    for i in range(len(tmp_list) - 1):
-        parsed_tmp_list.append(eval(tmp_list[i]))
 
-    if tmp_list[-1] == "Iris-setosa":
-        parsed_tmp_list.append(1)
-    else:
-        parsed_tmp_list.append(0)
-
-    if read_type == TypeOfRead.TRAINING:
-        Variables.train_data.append(parsed_tmp_list)
-    else:
-        Variables.predict_data.append(parsed_tmp_list)
-
-
-def download_data_set(data_loc :str, read_type: TypeOfRead):
-    logging.info("v")
-    logging.info("downloading data set")
+def download_data_set(data_loc :str) -> tuple[list[list[float]], int]:
+    dataset = []
 
     with open(data_loc, "r") as f:
         for line in f:
-            get_data(line, read_type)
+            splited = line.split()
+            parsed_tmp_list = [eval(splited[i]) for i in range(len(splited) - 1)]
+            if splited[-1] == "Iris-setosa":
+                parsed_tmp_list.append(1)
+            else:
+                parsed_tmp_list.append(0)
+            # get_data(line, read_type)
+            dataset.append(parsed_tmp_list)
 
-    if read_type == TypeOfRead.TRAINING:
-        Variables.number_of_features = len(Variables.train_data[0]) - 1
-        logging.info(f"number of features {len(Variables.train_data[0]) - 1}")
 
-    logging.info("^")
+    number_of_features = len(dataset[0]) - 1
+    logging.info(f"number of features {number_of_features}")
+
+    return dataset, number_of_features
 
 
-def train() -> Perceptron:
-    download_data_set(Variables.data_loc, TypeOfRead.TRAINING)
+def train(data_loc) -> Perceptron:
+    dataset, number_of_features = download_data_set(data_loc)
+    Variables.train_data = dataset
+    Variables.number_of_features = number_of_features
     perceptron = Perceptron()
     perceptron.train(Variables.train_data)
     logging.debug(perceptron.weights)
@@ -256,10 +255,19 @@ def predict(perceptron):
     perceptron.predict_data_set()
 
 
+def init():
+    level = logging.INFO
+    # level = logging.DEBUG
+    fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
+    logging.basicConfig(level = level, format = fmt) # filename = 'log_x.log', filemode = "w"
+
+
 def main():
-    ask_for_data_loc()
-    perceptron = train()
-    predict(perceptron)
+    init()
+    data_loc = ask_for_data_loc()
+    Variables.data_loc = data_loc
+    perceptron = train(data_loc)
+    # predict(perceptron)
 
 
 if __name__ == "__main__":
