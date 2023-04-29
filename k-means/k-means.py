@@ -4,6 +4,7 @@
 # 0 = Iris-setosa
 # 1 = Iris-versicolor
 # 2 = Iris-virginica
+import os
 import random
 from dataclasses import dataclass
 import logging
@@ -363,8 +364,7 @@ def download_data_set(data_loc :str) -> tuple[list[list[float]], int]:  # pure
     return dataset, number_of_features
 
 
-def train(k_value: int, dataset: list[list[float]], number_of_features: int, \ 
-          max_iterations: int) -> list[list[float]]: # pure
+def train(k_value: int, dataset: list[list[float]], number_of_features: int, max_iterations: int) -> list[list[float]]: # pure
 
     centroids = pick_random_points(k_value, number_of_features, dataset)
     centroids =  iteration_loop(k_value, dataset, centroids, number_of_features, max_iterations)
@@ -384,6 +384,11 @@ def ask_for_k_value_and_data_loc() -> tuple[int, str]: # pure
         if answer == 1:
             return k, "data/iris_training.txt"
         elif answer == 0:
+            while True:
+                data_loc = str(input("Enter custom data location (with ""): "))
+                if os.path.exists(data_loc):
+                    break
+                print("The file does not exits")
             return k, str(input("Enter custom data location (with ""): "))
         else:
             print("Enter valid input")
