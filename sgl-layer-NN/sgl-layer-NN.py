@@ -80,11 +80,11 @@ def normalization(X) -> list[float]: # pure
     return X
 
 
-def expected_output(label: int, n_outputs: int) -> list[int]: # pure?
+def expected_output(label: int, n_outputs: int) -> list[int]: # pure
     return [1 if i == label else 0 for i in range(n_outputs)]
 
 
-def calc_error(output: float, expected_output: int) -> float:# pure
+def calc_error(output: float, expected_output: int) -> float: # pure
     return math.pow(output - expected_output, 2)
 
 
