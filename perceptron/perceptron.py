@@ -1,21 +1,15 @@
 "Pereptron that predicts if a flower is an Iris-setosa (1)"
-from dataclasses import dataclass
-from enum import Enum
 import logging
 import random
 import os
-from re import split
+
+
 class Variables:
     data_loc = ""
     train_data = []
     predict_data = []
     number_of_features = 0
 
-
-class TypeOfRead(Enum):
-    TRAINING = 0
-    PREDICTING = 1
- 
 
 def step_func(x) -> int:
     logging.StreamHandler.terminator = "  "
@@ -170,15 +164,6 @@ class Perceptron:
         return self.activation_func(dot_product(X[:-1], self.weights) + self.bias)
 
 
-# For future reference
-# class State():
-    # perceptron: object = None
-    # perceptron = None
-    # perceptron = Perceptron()   
-    # Can't write None here, doesn't work later
-    # this Perceptron() will be overriten and is not used
-
-
 def dot_product(X: list, weights: list) -> int:
     result = 0
     for x, y in zip(X, weights):
@@ -202,24 +187,6 @@ def ask_for_data_loc() -> str: # ~~pure
                 print("The file does not exits")
 
 
-# def get_data(line: str, read_type: TypeOfRead):
-#     tmp_list: list = line.split()
-#
-#     parsed_tmp_list = []
-#     for i in range(len(tmp_list) - 1):
-#         parsed_tmp_list.append(eval(tmp_list[i]))
-#
-#     if tmp_list[-1] == "Iris-setosa":
-#         parsed_tmp_list.append(1)
-#     else:
-#         parsed_tmp_list.append(0)
-#
-#     if read_type == TypeOfRead.TRAINING:
-#         Variables.train_data.append(parsed_tmp_list)
-#     else:
-#         Variables.predict_data.append(parsed_tmp_list)
-
-
 def download_data_set(data_loc :str) -> tuple[list[list[float]], int]:
     dataset = []
 
@@ -231,7 +198,6 @@ def download_data_set(data_loc :str) -> tuple[list[list[float]], int]:
                 parsed_tmp_list.append(1)
             else:
                 parsed_tmp_list.append(0)
-            # get_data(line, read_type)
             dataset.append(parsed_tmp_list)
 
 
@@ -267,7 +233,7 @@ def main():
     data_loc = ask_for_data_loc()
     Variables.data_loc = data_loc
     perceptron = train(data_loc)
-    # predict(perceptron)
+    predict(perceptron)
 
 
 if __name__ == "__main__":
