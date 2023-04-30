@@ -3,6 +3,7 @@ from enum import Enum
 import logging
 import random
 import os
+import pathlib
 import math
 
 
@@ -179,30 +180,32 @@ class NeuralNetwork():
         print("|")
 
 
-def ask_for_data_loc() -> str: # pure
+def ask_for_data_loc() -> pathlib.Path: # ~~pure
     while True:
         answer = int(input("For default data location type 1. Otherwise type 0: "))
         if answer == 1:
-            return "data/training"
+            return pathlib.Path("data/training")
         elif answer == 0:
-            return str(input("Enter custom data location: "))
-        else:
-            print("Enter valid input")
+            while True:
+                path = pathlib.Path(str(input("Enter custom data location: ")))
+                if path.exists():
+                    return path
+                print("Path not found")
 
 
-def download_data_set(root_directory: str) -> tuple[list[list[int]], list[str]]: # pure
+def download_data_set(root_directory: pathlib.Path) -> tuple[list[list[int]], list[str]]: # pure
     logging.info("v - downloading data set")
     collected_data = []
     lang_table = []
     # Iterate over all files and directories in the root directory recursively
-    for dirpath, _, filenames in os.walk(root_directory): # _ = dirnames
+    for dirpath, _, filenames in os.walk(str(root_directory)): # _ = dirnames
         for fname in filenames:
             if fname.endswith(".txt"):
                 dir_name = os.path.basename(dirpath)
 
                 logging.debug(os.path.join(dirpath, fname))
                 with open(os.path.join(dirpath, fname), 'r', encoding="utf-8") as file:
-                    data = file.read() # Maby there is smth more effc
+                    data = file.read()
                 
                 vec = convert_txt_to_vector(data)
 
@@ -274,6 +277,7 @@ def main():
 
     custom_prediction(neural_network)
 
+    # TODO
     # logging.debug("##############################")
     # for example in train_data:
     #     output: list[float] = neural_network.feed_forward(example)
