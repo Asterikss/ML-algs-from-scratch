@@ -14,7 +14,7 @@ def ask_for_data_loc() -> pathlib.Path: # ~~pure
                 print("Path not found")
 
 
-def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int]: # pure
+def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int, list[str]]: # pure
     collected_data = []
     label_tabel = []
     
@@ -35,7 +35,7 @@ def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int]: # 
     number_of_feature = len(collected_data[0]) - 1
     logging.info(f"Number of features: {number_of_feature}")
 
-    return collected_data, number_of_feature
+    return collected_data, number_of_feature, label_tabel
 
 
 
@@ -47,10 +47,9 @@ def init():
 
 
 def main():
+    init()
     data_loc: pathlib.Path = ask_for_data_loc()
-    dataset, number_of_feature = downlad_dataset(data_loc)
-    print(dataset)
-    ...
+    dataset, number_of_feature, label_tabel = downlad_dataset(data_loc)
 
 
 if __name__ == "__main__":
