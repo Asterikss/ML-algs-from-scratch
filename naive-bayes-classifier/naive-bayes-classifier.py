@@ -14,29 +14,49 @@ def ask_for_data_loc() -> pathlib.Path: # ~~pure
                 print("Path not found")
 
 
-def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int, list[str]]: # pure
+def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int, list[str], list[int]]: # pure
     collected_data = []
     label_tabel = []
+    # not using a dict since indexes matter
+    label_occurrence_tabel = []
     
 
     with open(data_loc, "r", encoding="utf-8") as f:
         for line in f:
             splited: list[str] = line.split()
-            decoted: list[float] = [eval(splited[i]) for i in range(len(splited) - 1)]
+            decoded: list[float] = [eval(splited[i]) for i in range(len(splited) - 1)]
 
             label = splited[-1]
             if label not in label_tabel:
                 label_tabel.append(label)
+                label_occurrence_tabel.append(0)
 
-            decoted.append(label_tabel.index(label))
+            index = label_tabel.index(label)
+            decoded.append(index)
+            label_occurrence_tabel[index] += 1
             
-            collected_data.append(decoted)
+            collected_data.append(decoded)
 
     number_of_feature = len(collected_data[0]) - 1
     logging.info(f"Number of features: {number_of_feature}")
+    logging.info(f"Label table: {label_tabel}")
+    logging.info(f"Label occurrence table: {label_occurrence_tabel}")
+    logging.info(f"Length of the dataset: {len(collected_data)}")
 
-    return collected_data, number_of_feature, label_tabel
+    return collected_data, number_of_feature, label_tabel, label_occurrence_tabel
 
+
+def calc_prior_prob(label_occurrence_tabel: list[int], n_of_examples: int) -> list[float]: # pure
+    prior_prob = []
+    for n_of_given_label in label_occurrence_tabel:
+        prior_prob.append(n_of_given_label / n_of_examples)
+
+    logging.info(f"Prior probabilities : {prior_prob}")
+    return prior_prob
+
+
+def train():
+    ...
 
 
 def init():
@@ -49,7 +69,8 @@ def init():
 def main():
     init()
     data_loc: pathlib.Path = ask_for_data_loc()
-    dataset, number_of_feature, label_tabel = downlad_dataset(data_loc)
+    dataset, number_of_feature, label_tabel, label_occurrence_tabel = downlad_dataset(data_loc)
+    prior_probability: list[float] = calc_prior_prob(label_occurrence_tabel, len(dataset))
 
 
 if __name__ == "__main__":
