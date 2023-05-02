@@ -91,13 +91,22 @@ def train():
 
 def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]], n_bins=3) -> list[list[float]]: # pure
     binned_dataset: list[list[float]] = []
-    bins: list[list[float]] = []
 
-    intervals = [round((min_and_max_table[i][1] - min_and_max_table[i][0]) / n_bins, 2) for i in range(len(min_and_max_table))]
-    print(intervals)
+    intervals_len: list[float] = [round((min_and_max_table[i][1] - min_and_max_table[i][0]) / n_bins, 2) for i in range(len(min_and_max_table))]
+    logging.info(f"Intervals length: {intervals_len}")
+    
+    bins = []
+    for j in range(len(min_and_max_table)):
+        bins.append([[min_and_max_table[j][0] + (intervals_len[j] * i), min_and_max_table[j][0] + (intervals_len[j] * (i + 1))] for i in range(n_bins)])
+    logging.info(f"Bins: {bins}")
+
+    # for example in dataset:
+    #     pass
 
 
-    return []
+
+
+    return binned_dataset
     # for example in dataset:
     #     pass
 
