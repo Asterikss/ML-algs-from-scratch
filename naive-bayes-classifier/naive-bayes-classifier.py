@@ -14,7 +14,7 @@ def ask_for_data_loc() -> pathlib.Path: # ~~pure
                 print("Path not found")
 
 
-def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int, list[str], list[int]]: # pure
+def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int, list[str], list[int], list[list[float]]]: # pure
     collected_data = []
     label_tabel = []
     # ^, v - not using a dict since indexes matter
@@ -74,7 +74,7 @@ def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int, lis
     logging.info(f"Length of the dataset: {len(collected_data)}")
     logging.info(f"min and max table: {min_and_max_table}")
 
-    return collected_data, number_of_feature, label_tabel, label_occurrence_tabel
+    return collected_data, number_of_feature, label_tabel, label_occurrence_tabel, min_and_max_table
 
 
 def calc_prior_prob(label_occurrence_tabel: list[int], n_of_examples: int) -> list[float]: # pure
@@ -89,6 +89,20 @@ def calc_prior_prob(label_occurrence_tabel: list[int], n_of_examples: int) -> li
 def train():
     ...
 
+def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]], n_bins=3) -> list[list[float]]: # pure
+    binned_dataset: list[list[float]] = []
+    bins: list[list[float]] = []
+
+    intervals = [round((min_and_max_table[i][1] - min_and_max_table[i][0]) / n_bins, 2) for i in range(len(min_and_max_table))]
+    print(intervals)
+
+
+    return []
+    # for example in dataset:
+    #     pass
+
+
+
 
 def init():
     level = logging.INFO
@@ -100,8 +114,9 @@ def init():
 def main():
     init()
     data_loc: pathlib.Path = ask_for_data_loc()
-    dataset, number_of_feature, label_tabel, label_occurrence_tabel = downlad_dataset(data_loc)
+    dataset, number_of_feature, label_tabel, label_occurrence_tabel, min_and_max_table = downlad_dataset(data_loc)
     prior_probability: list[float] = calc_prior_prob(label_occurrence_tabel, len(dataset))
+    binned_dataset = bin_dataset(dataset, min_and_max_table)
 
 
 if __name__ == "__main__":
