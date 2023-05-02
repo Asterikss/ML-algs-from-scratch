@@ -32,7 +32,6 @@ def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int, lis
     with open(data_loc, "r", encoding="utf-8") as f:
         for line in f:
             splited: list[str] = line.split()
-            # decoded2: list[float] = [eval(splited[i]) for i in range(len(splited) - 1)]
             if firstTime:
                     min_and_max_table: list[list[float]] = [[0,0] for _ in range(len(splited) - 1)]
             
@@ -91,20 +90,37 @@ def train():
 
 def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]], n_bins=3) -> list[list[float]]: # pure
     binned_dataset: list[list[float]] = []
+    print(binned_dataset)
 
     intervals_len: list[float] = [round((min_and_max_table[i][1] - min_and_max_table[i][0]) / n_bins, 2) for i in range(len(min_and_max_table))]
     logging.info(f"Intervals length: {intervals_len}")
     
-    bins = []
+    bins: list[list[list[float]]] = []
+
     for j in range(len(min_and_max_table)):
         bins.append([[min_and_max_table[j][0] + (intervals_len[j] * i), min_and_max_table[j][0] + (intervals_len[j] * (i + 1))] for i in range(n_bins)])
+
     logging.info(f"Bins: {bins}")
 
-    # for example in dataset:
-    #     pass
+    # Allocate each feature in each example in the dataset to its bean (replace it with the index of the bin that it lies in for the given feature).
+    # Seperate bins are created for every feature. Number of bins = n_bins * n_features
+    for example in dataset:
+        tmp_binned_example = []
+        for i in range(len(example) - 1):
+            allocated_to_bin_index = -1
+            for j in range(n_bins):
+                if example[i] >= bins[i][j][0] and example[i] <= bins[i][j][1]:
+                    allocated_to_bin_index = j
+
+            tmp_binned_example.append(allocated_to_bin_index)
+
+        tmp_binned_example.append(example[-1])
+        binned_dataset.append(tmp_binned_example)
 
 
-
+    print(dataset)
+    print("--------------")
+    print(binned_dataset)
 
     return binned_dataset
     # for example in dataset:
