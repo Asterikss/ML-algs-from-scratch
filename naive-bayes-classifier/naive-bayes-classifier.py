@@ -1,11 +1,32 @@
 import pathlib
 import logging
+from enum import Enum
 
-def ask_for_data_loc() -> pathlib.Path: # ~~pure
+
+class InputType(Enum):
+    FOR_BASE_MODEL = 0
+    FOR_PREDICTION = 1
+
+
+class NumberOfFeaturesError(Exception):
+    pass
+
+
+class MissmatchInLabels(Exception):
+    pass
+
+
+def ask_for_data_loc(input_type: InputType) -> pathlib.Path: # ~~pure
     while True:
         answer = int(input("For default data location type 1. Otherwise type 0: "))
         if answer == 1:
-            return pathlib.Path("data/" + "iris_training.txt")
+            if input_type == InputType.FOR_BASE_MODEL:
+                # not including "/" does not work when
+                # oppening a file with: with open...
+                # Will look into it later
+                return pathlib.Path("data/" + "iris_training.txt")
+            else:
+                return pathlib.Path("data/" + "iris_test.txt")
         elif answer == 0:
             while True:
                 custom_path = pathlib.Path((input("Enter custom data location")))
@@ -88,7 +109,23 @@ def calc_prior_prob(label_occurrence_tabel: list[int], n_of_examples: int) -> li
 def train():
     ...
 
-def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]], n_bins=3) -> list[list[float]]: # pure
+
+def bin_single_vector(vector: list[float], bins: list[list[list[float]]]) -> list[float]: # pure
+    tmp_binned_example = []
+    for i in range(len(vector) - 1):
+        allocated_to_bin_index = -1
+        for j in range(len(bins[0])):
+            if vector[i] >= bins[i][j][0] and vector[i] <= bins[i][j][1]:
+                allocated_to_bin_index = j
+
+        tmp_binned_example.append(allocated_to_bin_index)
+
+    tmp_binned_example.append(vector[-1])
+
+    return tmp_binned_example
+
+
+def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]], n_bins=3) -> tuple[list[list[float]], list[list[list[float]]]]: # pure
     binned_dataset: list[list[float]] = []
     print(binned_dataset)
 
@@ -104,29 +141,44 @@ def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]]
 
     # Allocate each feature in each example in the dataset to its bean (replace it with the index of the bin that it lies in for the given feature).
     # Seperate bins are created for every feature. Number of bins = n_bins * n_features
-    for example in dataset:
-        tmp_binned_example = []
-        for i in range(len(example) - 1):
-            allocated_to_bin_index = -1
-            for j in range(n_bins):
-                if example[i] >= bins[i][j][0] and example[i] <= bins[i][j][1]:
-                    allocated_to_bin_index = j
-
-            tmp_binned_example.append(allocated_to_bin_index)
-
-        tmp_binned_example.append(example[-1])
-        binned_dataset.append(tmp_binned_example)
-
-
-    print(dataset)
-    print("--------------")
-    print(binned_dataset)
-
-    return binned_dataset
     # for example in dataset:
-    #     pass
+    #     tmp_binned_example = []
+    #     for i in range(len(example) - 1):
+    #         allocated_to_bin_index = -1
+    #         for j in range(n_bins):
+    #             if example[i] >= bins[i][j][0] and example[i] <= bins[i][j][1]:
+    #                 allocated_to_bin_index = j
+    #
+    #         tmp_binned_example.append(allocated_to_bin_index)
+    #
+    #     tmp_binned_example.append(example[-1])
+    #     binned_dataset.append(tmp_binned_example)
+
+    for example in dataset:
+        binned_dataset.append(bin_single_vector(example, bins))
 
 
+    logging.debug(dataset)
+    logging.debug("--------------")
+    logging.debug(binned_dataset)
+
+    return binned_dataset, bins
+
+
+def predict_dataset(dataset: list[list[float]], bins: list[list[list[float]]]):
+    ...
+
+
+def check_compatibility(number_of_feature1, number_of_feature2, label_tabel1, label_tabel2):
+    if number_of_feature1 != number_of_feature2:
+        raise NumberOfFeaturesError("Number of features is differ between datasets." +
+                                    " If the second dataset does not hava labels, add dummy labels."+
+                                    " (Must be one of the actuall labels from first dataset)")
+
+    for label in label_tabel2:
+        if label not in label_tabel1:
+            raise MissmatchInLabels("Some labels from the second "+
+                                    "dataset are not present in the first one")
 
 
 def init():
@@ -138,10 +190,17 @@ def init():
 
 def main():
     init()
-    data_loc: pathlib.Path = ask_for_data_loc()
+    data_loc: pathlib.Path = ask_for_data_loc(InputType.FOR_BASE_MODEL)
     dataset, number_of_feature, label_tabel, label_occurrence_tabel, min_and_max_table = downlad_dataset(data_loc)
     prior_probability: list[float] = calc_prior_prob(label_occurrence_tabel, len(dataset))
-    binned_dataset = bin_dataset(dataset, min_and_max_table)
+    binned_dataset, bins = bin_dataset(dataset, min_and_max_table)
+    
+    predict_dataset_loc = ask_for_data_loc(InputType.FOR_PREDICTION)
+    # dataset_for_prediction, number_of_feature, label_tabel, label_occurrence_tabel, min_and_max_table = downlad_dataset(predict_dataset_loc)
+    dataset_for_prediction, number_of_feature_pred, label_tabel_pred, label_occurrence_tabel_pred, _ = downlad_dataset(predict_dataset_loc)
+    check_compatibility(number_of_feature, number_of_feature_pred, label_tabel, label_tabel_pred)
+    print(dataset_for_prediction)
+    predict_dataset(dataset_for_prediction, bins)
 
 
 if __name__ == "__main__":
