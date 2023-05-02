@@ -110,7 +110,7 @@ def train():
     ...
 
 
-def bin_single_vector(vector: list[float], bins: list[list[list[float]]]) -> list[float]: # pure
+def bin_single_vector(vector: list[float], bins: list[list[list[float]]]) -> list[int]: # pure
     tmp_binned_example = []
     for i in range(len(vector) - 1):
         allocated_to_bin_index = -1
@@ -125,9 +125,9 @@ def bin_single_vector(vector: list[float], bins: list[list[list[float]]]) -> lis
     return tmp_binned_example
 
 
-def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]], n_bins=3) -> tuple[list[list[float]], list[list[list[float]]]]: # pure
-    binned_dataset: list[list[float]] = []
-    print(binned_dataset)
+def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]], n_bins=3) -> tuple[list[list[int]], list[list[list[float]]]]: # pure
+    # binned_dataset: list[list[float]] = []
+    # print(binned_dataset)
 
     intervals_len: list[float] = [round((min_and_max_table[i][1] - min_and_max_table[i][0]) / n_bins, 2) for i in range(len(min_and_max_table))]
     logging.info(f"Intervals length: {intervals_len}")
@@ -154,8 +154,12 @@ def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]]
     #     tmp_binned_example.append(example[-1])
     #     binned_dataset.append(tmp_binned_example)
 
-    for example in dataset:
-        binned_dataset.append(bin_single_vector(example, bins))
+
+    # for example in dataset:
+    #     binned_dataset.append(bin_single_vector(example, bins))
+
+    # binned_dataset: list[list[float]] = [bin_single_vector(example, bins) for example in dataset]
+    binned_dataset: list[list[int]] = [bin_single_vector(example, bins) for example in dataset]
 
 
     logging.debug(dataset)
@@ -164,12 +168,31 @@ def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]]
 
     return binned_dataset, bins
 
-
-def predict_dataset(dataset: list[list[float]], bins: list[list[list[float]]]):
+def calc_prob_for_a_feature_for_given_label(feauter_value: int, feauter_idx: int, label: str, orig_label_tabel: list[str]):
     ...
 
+def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str], bins: list[list[list[float]]], prior_probability: list[float], orig_label_tabel: list[str]):
+    
+    for example in new_dataset:
+        probability: float = 0
+        binned_example: list[int] = bin_single_vector(example, bins)
 
-def check_compatibility(number_of_feature1, number_of_feature2, label_tabel1, label_tabel2):
+        probability_tabel: list[float] = [0 for _ in orig_label_tabel]
+        print(probability_tabel)
+        
+        for i in range(len(probability_tabel)):
+            probability = prior_probability[i]
+
+            for j in range(len(example) - 1):
+                probability_for_a_feature = calc_prob_for_a_feature_for_given_label(binned_example[j], j, new_label_table[binned_example[-1]], orig_label_tabel)
+
+
+
+# TODO impl downloading second dataset in a better way to ensure it will be okey in case of the order of labels being changed
+
+
+
+def check_compatibility(number_of_feature1, number_of_feature2, label_tabel1, label_tabel2): # pure
     if number_of_feature1 != number_of_feature2:
         raise NumberOfFeaturesError("Number of features is differ between datasets." +
                                     " If the second dataset does not hava labels, add dummy labels."+
@@ -200,7 +223,8 @@ def main():
     dataset_for_prediction, number_of_feature_pred, label_tabel_pred, label_occurrence_tabel_pred, _ = downlad_dataset(predict_dataset_loc)
     check_compatibility(number_of_feature, number_of_feature_pred, label_tabel, label_tabel_pred)
     print(dataset_for_prediction)
-    predict_dataset(dataset_for_prediction, bins)
+    
+    predict_dataset(dataset_for_prediction, label_tabel_pred, bins, prior_probability, label_tabel)
 
 
 if __name__ == "__main__":
