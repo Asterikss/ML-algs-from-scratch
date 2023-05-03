@@ -224,6 +224,8 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
             orig_label_occurrence_table, orig_binned_dataset, len(bins[0]),
             prior_probability)
 
+        # If the second dataset has labels occurring in different
+        # order, this approach will prevent issues
         pred_label = orig_label_tabel[idx_of_most_prob_label]
         true_label = new_label_table[idx_true_label]
        
@@ -234,15 +236,9 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
         
         print(f"{pred_label}\t{true_label}\tCorrect: {correct}")
 
-
         # break
 
     print(f"Accuracy: {n_correct/ len(new_dataset)}")
-
-
-
-# fixed TODO impl downloading second dataset in a better way to ensure it will be okey in case of the order of labels being changed
-
 
 
 def check_compatibility(number_of_feature1, number_of_feature2, label_tabel1, label_tabel2): # pure
