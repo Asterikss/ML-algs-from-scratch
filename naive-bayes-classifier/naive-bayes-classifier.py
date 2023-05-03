@@ -12,7 +12,7 @@ class NumberOfFeaturesError(Exception):
     pass
 
 
-class MissmatchInLabels(Exception):
+class MissmatchedLabels(Exception):
     pass
 
 
@@ -249,7 +249,7 @@ def check_compatibility(number_of_feature1, number_of_feature2, label_tabel1, la
 
     for label in label_tabel2:
         if label not in label_tabel1:
-            raise MissmatchInLabels("Some labels from the second "+
+            raise MissmatchedLabels("Some labels from the second "+
                                     "dataset are not present in the first one")
 
 
@@ -291,10 +291,8 @@ def main():
     binned_dataset, bins = bin_dataset(dataset, min_and_max_table)
     
     predict_dataset_loc = ask_for_data_loc(InputType.FOR_PREDICTION)
-    # dataset_for_prediction, number_of_feature, label_tabel, label_occurrence_tabel, min_and_max_table = downlad_dataset(predict_dataset_loc)
     dataset_for_prediction, number_of_feature_pred, label_tabel_pred, _, _ = downlad_dataset(predict_dataset_loc)
     check_compatibility(number_of_features, number_of_feature_pred, label_tabel, label_tabel_pred)
-    print(dataset_for_prediction)
     
     predict_dataset(dataset_for_prediction, label_tabel_pred, bins, prior_probability, label_tabel, binned_dataset, label_occurrence_tabel)
 
