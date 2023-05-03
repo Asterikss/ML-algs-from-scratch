@@ -169,21 +169,39 @@ def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]]
     return binned_dataset, bins
 
 
-def calc_prob_for_a_feature_for_given_label(feauter_value: int, feauter_idx: int, label: str, orig_label_tabel: list[str], orig_dataset: list[list[float]]):
-    idx_of_label_in_orig_dataset = orig_label_tabel.index(label)
+def prob_for_given_label(binned_vec: list[int],
+        feauter_idx: int, orig_label_tabel: list[str],
+        orig_dataset: list[list[float]]) -> list[float]: # pure
 
-    n_examples_with_given_label = 0
-    n_examples_with_given_label_in_same_bin = 0
+    # In case the indexes of labels in label tabels don't match
+    # idx_of_label_in_orig_dataset = orig_label_tabel.index(label)
+
+    # n_exmpl_with_given_label = 0
+    # n_exmpl_with_given_label_in_same_bin = 0
+
+    n_exmpl_with_x_label_tab = [0 for _ in orig_label_tabel]
+    n_exmpl_with_x_label_in_same_bin_tab = [0 for _ in orig_label_tabel]
+
+
     for example in orig_dataset:
-        if example[-1] == idx_of_label_in_orig_dataset:
-            n_examples_with_given_label += 1
-            if example[feauter_idx] == feauter_value:
-                n_examples_with_given_label_in_same_bin += 1
-                # here
+        label_idx: int = int(example[-1])
+
+        n_exmpl_with_x_label_tab[label_idx] += 1
+        
+        for i, binned_feature in enumerate(binned_vec):
+            if binned_feature == example[i]
+
+            
 
 
 
-    ...
+
+        if example[feauter_idx] == feauter_value:
+            n_exmpl_with_x_label_in_same_bin_tab += 1
+
+    return n_exmpl_with_x_label_in_same_bin_tab / n_exmpl_with_given_label
+
+
 
 def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
         bins: list[list[list[float]]], prior_probability: list[float],
@@ -197,10 +215,17 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
         print(probability_tabel)
         
         for i in range(len(probability_tabel)):
-            probability = prior_probability[i]
+            # probability = prior_probability[i]
+            probability_tabel[i] = prior_probability[i]
 
-            for j in range(len(example) - 1):
-                probability_for_a_feature = calc_prob_for_a_feature_for_given_label(binned_example[j], j, new_label_table[binned_example[-1]], orig_label_tabel, orig_dataset)
+            # for j in range(len(example) - 1):
+            #     # probability_for_a_feature = calc_prob_for_a_feature_for_given_label(binned_example[j], j, new_label_table[binned_example[-1]], orig_label_tabel, orig_dataset)
+            #     probability_for_a_feature = calc_prob_for_a_feature_for_given_label(binned_example[j], j, orig_label_tabel, orig_dataset)
+
+            # probability_for_a_feature = prob_for_given_label(binned_example[j], j, orig_label_tabel, orig_dataset)
+
+            probability_tabel[i] *= prob_for_given_label(binned_example, i, orig_label_tabel, orig_dataset)
+
 
 
 
