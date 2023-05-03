@@ -87,14 +87,14 @@ def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int, lis
             
             collected_data.append(decoded)
 
-    number_of_feature = len(collected_data[0]) - 1
-    logging.info(f"Number of features: {number_of_feature}")
+    number_of_features = len(collected_data[0]) - 1
+    logging.info(f"Number of features: {number_of_features}")
     logging.info(f"Label table: {label_tabel}")
     logging.info(f"Label occurrence table: {label_occurrence_tabel}")
     logging.info(f"Length of the dataset: {len(collected_data)}")
     logging.info(f"min and max table: {min_and_max_table}")
 
-    return collected_data, number_of_feature, label_tabel, label_occurrence_tabel, min_and_max_table
+    return collected_data, number_of_features, label_tabel, label_occurrence_tabel, min_and_max_table
 
 
 def calc_prior_prob(label_occurrence_tabel: list[int], n_of_examples: int) -> list[float]: # pure
@@ -220,13 +220,13 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
     for example in new_dataset:
         binned_example: list[int] = bin_single_vector(example, bins)
 
-        idx_of_most_prob_label, idx_true_label = calc_idx_most_prob_label(binned_example,
+        idx_most_prob_label, idx_true_label = calc_idx_most_prob_label(binned_example,
             orig_label_occurrence_table, orig_binned_dataset, len(bins[0]),
             prior_probability)
 
         # If the second dataset has labels occurring in different
         # order, this approach will prevent issues
-        pred_label = orig_label_tabel[idx_of_most_prob_label]
+        pred_label = orig_label_tabel[idx_most_prob_label]
         true_label = new_label_table[idx_true_label]
        
         correct = False
@@ -253,6 +253,29 @@ def check_compatibility(number_of_feature1, number_of_feature2, label_tabel1, la
                                     "dataset are not present in the first one")
 
 
+def custom_prediction(number_of_features: int, bins: list[list[list[float]]],
+          orig_label_occurrence_table: list[int], orig_binned_dataset:
+          list[list[int]], prior_prob: list[float], orig_label_tabel: list[str]):
+
+    print("Custom prediction")
+    custom_vector = []
+    for i in range(number_of_features):
+        custom_vector.append(float(input(f"Input {i+1} feature: ")))
+
+    # True label - unknown
+    custom_vector.append(-1)
+
+    binned_cust_vec: list[int] = bin_single_vector(custom_vector, bins)
+
+    idx_most_prob_label, _ = calc_idx_most_prob_label(binned_cust_vec,
+                                   orig_label_occurrence_table, orig_binned_dataset,
+                                   len(bins[0]), prior_prob)
+
+    pred_label = orig_label_tabel[idx_most_prob_label]
+
+    print(f"Prediction -> {pred_label}")
+
+
 def init():
     level = logging.INFO
     # level = logging.DEBUG
@@ -263,17 +286,19 @@ def init():
 def main():
     init()
     data_loc: pathlib.Path = ask_for_data_loc(InputType.FOR_BASE_MODEL)
-    dataset, number_of_feature, label_tabel, label_occurrence_tabel, min_and_max_table = downlad_dataset(data_loc)
+    dataset, number_of_features, label_tabel, label_occurrence_tabel, min_and_max_table = downlad_dataset(data_loc)
     prior_probability: list[float] = calc_prior_prob(label_occurrence_tabel, len(dataset))
     binned_dataset, bins = bin_dataset(dataset, min_and_max_table)
     
     predict_dataset_loc = ask_for_data_loc(InputType.FOR_PREDICTION)
     # dataset_for_prediction, number_of_feature, label_tabel, label_occurrence_tabel, min_and_max_table = downlad_dataset(predict_dataset_loc)
-    dataset_for_prediction, number_of_feature_pred, label_tabel_pred, label_occurrence_tabel_pred, _ = downlad_dataset(predict_dataset_loc)
-    check_compatibility(number_of_feature, number_of_feature_pred, label_tabel, label_tabel_pred)
+    dataset_for_prediction, number_of_feature_pred, label_tabel_pred, _, _ = downlad_dataset(predict_dataset_loc)
+    check_compatibility(number_of_features, number_of_feature_pred, label_tabel, label_tabel_pred)
     print(dataset_for_prediction)
     
     predict_dataset(dataset_for_prediction, label_tabel_pred, bins, prior_probability, label_tabel, binned_dataset, label_occurrence_tabel)
+
+    custom_prediction(number_of_features, bins, label_occurrence_tabel, binned_dataset, prior_probability, label_tabel)
 
 
 if __name__ == "__main__":
