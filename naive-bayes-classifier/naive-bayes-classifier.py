@@ -169,9 +169,9 @@ def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]]
     return binned_dataset, bins
 
 
-def prob_for_given_label(binned_vec: list[int],
-        orig_label_occurrence_table: list[int],
-        orig_binned_dataset: list[list[int]]) -> list[float]: # pure
+def prob_for_given_label(binned_vec: list[int], orig_label_occurrence_table: list[int],
+        orig_binned_dataset: list[list[int]], n_bins: int,
+        prior_prob: list[float]) -> tuple[int, int]: # pure
 
     # In case the indexes of labels in label tabels don't match
     # idx_of_label_in_orig_dataset = orig_label_tabel.index(label)
@@ -182,11 +182,13 @@ def prob_for_given_label(binned_vec: list[int],
     # n_exmpl_with_x_label_tab = [0 for _ in orig_label_tabel]
 
     # This name is funny. I know
-    for_each_label_n_exmpl_with_x_label_tab_in_same_bin: list[list[int]] = \
+    for_each_label_n_exmpl_with_x_label_in_same_bin: list[list[int]] = \
             [[0 for _ in range(len(binned_vec) - 1)] for _ in orig_label_occurrence_table]
 
     # n_exmpl_with_x_label: list[int] = [0 for _ in orig_label_occurrence_table]
 
+
+    print(f"num bins = {n_bins}")
 
     for example in orig_binned_dataset:
         label_idx: int = int(example[-1])
@@ -197,15 +199,37 @@ def prob_for_given_label(binned_vec: list[int],
         for i in range(len(binned_vec) - 1):
             # print(label_idx, binned_vec[i], example[i])
             if binned_vec[i] == example[i]:
-                for_each_label_n_exmpl_with_x_label_tab_in_same_bin[label_idx][i] += 1
+                for_each_label_n_exmpl_with_x_label_in_same_bin[label_idx][i] += 1
 
 
             
     # print(n_exmpl_with_x_label)
-    print(for_each_label_n_exmpl_with_x_label_tab_in_same_bin)
+    print(for_each_label_n_exmpl_with_x_label_in_same_bin)
 
-    # return n_exmpl_with_x_label / n_exmpl_with_given_label
-    return [3]
+    # smoothed_label_occurrence_table = orig_label_occurrence_table
+    # for tab in for_each_label_n_exmpl_with_x_label_in_same_bin:
+    #     for i, n_matched in enumerate(tab):
+    #         if n_matched == 0:
+    #             tab[i] = 1
+    
+    probability_tabel: list[float] = [1 for _ in orig_label_occurrence_table]
+
+    for i, tab in enumerate(for_each_label_n_exmpl_with_x_label_in_same_bin):
+        for n_positives_for_feature in tab:
+            if n_positives_for_feature != 0:
+                probability_tabel[i] *= n_positives_for_feature / orig_label_occurrence_table[i]
+            else:
+                probability_tabel[i] *= (n_positives_for_feature + 1) / (orig_label_occurrence_table[i] + n_bins)
+
+        probability_tabel[i] *= prior_prob[i]
+
+
+    logging.info(probability_tabel)
+    idx_most_prob_label = probability_tabel.index(max(probability_tabel))
+
+    idx_true_label = binned_vec[-1]
+
+    return idx_most_prob_label, idx_true_label
 
 
 
@@ -215,28 +239,32 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
         orig_label_occurrence_table: list[int]):
     
     # i = 0
+    n_correct = 0
+
     for example in new_dataset:
-        probability: float = 0
         binned_example: list[int] = bin_single_vector(example, bins)
 
-        probability_tabel: list[float] = [0 for _ in orig_label_tabel]
+        idx_of_most_prob_label, idx_true_label = prob_for_given_label(binned_example,
+            orig_label_occurrence_table, orig_binned_dataset, len(bins[0]),
+            prior_probability)
+
+        pred_label = orig_label_tabel[idx_of_most_prob_label]
+        true_label = new_label_table[idx_true_label]
+       
+        correct = False
+        if pred_label == true_label:
+            n_correct += 1
+            correct = True
         
-        for i in range(len(probability_tabel)):
-            # probability = prior_probability[i]
-            probability_tabel[i] = prior_probability[i]
+        print("prediction:\ttrue label:")
+        print(f"{pred_label}\t{true_label}\tCorrect: {correct}")
 
-            # for j in range(len(example) - 1):
-            #     # probability_for_a_feature = calc_prob_for_a_feature_for_given_label(binned_example[j], j, new_label_table[binned_example[-1]], orig_label_tabel, orig_dataset)
-            #     probability_for_a_feature = calc_prob_for_a_feature_for_given_label(binned_example[j], j, orig_label_tabel, orig_dataset)
-
-            # probability_for_a_feature = prob_for_given_label(binned_example[j], j, orig_label_tabel, orig_dataset)
-
-            # probability_tabel[i] *= prob_for_given_label(binned_example, i, orig_label_tabel, orig_dataset)
-        prob_for_given_label(binned_example, orig_label_occurrence_table, orig_binned_dataset)
 
         # i += 1
         # if i > 2:
         break
+
+    print(n_correct)
 
 
 
@@ -247,8 +275,8 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
 def check_compatibility(number_of_feature1, number_of_feature2, label_tabel1, label_tabel2): # pure
     if number_of_feature1 != number_of_feature2:
         raise NumberOfFeaturesError("Number of features is differ between datasets." +
-                                    " If the second dataset does not hava labels, add dummy labels."+
-                                    " (Must be one of the actuall labels from first dataset)")
+                                    " If the second dataset does not hava labels, add dummy labels"+
+                                    " and ignor it (Must be one of the actuall labels from first dataset)")
 
     for label in label_tabel2:
         if label not in label_tabel1:
