@@ -16,7 +16,7 @@ class MissmatchedLabels(Exception):
     pass
 
 
-def ask_for_data_loc(input_type: InputType) -> pathlib.Path: # ~~pure
+def ask_for_data_loc(input_type: InputType) -> pathlib.Path:
     while True:
         answer = int(input("For default data location type 1. Otherwise type 0: "))
         if answer == 1:
@@ -72,14 +72,12 @@ def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int, lis
                     elif tmp_eval > min_and_max_table[i][1]:
                         min_and_max_table[i][1] = tmp_eval
 
-            firstTime = False
-
-
 
             label = splited[-1]
             if label not in label_tabel:
                 label_tabel.append(label)
                 label_occurrence_tabel.append(0)
+                firstTime = False
 
             index = label_tabel.index(label)
             decoded.append(index)
@@ -91,7 +89,7 @@ def downlad_dataset(data_loc: pathlib.Path) -> tuple[list[list[float]], int, lis
     logging.info(f"Number of features: {number_of_features}")
     logging.info(f"Label table: {label_tabel}")
     logging.info(f"Label occurrence table: {label_occurrence_tabel}")
-    logging.info(f"Length of the dataset: {len(collected_data)}")
+    logging.info(f"Number of examples in the dataset: {len(collected_data)}")
     logging.info(f"min and max table: {min_and_max_table}")
 
     return collected_data, number_of_features, label_tabel, label_occurrence_tabel, min_and_max_table
@@ -104,10 +102,6 @@ def calc_prior_prob(label_occurrence_tabel: list[int], n_of_examples: int) -> li
 
     logging.info(f"Prior probabilities : {prior_prob}")
     return prior_prob
-
-
-def train():
-    ...
 
 
 def bin_single_vector(vector: list[float], bins: list[list[list[float]]]) -> list[int]: # pure
@@ -139,28 +133,7 @@ def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]]
 
     logging.info(f"Bins: {bins}")
 
-    # Allocate each feature in each example in the dataset to its bean (replace it with the index of the bin that it lies in for the given feature).
-    # Seperate bins are created for every feature. Number of bins = n_bins * n_features
-    # for example in dataset:
-    #     tmp_binned_example = []
-    #     for i in range(len(example) - 1):
-    #         allocated_to_bin_index = -1
-    #         for j in range(n_bins):
-    #             if example[i] >= bins[i][j][0] and example[i] <= bins[i][j][1]:
-    #                 allocated_to_bin_index = j
-    #
-    #         tmp_binned_example.append(allocated_to_bin_index)
-    #
-    #     tmp_binned_example.append(example[-1])
-    #     binned_dataset.append(tmp_binned_example)
-
-
-    # for example in dataset:
-    #     binned_dataset.append(bin_single_vector(example, bins))
-
-    # binned_dataset: list[list[float]] = [bin_single_vector(example, bins) for example in dataset]
     binned_dataset: list[list[int]] = [bin_single_vector(example, bins) for example in dataset]
-
 
     logging.debug(dataset)
     logging.debug("--------------")
@@ -181,7 +154,6 @@ def calc_idx_most_prob_label(binned_vec: list[int], orig_label_occurrence_table:
         label_idx: int = int(example[-1])
         
         for i in range(len(binned_vec) - 1):
-            # logging.debug(label_idx, binned_vec[i], example[i])
             if binned_vec[i] == example[i]:
                 for_each_label_n_exmpl_with_x_label_in_same_bin[label_idx][i] += 1
 
@@ -236,7 +208,6 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
         
         print(f"{pred_label}\t{true_label}\tCorrect: {correct}")
 
-        # break
 
     print(f"Accuracy: {n_correct/ len(new_dataset)}")
 
