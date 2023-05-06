@@ -119,9 +119,8 @@ def bin_single_vector(vector: list[float], bins: list[list[list[float]]]) -> lis
     return tmp_binned_example
 
 
-def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]], n_bins=3) -> tuple[list[list[int]], list[list[list[float]]]]: # pure
-    # binned_dataset: list[list[float]] = []
-    # print(binned_dataset)
+def bin_dataset(dataset: list[list[float]], min_and_max_table: list[list[float]],
+                n_bins=3) -> tuple[list[list[int]], list[list[list[float]]]]: # pure
 
     intervals_len: list[float] = [round((min_and_max_table[i][1] - min_and_max_table[i][0]) / n_bins, 2) for i in range(len(min_and_max_table))]
     logging.info(f"Intervals length: {intervals_len}")
@@ -196,7 +195,7 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
             orig_label_occurrence_table, orig_binned_dataset, len(bins[0]),
             prior_probability)
 
-        # If the second dataset has labels occurring in different
+        # If the test dataset has labels occurring in different
         # order, this approach will prevent issues
         pred_label = orig_label_tabel[idx_most_prob_label]
         true_label = new_label_table[idx_true_label]
@@ -212,7 +211,7 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
     print(f"Accuracy: {n_correct/ len(new_dataset)}")
 
 
-def check_compatibility(number_of_feature1, number_of_feature2, label_tabel1, label_tabel2): # pure
+def check_compatibility(number_of_feature1, number_of_feature2, label_tabel1, label_tabel2): # pure?
     if number_of_feature1 != number_of_feature2:
         raise NumberOfFeaturesError("Number of features is differ between datasets." +
                                     " If the second dataset does not hava labels, add dummy labels"+
