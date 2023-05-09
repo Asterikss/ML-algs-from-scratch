@@ -186,7 +186,6 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
         orig_label_occurrence_table: list[int]):
     
     n_correct = 0
-    # correct = False
     print("prediction:\ttrue label:")
 
     n_correct_incorrect_tab = [[0 for _ in new_label_table] for _ in new_label_table]
@@ -203,12 +202,11 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
         pred_label = orig_label_tabel[idx_most_prob_label]
         true_label = new_label_table[idx_true_label]
        
-        correct = False
         if pred_label == true_label:
             n_correct += 1
             correct = True
-        # else:
-        #     correct = not correct
+        else:
+            correct = False
     
         if correct:
             n_correct_incorrect_tab[idx_true_label][idx_true_label] += 1
