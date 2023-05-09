@@ -186,7 +186,10 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
         orig_label_occurrence_table: list[int]):
     
     n_correct = 0
+    # correct = False
     print("prediction:\ttrue label:")
+
+    n_correct_incorrect_tab = [[0 for _ in new_label_table] for _ in new_label_table]
 
     for example in new_dataset:
         binned_example: list[int] = bin_single_vector(example, bins)
@@ -204,11 +207,34 @@ def predict_dataset(new_dataset: list[list[float]], new_label_table: list[str],
         if pred_label == true_label:
             n_correct += 1
             correct = True
+        # else:
+        #     correct = not correct
+    
+        if correct:
+            n_correct_incorrect_tab[idx_true_label][idx_true_label] += 1
+        else:
+            n_correct_incorrect_tab[idx_true_label][new_label_table.index(pred_label)] += 1
+
+
         
         print(f"{pred_label}\t{true_label}\tCorrect: {correct}")
 
 
+    logging.debug(n_correct_incorrect_tab)
+
     print(f"Accuracy: {n_correct/ len(new_dataset)}")
+    print(f"            guessed ->")
+    print(f"real label  ", end="")
+    for i in range(len(n_correct_incorrect_tab)):
+        print(new_label_table[i], end=" ")
+    print()
+    for i, tab in enumerate(n_correct_incorrect_tab):
+        print(new_label_table[i], end="\t")
+              # , tab[0], tab[1])
+        for val in tab:
+            print(val, end="\t\t")
+        print()
+
 
 
 def check_compatibility(number_of_feature1, number_of_feature2, label_tabel1, label_tabel2): # pure?
@@ -266,7 +292,7 @@ def main():
     
     predict_dataset(dataset_for_prediction, label_tabel_pred, bins, prior_probability, label_tabel, binned_dataset, label_occurrence_tabel)
 
-    custom_prediction(number_of_features, bins, label_occurrence_tabel, binned_dataset, prior_probability, label_tabel)
+    # custom_prediction(number_of_features, bins, label_occurrence_tabel, binned_dataset, prior_probability, label_tabel)
 
 
 if __name__ == "__main__":
