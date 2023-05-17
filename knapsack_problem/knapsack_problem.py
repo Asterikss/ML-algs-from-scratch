@@ -78,6 +78,7 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int):
     max_score = 0
     max_size = 0
     
+    # This assumes that not all objects can fit in the knapsack
     for combination in itertools.product(*all_combinations):
 
         for i, switch in enumerate(combination):
@@ -111,7 +112,8 @@ def main():
     dataset = random.choice(dataset_examples)
     print(dataset)
 
-    brute_force(dataset, capacity)
+    max_score, max_size = brute_force(dataset, capacity)
+    print(max_score, max_size)
     
 
 if __name__ == "__main__":
