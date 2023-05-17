@@ -44,9 +44,13 @@ def download_datasets(data_loc: Path) -> list[list[tuple[int, int]]]: # pure
                 tmp_values.clear()
                 tmp_sizes.clear()
             
-    logging.debug(datasets)
+    # logging.debug(datasets)
 
     return datasets
+
+
+def brute_force(dataset: list[tuple[int, int]]):
+    ...
 
 
 def init():
@@ -63,6 +67,7 @@ def main():
     dataset_examples: list[list[tuple[int, int]]] = download_datasets(data_loc)
     dataset = random.choice(dataset_examples)
     print(dataset)
+    brute_force(dataset)
     
 
 if __name__ == "__main__":
