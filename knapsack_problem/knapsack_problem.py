@@ -15,7 +15,7 @@ def ask_for_data_loc():
             # not including "/" does not work when
             # oppening a file with .open()
             # Will look into it later
-            return Path("data/" + "knapsacks.txt")
+            return Path("data/" + "knapsacks2.txt")
         elif answer == "0":
             while True:
                 custom_path = Path((input("Enter custom data location: ")))
@@ -48,13 +48,13 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
 
 
         for i, line in enumerate(filter(desired_lines, f)):
-            print(i)
+            logging.debug(i)
 
             for val in line[line.find("{") + 1:line.find("}")].replace(",", " ").split():
                 if i%2 != 0:
-                    tmp_values.append(val)
+                    tmp_values.append(int(val))
                 else:
-                    tmp_sizes.append(val)
+                    tmp_sizes.append(int(val))
                     
             if i%2 != 0:
                 datasets.append([(tmp_sizes[j], tmp_values[j]) for j in range(len(tmp_values))])
@@ -68,6 +68,7 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
 
 def brute_force(dataset: list[tuple[int, int]], capacity: int):
     all_combinations = [[True, False] for _ in range(len(dataset))]
+    # all_combinations = [[0, 1] for _ in range(len(dataset))]
 
     score = 0
     size = 0
@@ -79,20 +80,36 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int):
     max_size = 0
     
     # This assumes that not all objects can fit in the knapsack
+    # upper_limit = 0
     for combination in itertools.product(*all_combinations):
+        # upper_limit += 1
+        # print(combination)
+        # print(max_score)
+        # print(max_size)
 
         for i, switch in enumerate(combination):
-
+            
+            # print(switch)
             last_addition_score = switch * dataset[i][1]
-            score += last_addition_score
+            # print(last_addition_score)
+            score += int(last_addition_score)
+            # print(score)
 
             last_addition_size = switch * dataset[i][0]
+            # print(last_addition_size)
             size += last_addition_size
+            # print(size)
 
             if size > capacity:
-                max_score = score - last_addition_score
-                max_size = size - last_addition_size
-                
+                if (score - last_addition_score) > max_score :
+                    max_score = score - last_addition_score
+                    max_size = size - last_addition_size
+                score = 0
+                size = 0
+                break
+               
+        # if upper_limit > 1:
+        #     break
     
     return max_score, max_size
 
@@ -110,6 +127,7 @@ def main():
     # v - [ [(3 - size, 7 - value), ..., (1, 4)], ...]
     dataset_examples, capacity = download_datasets(data_loc)
     dataset = random.choice(dataset_examples)
+    print("aaa")
     print(dataset)
 
     max_score, max_size = brute_force(dataset, capacity)
