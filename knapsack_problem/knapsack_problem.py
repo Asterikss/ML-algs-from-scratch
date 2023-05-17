@@ -1,6 +1,11 @@
 import logging
 from pathlib import Path
 import random
+import itertools
+
+
+class CapacityNotFound(Exception):
+    pass
 
 
 def ask_for_data_loc():
@@ -19,8 +24,9 @@ def ask_for_data_loc():
                 print("Path not found")
 
 
-def download_datasets(data_loc: Path) -> list[list[tuple[int, int]]]: # pure
+def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]: # pure
     datasets = []
+    capacity = 0
 
     desired_lines = lambda l: l.find("{") != -1
     # checking the index of { twice. Maby could use a function that changes the state
@@ -29,6 +35,17 @@ def download_datasets(data_loc: Path) -> list[list[tuple[int, int]]]: # pure
     with data_loc.open(mode="r") as f:
         tmp_sizes = []
         tmp_values = []
+    
+        first_line = f.readline()
+        cap_idx = first_line.index("capacity")
+        first_line_capacity = first_line[cap_idx + 8 + 1:-1]
+
+        if first_line_capacity.isdecimal():
+            capacity = int(first_line_capacity)
+            logging.debug(capacity)
+        else:
+            raise CapacityNotFound("Capacity could no be found. Be sure to use an int")
+
 
         for i, line in enumerate(filter(desired_lines, f)):
             print(i)
@@ -46,11 +63,14 @@ def download_datasets(data_loc: Path) -> list[list[tuple[int, int]]]: # pure
             
     # logging.debug(datasets)
 
-    return datasets
+    return datasets, capacity
 
 
-def brute_force(dataset: list[tuple[int, int]]):
-    ...
+def brute_force(dataset: list[tuple[int, int]], capacity: int):
+    all_combinations = [[True, False] for _ in range(len(dataset))]
+    
+    for c in itertools.product(*all_combinations):
+        print(c)
 
 
 def init():
@@ -63,11 +83,12 @@ def init():
 def main():
     init()
     data_loc: Path = ask_for_data_loc()
-    # v - [ [(3 - size, 7 - value), ..., (1, 4)], ..., [(2, 3), ..., (4, 5)] ]
+    # v - [ [(3 - size, 7 - value), ..., (1, 4)], ...]
     dataset_examples: list[list[tuple[int, int]]] = download_datasets(data_loc)
     dataset = random.choice(dataset_examples)
     print(dataset)
-    brute_force(dataset)
+                             # read capacity
+    # brute_force(dataset, 40)
     
 
 if __name__ == "__main__":
