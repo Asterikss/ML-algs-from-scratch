@@ -68,9 +68,32 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
 
 def brute_force(dataset: list[tuple[int, int]], capacity: int):
     all_combinations = [[True, False] for _ in range(len(dataset))]
+
+    score = 0
+    size = 0
+
+    last_addition_size = 0
+    last_addition_score = 0
+
+    max_score = 0
+    max_size = 0
     
-    for c in itertools.product(*all_combinations):
-        print(c)
+    for combination in itertools.product(*all_combinations):
+
+        for i, switch in enumerate(combination):
+
+            last_addition_score = switch * dataset[i][1]
+            score += last_addition_score
+
+            last_addition_size = switch * dataset[i][0]
+            size += last_addition_size
+
+            if size > capacity:
+                max_score = score - last_addition_score
+                max_size = size - last_addition_size
+                
+    
+    return max_score, max_size
 
 
 def init():
@@ -84,11 +107,11 @@ def main():
     init()
     data_loc: Path = ask_for_data_loc()
     # v - [ [(3 - size, 7 - value), ..., (1, 4)], ...]
-    dataset_examples: list[list[tuple[int, int]]] = download_datasets(data_loc)
+    dataset_examples, capacity = download_datasets(data_loc)
     dataset = random.choice(dataset_examples)
     print(dataset)
-                             # read capacity
-    # brute_force(dataset, 40)
+
+    brute_force(dataset, capacity)
     
 
 if __name__ == "__main__":
