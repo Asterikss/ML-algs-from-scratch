@@ -136,7 +136,7 @@ def init():
 def main():
     init()
     data_loc: Path = ask_for_data_loc()
-    # v - [ [(3 - size, 7 - value), ..., (1, 4)], ...]
+    # v - [ [(3 - size, 7 - value), ...], ...]
     dataset_examples, capacity = download_datasets(data_loc)
     dataset = random.choice(dataset_examples)
     print("aaa")
