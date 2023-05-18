@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 import random
 import itertools
+from typing import final
 
 
 class CapacityNotFound(Exception):
@@ -30,7 +31,7 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
 
     desired_lines = lambda l: l.find("{") != -1
     # checking the index of { twice. Maby could use a function that changes the state
-    # outside of it, so it can "return" two values and still can be used inside filter()
+    # outside of it, so it can "return" "two values" and still could be used inside filter()
 
     with data_loc.open(mode="r") as f:
         tmp_sizes = []
@@ -66,7 +67,7 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
     return datasets, capacity
 
 
-def brute_force(dataset: list[tuple[int, int]], capacity: int):
+def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int, list[int]]:
     all_combinations = [[True, False] for _ in range(len(dataset))]
     # all_combinations = [[0, 1] for _ in range(len(dataset))]
 
@@ -78,10 +79,13 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int):
 
     max_score = 0
     max_size = 0
+
+    final_object_idxs = []
     
     # This assumes that not all objects can fit in the knapsack
     # upper_limit = 0
     for combination in itertools.product(*all_combinations):
+        object_idxs = []
         # upper_limit += 1
         # print(combination)
         # print(max_score)
@@ -100,18 +104,26 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int):
             size += last_addition_size
             # print(size)
 
+            if switch:
+                object_idxs.append(i)
+
             if size > capacity:
                 if (score - last_addition_score) > max_score :
                     max_score = score - last_addition_score
                     max_size = size - last_addition_size
-                score = 0
-                size = 0
+                    object_idxs.pop()
+                    final_object_idxs = object_idxs
                 break
                
+
+        score = 0
+        size = 0
+        
         # if upper_limit > 1:
         #     break
+    print(final_object_idxs)
     
-    return max_score, max_size
+    return max_score, max_size, final_object_idxs
 
 
 def init():
@@ -130,7 +142,7 @@ def main():
     print("aaa")
     print(dataset)
 
-    max_score, max_size = brute_force(dataset, capacity)
+    max_score, max_size, final_object_idxs = brute_force(dataset, capacity)
     print(max_score, max_size)
     
 
