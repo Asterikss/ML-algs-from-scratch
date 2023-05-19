@@ -44,13 +44,11 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
 
         if first_line_capacity.isdecimal():
             capacity = int(first_line_capacity)
-            logging.debug(capacity)
         else:
             raise CapacityNotFound("Capacity could no be found. Be sure to use an int")
 
 
         for i, line in enumerate(filter(desired_lines, f)):
-            logging.debug(i)
 
             for val in line[line.find("{") + 1:line.find("}")].replace(",", " ").split():
                 if i%2 != 0:
@@ -69,7 +67,6 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
 
 def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int, list[int], float]: # pure
     all_combinations = [[True, False] for _ in range(len(dataset))]
-    # all_combinations = [[0, 1] for _ in range(len(dataset))]
 
     score = 0
     size = 0
@@ -89,16 +86,11 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int
 
         for i, switch in enumerate(combination):
             
-            # print(switch)
             last_addition_score = switch * dataset[i][1]
-            # print(last_addition_score)
             score += int(last_addition_score)
-            # print(score)
 
             last_addition_size = switch * dataset[i][0]
-            # print(last_addition_size)
             size += last_addition_size
-            # print(size)
 
             if switch:
                 object_idxs.append(i)
@@ -122,18 +114,62 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int
     return max_score, max_size, final_object_idxs, seconds_needed
 
 
-def print_results(dataset: list[tuple[int, int]], max_score: int, max_size: int,
-                  final_object_idxs: list[int], capacity: int, time_sec_brute: float): 
-
+def print_results(dataset: list[tuple[int, int]], max_score: int, max_size: int, time_sec_brute: float,
+                  capacity: int, final_item_idxs: list[int]=[], item_list: list[tuple[int, int]]=[]): 
+    print("\nResults:\n")
     print("Dataset choosen:")
     print(dataset)
     print("Selected items:")
-    for idx in final_object_idxs:
-        print(f"idx - {idx} size - {dataset[idx][0]} value - {dataset[idx][1]}")
+
+    if not item_list and final_item_idxs:
+        for idx in final_item_idxs:
+            print(f"idx - {idx} size - {dataset[idx][0]} value - {dataset[idx][1]}")
+
+    elif not final_item_idxs and item_list:
+        for item in item_list:
+            print(f"idx - {dataset.index(item)} size - {item[0]} value - {item[1]}")
+
+    else:
+        print("Either 'final_item_idxs' or 'item_list' must be delivered to the function")
 
     print(f"Final score: {max_score}")
     print(f"Capacity used: {max_size}/{capacity}")
-    print(f"Time taken: {time_sec_brute}")
+    print(f"Time taken: {time_sec_brute}s")
+
+
+def heuristic_approach(dataset: list[tuple[int, int]], capacity: int):
+    max_size = 0
+    max_score = 0
+    last_idx = 0
+
+    size = 0
+    score = 0
+
+    last_addition_size = 0
+    last_addition_score = 0
+
+    t0 = time.monotonic_ns()
+    sorted_dataset = sorted(dataset, key=lambda tup: tup[1] / tup[0], reverse=True)
+
+
+    for i, item in enumerate(sorted_dataset):
+        last_addition_size = item[0]
+        size += last_addition_size
+
+        last_addition_score = item[1]
+        score += last_addition_score
+
+        if size > capacity:
+            max_score = score - last_addition_score
+            max_size = size - last_addition_size
+            last_idx = i
+            break
+
+    t1 = time.monotonic_ns()
+    seconds_needed = (t1-t0)/1000000000
+
+    return max_score, max_size, sorted_dataset[:last_idx], seconds_needed
+
 
 
 def init():
@@ -150,8 +186,11 @@ def main():
 
     dataset = random.choice(dataset_examples)
 
-    max_score, max_size, final_object_idxs, time_sec_brute = brute_force(dataset, capacity)
-    print_results(dataset, max_score, max_size, final_object_idxs, capacity, time_sec_brute)
+    max_score, max_size, final_itmes_idxs, time_sec_brute = brute_force(dataset, capacity)
+    print_results(dataset, max_score, max_size, time_sec_brute, capacity, final_item_idxs=final_itmes_idxs)
+
+    max_score_h, max_size_h, final_item_list, time_sec_heuristic = heuristic_approach(dataset, capacity)
+    print_results(dataset, max_score_h, max_size_h, time_sec_heuristic, capacity, item_list=final_item_list)
     
 
 if __name__ == "__main__":
