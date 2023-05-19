@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 import random
 import itertools
-# from typing import final
+import time
 
 
 class CapacityNotFound(Exception):
@@ -63,12 +63,11 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
                 tmp_values.clear()
                 tmp_sizes.clear()
             
-    # logging.debug(datasets)
 
     return datasets, capacity
 
 
-def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int, list[int]]: # pure
+def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int, list[int], float]: # pure
     all_combinations = [[True, False] for _ in range(len(dataset))]
     # all_combinations = [[0, 1] for _ in range(len(dataset))]
 
@@ -84,13 +83,9 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int
     final_object_idxs = []
     
     # This assumes that not all objects can fit in the knapsack
-    # upper_limit = 0
+    t0 = time.monotonic_ns()
     for combination in itertools.product(*all_combinations):
         object_idxs = []
-        # upper_limit += 1
-        # print(combination)
-        # print(max_score)
-        # print(max_size)
 
         for i, switch in enumerate(combination):
             
@@ -120,15 +115,15 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int
         score = 0
         size = 0
         
-        # if upper_limit > 1:
-        #     break
-    # print(final_object_idxs)
-    
-    return max_score, max_size, final_object_idxs
+
+    t1 = time.monotonic_ns()
+    seconds_needed = (t1-t0)/1000000000
+
+    return max_score, max_size, final_object_idxs, seconds_needed
 
 
-def print_results(dataset: list[tuple[int, int]], max_score: int,
-        max_size: int, final_object_idxs: list[int], capacity: int): 
+def print_results(dataset: list[tuple[int, int]], max_score: int, max_size: int,
+                  final_object_idxs: list[int], capacity: int, time_sec_brute: float): 
 
     print("Dataset choosen:")
     print(dataset)
@@ -138,6 +133,7 @@ def print_results(dataset: list[tuple[int, int]], max_score: int,
 
     print(f"Final score: {max_score}")
     print(f"Capacity used: {max_size}/{capacity}")
+    print(f"Time taken: {time_sec_brute}")
 
 
 def init():
@@ -154,8 +150,8 @@ def main():
 
     dataset = random.choice(dataset_examples)
 
-    max_score, max_size, final_object_idxs = brute_force(dataset, capacity)
-    print_results(dataset, max_score, max_size, final_object_idxs, capacity)
+    max_score, max_size, final_object_idxs, time_sec_brute = brute_force(dataset, capacity)
+    print_results(dataset, max_score, max_size, final_object_idxs, capacity, time_sec_brute)
     
 
 if __name__ == "__main__":
