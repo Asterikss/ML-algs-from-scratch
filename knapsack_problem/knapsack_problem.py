@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 import random
 import itertools
-from typing import final
+# from typing import final
 
 
 class CapacityNotFound(Exception):
@@ -26,6 +26,7 @@ def ask_for_data_loc():
 
 
 def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]: # pure
+    # v - [ [(3 - size, 7 - value), ...], ...]
     datasets = []
     capacity = 0
 
@@ -67,7 +68,7 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
     return datasets, capacity
 
 
-def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int, list[int]]:
+def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int, list[int]]: # pure
     all_combinations = [[True, False] for _ in range(len(dataset))]
     # all_combinations = [[0, 1] for _ in range(len(dataset))]
 
@@ -121,9 +122,22 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int
         
         # if upper_limit > 1:
         #     break
-    print(final_object_idxs)
+    # print(final_object_idxs)
     
     return max_score, max_size, final_object_idxs
+
+
+def print_results(dataset: list[tuple[int, int]], max_score: int,
+        max_size: int, final_object_idxs: list[int], capacity: int): 
+
+    print("Dataset choosen:")
+    print(dataset)
+    print("Selected items:")
+    for idx in final_object_idxs:
+        print(f"idx - {idx} size - {dataset[idx][0]} value - {dataset[idx][1]}")
+
+    print(f"Final score: {max_score}")
+    print(f"Capacity used: {max_size}/{capacity}")
 
 
 def init():
@@ -136,14 +150,12 @@ def init():
 def main():
     init()
     data_loc: Path = ask_for_data_loc()
-    # v - [ [(3 - size, 7 - value), ...], ...]
     dataset_examples, capacity = download_datasets(data_loc)
+
     dataset = random.choice(dataset_examples)
-    print("aaa")
-    print(dataset)
 
     max_score, max_size, final_object_idxs = brute_force(dataset, capacity)
-    print(max_score, max_size)
+    print_results(dataset, max_score, max_size, final_object_idxs, capacity)
     
 
 if __name__ == "__main__":
