@@ -14,7 +14,7 @@ def ask_for_data_loc():
         answer = input("For default data location type 1. Otherwise type 0: ")
         if answer == "1":
             # not including "/" does not work when
-            # oppening a file with .open()
+            # opening a file with .open()
             # Will look into it later
             return Path("data/" + "knapsacks2.txt")
         elif answer == "0":
@@ -31,7 +31,7 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
     capacity = 0
 
     desired_lines = lambda l: l.find("{") != -1
-    # checking the index of { twice. Maby could use a function that changes the state
+    # checking the index of { twice. Maybe I could use a function that changes the state
     # outside of it, so it can "return" "two values" and still could be used inside filter()
 
     with data_loc.open(mode="r") as f:
@@ -80,6 +80,7 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int
     final_object_idxs = []
     
     # This assumes that not all objects can fit in the knapsack
+    # and that their sizes and their corresponding values are never zero
     t0 = time.monotonic_ns()
     for combination in itertools.product(*all_combinations):
         object_idxs = []
@@ -137,7 +138,7 @@ def print_results(dataset: list[tuple[int, int]], max_score: int, max_size: int,
     print(f"Time taken: {time_sec_brute}s")
 
 
-def heuristic_approach(dataset: list[tuple[int, int]], capacity: int):
+def heuristic_approach(dataset: list[tuple[int, int]], capacity: int): # pure
     max_size = 0
     max_score = 0
     last_idx = 0
@@ -169,7 +170,6 @@ def heuristic_approach(dataset: list[tuple[int, int]], capacity: int):
     seconds_needed = (t1-t0)/1000000000
 
     return max_score, max_size, sorted_dataset[:last_idx], seconds_needed
-
 
 
 def init():
