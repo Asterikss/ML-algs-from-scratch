@@ -65,7 +65,7 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
     return datasets, capacity
 
 
-def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int, list[int], float]: # pure
+def brute_force_init(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int, list[int], float]: # pure
     all_combinations = [[True, False] for _ in range(len(dataset))]
 
     score = 0
@@ -88,7 +88,7 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int
         for i, switch in enumerate(combination):
             
             last_addition_score = switch * dataset[i][1]
-            score += int(last_addition_score)
+            score += last_addition_score
 
             last_addition_size = switch * dataset[i][0]
             size += last_addition_size
@@ -100,13 +100,56 @@ def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int
                 if (score - last_addition_score) > max_score :
                     max_score = score - last_addition_score
                     max_size = size - last_addition_size
-                    object_idxs.pop()
+                    # object_idxs.pop()
                     final_object_idxs = object_idxs
                 break
                
 
         score = 0
         size = 0
+        
+
+    t1 = time.monotonic_ns()
+    seconds_needed = (t1-t0)/1000000000
+
+    list2 = final_object_idxs[:-1]
+    print(final_object_idxs)
+    print(list2)
+    # return max_score, max_size, final_object_idxs, seconds_needed
+    return max_score, max_size, list2, seconds_needed
+
+
+def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int, list[int], float]: # pure
+    all_combinations = [[True, False] for _ in range(len(dataset))]
+
+    score, size, max_score, max_size = 0, 0, 0, 0
+    final_object_idxs = []
+    
+    t0 = time.monotonic_ns()
+
+    # This assumes that object sizes and corresponding values are never zero
+    for combination in itertools.product(*all_combinations):
+        object_idxs = []
+        score = 0
+        size = 0
+
+        for i, switch in enumerate(combination):
+
+            # faster than multiplying by switch
+            if switch:
+                size += dataset[i][0] 
+                
+                if size > capacity:
+                    break
+
+                score += dataset[i][1]
+
+                object_idxs.append(i)
+
+                if score > max_score :
+                    max_score = score
+                    max_size = size
+                    final_object_idxs = object_idxs
         
 
     t1 = time.monotonic_ns()
