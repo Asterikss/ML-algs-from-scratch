@@ -13,9 +13,6 @@ def ask_for_data_loc():
     while True:
         answer = input("For default data location type 1. Otherwise type 0: ")
         if answer == "1":
-            # not including "/" does not work when
-            # opening a file with .open()
-            # Will look into it later
             return Path("data/" + "knapsacks2.txt")
         elif answer == "0":
             while True:
@@ -63,60 +60,6 @@ def download_datasets(data_loc: Path) -> tuple[list[list[tuple[int, int]]], int]
             
 
     return datasets, capacity
-
-
-def brute_force_init(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int, list[int], float]: # pure
-    all_combinations = [[True, False] for _ in range(len(dataset))]
-
-    score = 0
-    size = 0
-
-    last_addition_size = 0
-    last_addition_score = 0
-
-    max_score = 0
-    max_size = 0
-
-    final_object_idxs = []
-    
-    # This assumes that not all objects can fit in the knapsack
-    # and that their sizes and their corresponding values are never zero
-    t0 = time.monotonic_ns()
-    for combination in itertools.product(*all_combinations):
-        object_idxs = []
-
-        for i, switch in enumerate(combination):
-            
-            last_addition_score = switch * dataset[i][1]
-            score += last_addition_score
-
-            last_addition_size = switch * dataset[i][0]
-            size += last_addition_size
-
-            if switch:
-                object_idxs.append(i)
-
-            if size > capacity:
-                if (score - last_addition_score) > max_score :
-                    max_score = score - last_addition_score
-                    max_size = size - last_addition_size
-                    # object_idxs.pop()
-                    final_object_idxs = object_idxs
-                break
-               
-
-        score = 0
-        size = 0
-        
-
-    t1 = time.monotonic_ns()
-    seconds_needed = (t1-t0)/1000000000
-
-    list2 = final_object_idxs[:-1]
-    print(final_object_idxs)
-    print(list2)
-    # return max_score, max_size, final_object_idxs, seconds_needed
-    return max_score, max_size, list2, seconds_needed
 
 
 def brute_force(dataset: list[tuple[int, int]], capacity: int) -> tuple[int, int, list[int], float]: # pure
@@ -216,8 +159,8 @@ def heuristic_approach(dataset: list[tuple[int, int]], capacity: int): # pure
 
 
 def init():
-    # level = logging.INFO
-    level = logging.DEBUG
+    level = logging.INFO
+    # level = logging.DEBUG
     fmt = "%(levelname)s:%(lineno)d:%(funcName)s: %(message)s"
     logging.basicConfig(level = level, format = fmt) # filename = "log.log", filemode = "w"
 
