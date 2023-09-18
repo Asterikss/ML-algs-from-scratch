@@ -36,7 +36,7 @@ class Perceptron:
     def train(self, data_set) -> None:
         logging.info("v")
         for idx in range(self.n_iters):
-            logging.debug(f"~~~~~~inter {idx + 1}")
+            logging.debug(f"~~~~~~iter {idx + 1}")
             logging.debug(self.weights)
             logging.debug(self.bias)
             logging.debug("~~~~~~")
@@ -63,7 +63,7 @@ class Perceptron:
 
                     for j in range(len(x_i) - 1):
                         logging.debug(x_i[j])
-                        logging.debug(f"ubdate: {update}")
+                        logging.debug(f"update: {update}")
                         logging.debug(x_i[j] * update)
                         self.weights[j] += x_i[j] * update
                         # Multiplying the error by the input feature in the
@@ -98,7 +98,7 @@ class Perceptron:
         logging.info("^")
 
 
-    def predict_data_set(self) -> None:
+    def predict_dataset(self) -> None:
         logging.info("v")
         logging.info("prediciting data set")
 
@@ -113,11 +113,11 @@ class Perceptron:
         if choice == "1" or choice == "3":
 
             if choice == "1":
-                dataset, number_of_features = download_data_set("data/iris_test.txt") 
+                dataset, number_of_features = download_dataset("data/iris_test.txt") 
                 Variables.predict_data = dataset
             if choice == "3":
                 path = str(input("Provide path: "))
-                dataset, number_of_features = download_data_set(path)
+                dataset, number_of_features = download_dataset(path)
                 print(number_of_features)
                 Variables.predict_data = dataset
 
@@ -174,7 +174,7 @@ def dot_product(X: list, weights: list) -> int:
     return round(result, 2)
 
 
-def ask_for_data_loc() -> str: # ~~pure
+def ask_for_data_loc() -> str:
     while True:
         answer = int(input("For default data location type 1. Otherwise type 0: "))
         if answer == 1:
@@ -187,7 +187,7 @@ def ask_for_data_loc() -> str: # ~~pure
                 print("The file does not exits")
 
 
-def download_data_set(data_loc :str) -> tuple[list[list[float]], int]:
+def download_dataset(data_loc :str) -> tuple[list[list[float]], int]:
     dataset = []
 
     with open(data_loc, "r") as f:
@@ -208,7 +208,7 @@ def download_data_set(data_loc :str) -> tuple[list[list[float]], int]:
 
 
 def train(data_loc) -> Perceptron:
-    dataset, number_of_features = download_data_set(data_loc)
+    dataset, number_of_features = download_dataset(data_loc)
     Variables.train_data = dataset
     Variables.number_of_features = number_of_features
     perceptron = Perceptron()
@@ -218,7 +218,7 @@ def train(data_loc) -> Perceptron:
 
 
 def predict(perceptron):
-    perceptron.predict_data_set()
+    perceptron.predict_dataset()
 
 
 def init():
